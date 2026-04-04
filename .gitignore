@@ -1,0 +1,23 @@
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+.vs/
+*.user
+*.suo
+
+# IDE settings
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+
+# Publish output
+wwwroot/_framework/
+publish/
+
+# Logs and temporary files
+*.log
+*.tmp
