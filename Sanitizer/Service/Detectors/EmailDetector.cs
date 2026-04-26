@@ -6,8 +6,9 @@ public class EmailDetector : IDetector
 {
     // Поддерживает стандартные и Unicode/кириллические домены.
     // (?<!@) — исключает случаи вида email@domain@other.com
+    // (?<![.\w@]) — исключает совпадения внутри чужих доменов и двойных @
     private static readonly Regex EmailRegex = new(
-        @"(?<!@)[\w+][\w.+\-]*@[\w-]+(\.[\w-]+)*\.\p{L}{2,}",
+        @"(?<![.\w@])[\w+][\w.+\-]*@[\w-]+(\.[\w-]+)*\.\p{L}{2,}",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public ItemMatch[] Find(string text)
