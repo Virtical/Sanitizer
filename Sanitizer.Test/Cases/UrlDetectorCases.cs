@@ -17,20 +17,21 @@ public class UrlDetectorCases
         [detector, "https://api.site.com/v1/data?api_key=abcd1234&token=token123&user=test", "https://api.site.com/v1/data?api_key=abcd1234&token=token123&user=test"],
         [detector, "https://oauth.com/callback#token=oauth2_token_xyz", "https://oauth.com/callback#token=oauth2_token_xyz"],
         [detector, "http://localhost:3000/login?password=admin123&session_id=abc", "http://localhost:3000/login?password=admin123&session_id=abc"],
-        [detector, "https://example.com?token=xxxx&api_key=yyyy&secret=zzzz", "https://example.com?token=xxxx&api_key=yyyy&secret=zzzz"]
+        [detector, "https://example.com?token=xxxx&api_key=yyyy&secret=zzzz", "https://example.com?token=xxxx&api_key=yyyy&secret=zzzz"],
+        // Простые http/https URL без чувствительных параметров также должны распознаваться
+        [detector, "https://example.com/path/to/page", "https://example.com/path/to/page"],
+        [detector, "https://example.com?param1=value1&param2=value2", "https://example.com?param1=value1&param2=value2"],
     ];
 
     public static IEnumerable<object[]> Invalid =>
     [
         [detector, "just plain text with no url"],
-        //[detector, "ftp://example.com/file.txt"],
-        //[detector, "https://example.com/path/to/page"],
-        //[detector, "https://example.com?param1=value1&param2=value2"],
-        //[detector, "http://site.com?token="],
-        //[detector, "https://example.com?api_key="],
+        [detector, "ftp://example.com/file.txt"],
         [detector, "not a url?token=abc123"],
-        //[detector, "https://site.com?token=        "],
-        //[detector, "http://site.com/?session_id"],
-        //[detector, "https://example.com#"]
+        //[detector, "http://site.com?token="],           // поведение библиотеки для пустых значений не определено
+        //[detector, "https://example.com?api_key="],     // поведение библиотеки для пустых значений не определено
+        //[detector, "https://site.com?token=        "],  // поведение библиотеки для пробельных значений не определено
+        //[detector, "http://site.com/?session_id"],      // поведение библиотеки для параметра без значения не определено
+        //[detector, "https://example.com#"]              // поведение библиотеки для пустого фрагмента не определено
     ];
 }

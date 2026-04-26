@@ -21,3 +21,4 @@ publish/
 # Logs and temporary files
 *.log
 *.tmp
+.aider*
