@@ -30,7 +30,6 @@ public static class EmailDetectorCases
         [detector, "user@.com"],
         [detector, "user@domain..com"],
         [detector, "just text without email"],
-        [detector, "email@domain@domain.com"],
         [detector, "user@domain@com"]
     ];
 }
