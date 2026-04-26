@@ -3,12 +3,12 @@ using Microsoft.Recognizers.Text.Sequence;
 
 namespace Sanitizer.Service.Detectors;
 
-public class EmailDetector : IDetector
+public class UrlDetector : IDetector
 {
     public ItemMatch[] Find(string text)
     {
         return SequenceRecognizer
-            .RecognizeEmail(text, Culture.English)
+            .RecognizeURL(text, Culture.English)
             .Select(x => new ItemMatch { Value = x.Text, Position = x.Start } )
             .ToArray();
     }
