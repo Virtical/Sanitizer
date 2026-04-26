@@ -26,6 +26,9 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] SanitizationProfile profile)
     {
+        if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
+            return BadRequest("Profile.Reversible=false but one or more rules use Tokenize.");
+
         var created = await profileService.CreateAsync(profile);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
@@ -34,6 +37,9 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] SanitizationProfile profile)
     {
+        if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
+            return BadRequest("Profile.Reversible=false but one or more rules use Tokenize.");
+
         var updated = await profileService.UpdateAsync(id, profile);
         return updated is null ? NotFound() : Ok(updated);
     }

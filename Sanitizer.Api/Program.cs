@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Sanitizer.Api.Data;
 using Sanitizer.Api.Middleware;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.Storage;
@@ -33,19 +35,27 @@ var allowedOrigins = builder.Configuration
 builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
+builder.Services.AddDbContext<SanitizerDbContext>(opt =>
+    opt.UseInMemoryDatabase("SanitizerDb"));
+
 builder.Services.AddHttpClient<LlmProxyService>();
 
-// Storage (singleton — файловый доступ сериализован через SemaphoreSlim внутри)
-builder.Services.AddSingleton<IProfileStorage, JsonProfileStorage>();
-builder.Services.AddSingleton<IApiKeyStorage,  JsonApiKeyStorage>();
+builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
+builder.Services.AddScoped<IApiKeyStorage,  EfApiKeyStorage>();
 
-// Core services
 builder.Services.AddSingleton<TokenStore>();
 builder.Services.AddSingleton<DetectorRegistry>();
 builder.Services.AddSingleton<StrategyFactory>();
+builder.Services.AddSingleton<DesanitizerService>();
 builder.Services.AddScoped<SanitizerService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<ApiKeyService>();
+
+var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
+if (llmProvider == "openai")
+    builder.Services.AddScoped<ILlmClient, OpenAiLlmClient>();
+else
+    builder.Services.AddSingleton<ILlmClient, StubLlmClient>();
 
 var app = builder.Build();
 

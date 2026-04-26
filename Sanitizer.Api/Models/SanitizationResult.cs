@@ -10,6 +10,8 @@ public class SanitizationResult
     /// </summary>
     public string? SessionId { get; set; }
 
+    public SanitizationContext? Context { get; set; }
+
     public List<SanitizedItem> Items { get; set; } = new();
 }
 
