@@ -29,7 +29,7 @@ public class IpAddressDetectorCases
         [detector, "256.100.50.25"],
         [detector, "192.168.1"],
         [detector, "2001:gggg::1"],
-        //[detector, "192.168.1.1.1"],
+        [detector, "192.168.1.1.1"],
         [detector, "localhost 192.168"],
         [detector, "300.300.300.300"],
         [detector, "2001:db8::1::2"],

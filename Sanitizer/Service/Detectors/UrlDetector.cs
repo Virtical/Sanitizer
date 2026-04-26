@@ -9,7 +9,9 @@ public class UrlDetector : IDetector
     {
         return SequenceRecognizer
             .RecognizeURL(text, Culture.English)
-            .Select(x => new ItemMatch { Value = x.Text, Position = x.Start } )
+            .Where(x => x.Text.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                        x.Text.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ItemMatch { Value = x.Text, Position = x.Start })
             .ToArray();
     }
 }
