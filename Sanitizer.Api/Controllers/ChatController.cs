@@ -12,8 +12,24 @@ namespace Sanitizer.Api.Controllers;
 [Route("api/chat")]
 public class ChatController(SanitizerService sanitizerService,
                              ProfileService profileService,
-                             LlmProxyService llmProxy) : ControllerBase
+                             LlmProxyService llmProxy,
+                             ILlmClient llmClient,
+                             DesanitizerService desanitizer) : ControllerBase
 {
+    public record SanitizeRequest(string Text, string ProfileId);
+    public record RestoreRequest(string Text, string SessionId);
+
+    /// <summary>Санитизировать текст по профилю.</summary>
+    [HttpPost]
+    public async Task<IActionResult> Sanitize([FromBody] SanitizeRequest request)
+    {
+        var profile = await profileService.GetByIdAsync(request.ProfileId);
+        if (profile is null) return NotFound($"Profile '{request.ProfileId}' not found.");
+
+        var result = sanitizerService.Sanitize(request.Text, profile);
+        return Ok(result);
+    }
+
     [HttpPost("completions")]
     public async Task<IActionResult> Completions([FromBody] ChatRequest request, CancellationToken ct)
     {
@@ -55,5 +71,46 @@ public class ChatController(SanitizerService sanitizerService,
             AssistantMessage = assistantMessage,
             SanitizedItems   = allItems
         });
+    }
+
+    [HttpPost("send")]
+    public async Task<IActionResult> Send([FromBody] ChatSendRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.ProfileId))
+            return BadRequest("ProfileId is required.");
+        if (string.IsNullOrEmpty(request.Message))
+            return BadRequest("Message is required.");
+
+        var profile = await profileService.GetByIdAsync(request.ProfileId);
+        if (profile is null) return NotFound($"Profile '{request.ProfileId}' not found.");
+
+        SanitizationResult sanitization;
+        try
+        {
+            sanitization = sanitizerService.Sanitize(request.Message, profile);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+
+        string raw;
+        try
+        {
+            raw = await llmClient.GetCompletionAsync(sanitization.SanitizedText, ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(502, new { Error = "LLM provider error.", Details = ex.Message });
+        }
+
+        var final = desanitizer.Desanitize(raw, sanitization.Context);
+
+        return Ok(new ChatSendResponse(
+            SanitizedPrompt: sanitization.SanitizedText,
+            LlmRawResponse: raw,
+            FinalResponse: final,
+            SessionId: sanitization.SessionId,
+            SanitizedItems: sanitization.Items));
     }
 }
