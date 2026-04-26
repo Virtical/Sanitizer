@@ -60,7 +60,7 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
     private static List<(ItemMatch Match, DetectorType Type, StrategyConfig Config)> RemoveOverlaps(
         List<(ItemMatch Match, DetectorType Type, StrategyConfig Config)> matches)
     {
-        var selected  = new List<(ItemMatch, DetectorType, StrategyConfig)>();
+        var selected  = new List<(ItemMatch Match, DetectorType Type, StrategyConfig Config)>();
         var usedRanges = new List<(int Start, int End)>();
 
         foreach (var item in matches.OrderByDescending(x => x.Match.Value.Length)
