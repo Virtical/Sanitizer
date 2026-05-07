@@ -1,4 +1,4 @@
-const PROFILES_API_BASE = 'http://localhost:5000/api/profiles'; // указать актуальный порт Sanitizer.Api
+const PROFILES_API_BASE = 'http://localhost:5127/api/profiles'; // указать актуальный порт Sanitizer.Api
 
 async function apiGetAllProfiles() {
     const resp = await fetch(PROFILES_API_BASE);
