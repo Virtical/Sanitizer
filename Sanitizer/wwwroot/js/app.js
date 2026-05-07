@@ -124,12 +124,11 @@ function initScrollbars() {
     }
 }
 
-function init() {
+async function init() {
     console.log('Sanitizer app initializing...');
     initDOMElements();
     createInitialDialog();
-    updateProfileDropdowns();
-    updateProfileButtonText();
+    await initProfiles();
     renderDialogs();
     renderMessages();
     initEventListeners();
@@ -142,7 +141,7 @@ function init() {
 
 // Запуск после загрузки DOM
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => init());
 } else {
     init();
 }

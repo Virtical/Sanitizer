@@ -4,17 +4,22 @@ let isDialogsHidden = false;
 let dialogs = [];
 let messages = {};
 
-let allProfiles = [
-    { id: 1, name: 'Профиль общения 1' },
-    { id: 2, name: 'Профиль общения 2' },
-    { id: 3, name: 'Профиль общения 3' },
-    { id: 4, name: 'Профиль общения 4' }
-];
-let currentProfile = allProfiles[0];
+let allProfiles = [];
+let currentProfile = { id: null, name: 'Нет профилей' };
 let isProfileCreationVisible = false;
-let nextProfileId = 5;
 
 let selectedDataTypes = [];
 let selectedMethod = null;
 
 let isDialogsCollapsed = false;
+
+async function initProfiles() {
+    try {
+        allProfiles = await apiGetAllProfiles();
+    } catch {
+        allProfiles = [];
+    }
+    currentProfile = allProfiles.length > 0 ? allProfiles[0] : { id: null, name: 'Нет профилей' };
+    updateProfileDropdowns();
+    updateProfileButtonText();
+}
