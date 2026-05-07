@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Sanitizer.Api.Data.Entities;
+using Sanitizer.Api.Storage.Data.Entities;
 
-namespace Sanitizer.Api.Data;
+namespace Sanitizer.Api.Storage.Data;
 
 public class SanitizerDbContext(DbContextOptions<SanitizerDbContext> options) : DbContext(options)
 {

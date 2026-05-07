@@ -1,4 +1,4 @@
-namespace Sanitizer.Api.Data.Entities;
+namespace Sanitizer.Api.Storage.Data.Entities;
 
 public class ApiKeyEntity
 {
