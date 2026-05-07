@@ -8,37 +8,24 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
     if (!dropdownElement) return;
     const dropdownContent = dropdownElement;
     dropdownContent.innerHTML = '';
-
-    const selectedDiv = document.createElement('div');
-    selectedDiv.className = 'profile-selected-item';
-    const selectedName = document.createElement('span');
-    selectedName.className = 'profile-selected-name';
-    selectedName.textContent = truncateText(currentProfile.name, 25);
-    selectedName.title = currentProfile.name;
-    selectedDiv.appendChild(selectedName);
-    const editIcon = document.createElement('div');
-    editIcon.className = 'profile-selected-edit';
-    editIcon.innerHTML = '<img src="images/editing.svg" alt="Edit">';
-    editIcon.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const newName = prompt('Новое название профиля:', currentProfile.name);
-        if (!newName?.trim()) return;
-        try {
-            const updated = await apiUpdateProfile(currentProfile.id, { ...currentProfile, name: newName.trim() });
-            const idx = allProfiles.findIndex(p => p.id === updated.id);
-            if (idx !== -1) allProfiles[idx] = updated;
-            currentProfile = updated;
-            updateProfileDropdowns();
-            updateProfileButtonText();
-        } catch (e) {
-            console.error(e);
-        }
-    });
-    selectedDiv.appendChild(editIcon);
-    selectedDiv.addEventListener('click', () => {
-        dropdownElement.classList.remove('show');
-    });
-    dropdownContent.appendChild(selectedDiv);
+    
+    if (currentProfile != null)
+    {
+        const selectedDiv = document.createElement('div');
+        selectedDiv.className = 'profile-selected-item';
+        const selectedName = document.createElement('span');
+        selectedName.className = 'profile-selected-name';
+        selectedName.textContent = currentProfile.name
+        selectedDiv.appendChild(selectedName);
+        const editIcon = document.createElement('div');
+        editIcon.className = 'profile-selected-edit';
+        editIcon.innerHTML = '<img src="images/editing.svg" alt="Edit">';
+        selectedDiv.appendChild(editIcon);
+        selectedDiv.addEventListener('click', () => {
+            dropdownElement.classList.remove('show');
+        });
+        dropdownContent.appendChild(selectedDiv);
+    }
 
     const otherProfiles = allProfiles.filter(p => p.id !== currentProfile.id);
     if (otherProfiles.length > 0) {
@@ -47,8 +34,7 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
         otherProfiles.forEach(profile => {
             const option = document.createElement('div');
             option.className = 'profile-option-item';
-            option.textContent = truncateText(profile.name, 30);
-            option.title = profile.name;
+            option.textContent = profile.name;
             option.addEventListener('click', () => {
                 currentProfile = profile;
                 dropdownElement.classList.remove('show');
@@ -71,9 +57,11 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
         }
     }
 
-    const divider = document.createElement('div');
-    divider.className = 'profile-divider-line';
-    dropdownContent.appendChild(divider);
+    if (currentProfile != null) {
+        const divider = document.createElement('div');
+        divider.className = 'profile-divider-line';
+        dropdownContent.appendChild(divider);
+    }
 
     const createBtn = document.createElement('button');
     createBtn.className = 'create-new-profile-btn';
@@ -176,7 +164,6 @@ async function saveNewProfile() {
 function updateProfileButtonText() {
     const profileChatText = document.querySelector('.profile-chat-text');
     if (profileChatText) {
-        profileChatText.textContent = truncateText(currentProfile.name, 20);
-        profileChatText.title = currentProfile.name;
+        profileChatText.textContent = currentProfile == null ? "Выберите профиль" : currentProfile.name;
     }
 }

@@ -5,7 +5,7 @@ let dialogs = [];
 let messages = {};
 
 let allProfiles = [];
-let currentProfile = { id: null, name: 'Нет профилей' };
+let currentProfile = null
 let isProfileCreationVisible = false;
 
 let selectedDataTypes = [];
@@ -19,7 +19,7 @@ async function initProfiles() {
     } catch {
         allProfiles = [];
     }
-    currentProfile = allProfiles.length > 0 ? allProfiles[0] : { id: null, name: 'Нет профилей' };
+    currentProfile = allProfiles.length > 0 ? allProfiles[0] : null;
     updateProfileDropdowns();
     updateProfileButtonText();
 }
