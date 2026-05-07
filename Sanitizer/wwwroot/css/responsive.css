@@ -1,0 +1,49 @@
+@media (max-width: 1400px) {
+    .messages-area { padding: 16px 60px 16px 60px; }
+    .input-container { padding: 16px 60px; }
+    .send-btn { right: 72px; }
+}
+
+@media (max-width: 1100px) {
+    .messages-area { padding: 12px 40px 12px 40px; }
+    .input-container { padding: 12px 40px; }
+    .send-btn { right: 52px; bottom: 20px; }
+    .message-bubble { font-size: 18px; padding: 12px 16px; }
+    .empty-title { font-size: 28px; }
+    .empty-message-input { height: 48px; font-size: 18px; }
+    .message-input { height: 48px; font-size: 18px; }
+    .profile-chat-btn { width: 220px; height: 42px; }
+    .profile-chat-text { font-size: 18px; }
+}
+
+@media (max-width: 768px) {
+    .messages-area { padding: 10px 20px 10px 20px; }
+    .input-container { padding: 10px 20px; }
+    .send-btn { right: 32px; bottom: 18px; width: 36px; height: 36px; }
+    .send-btn .send-circle { width: 36px; height: 36px; }
+    .send-btn .send-arrow { width: 16px; height: 18px; }
+    .message-bubble { font-size: 16px; padding: 10px 14px; border-radius: 18px; }
+    .empty-title { font-size: 24px; }
+    .empty-message-input { height: 44px; font-size: 16px; padding: 0 60px 0 18px; }
+    .message-input { height: 44px; font-size: 16px; padding: 0 60px 0 18px; }
+    .eye-btn { width: 30px; height: 30px; }
+    .eye-icon { width: 30px; height: 30px; }
+    .profile-chat-btn { width: 180px; height: 38px; }
+    .profile-chat-text { font-size: 16px; }
+    .dialogs-panel { position: absolute; z-index: 20; }
+}
+
+@media (max-width: 480px) {
+    .messages-area { padding: 8px 12px 8px 12px; gap: 12px; }
+    .input-container { padding: 8px 12px; }
+    .send-btn { right: 24px; bottom: 14px; width: 32px; height: 32px; }
+    .message-bubble { font-size: 14px; padding: 8px 12px; border-radius: 16px; }
+    .empty-title { font-size: 20px; }
+    .empty-message-input { height: 40px; font-size: 14px; padding: 0 50px 0 14px; }
+    .message-input { height: 40px; font-size: 14px; padding: 0 50px 0 14px; }
+    .eye-btn { width: 26px; height: 26px; }
+    .eye-icon { width: 26px; height: 26px; }
+    .profile-chat-btn { width: 140px; height: 34px; }
+    .profile-chat-text { font-size: 14px; }
+    .profile-chat-arrow { width: 10px; }
+}

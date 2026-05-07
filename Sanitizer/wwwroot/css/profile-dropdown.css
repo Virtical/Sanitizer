@@ -1,0 +1,151 @@
+/* profile-dropdown styles */
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 280px;
+    background-color: #F5F5F5;
+    border: 2px solid #5B5B5B;
+    border-radius: 35px;
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+    overflow: visible;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.profile-dropdown.show {
+    display: flex;
+}
+
+.profile-selected-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: #037C4E;
+    margin: 8px 12px;
+    border-radius: 20px;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.profile-selected-name {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 100%;
+    color: #FFFFFF;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-selected-edit {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-selected-edit img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
+.profiles-list {
+    display: flex;
+    flex-direction: column;
+    max-height: none;
+    overflow-y: visible;
+}
+
+.profiles-list.has-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.profile-option-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 100%;
+    color: #000000;
+    transition: background 0.2s;
+    background: transparent;
+    border-radius: 20px;
+    margin: 4px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.profile-option-item:hover {
+    background-color: #E8E8E8;
+}
+
+.profile-divider-line {
+    height: 1px;
+    background-color: #5B5B5B;
+    margin: 8px 12px;
+    flex-shrink: 0;
+}
+
+.create-new-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: transparent;
+    border: none;
+    width: calc(100% - 24px);
+    text-align: left;
+    border-radius: 20px;
+    margin: 8px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.create-new-profile-btn:hover {
+    background-color: #E8E8E8;
+}
+
+.create-icon-box {
+    width: 24px;
+    height: 24px;
+    background: #D9D9D9;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.create-icon-plus {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 100%;
+    color: #000000;
+}
+
+.create-btn-text {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    color: #000000;
+    white-space: nowrap;
+}

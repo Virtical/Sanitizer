@@ -1,0 +1,33 @@
+<main class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+        <div class="profile-container">
+            <button class="profile-chat-btn" id="profileChatBtn">
+                <span class="profile-chat-text">Профиль общения</span>
+                <img src="images/black-arrow.svg" alt="▼" class="profile-chat-arrow">
+            </button>
+            <div class="profile-dropdown" id="profileDropdown"></div>
+        </div>
+    </div>
+
+    <div class="chat-empty-state" id="chatEmptyState">
+        <h1 class="empty-title">Начните общение</h1>
+        <div class="empty-input-container">
+            <input type="text" class="empty-message-input" id="emptyMessageInput" placeholder="Введите текст...">
+            <button class="empty-send-btn" id="emptySendBtn">
+                <img src="images/green-circle.png" alt="Send" class="send-circle">
+                <img src="images/white-arrow.svg" alt="↑" class="send-arrow">
+            </button>
+        </div>
+    </div>
+
+    <div class="messages-area-wrapper" id="messagesWrapper" style="display: none;">
+        <div class="messages-area" id="messagesArea"></div>
+        <div class="input-container">
+            <input type="text" class="message-input" id="messageInput" placeholder="Введите текст...">
+            <button class="send-btn" id="sendBtn">
+                <img src="images/green-circle.png" alt="Send" class="send-circle">
+                <img src="images/white-arrow.svg" alt="↑" class="send-arrow">
+            </button>
+        </div>
+    </div>
+</main>

@@ -1,8 +1,23 @@
-﻿@page "/"
-@InteractiveServer
+@page "/"
+@using Sanitizer.Components.Shared
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Sanitizer</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="app-container">
+    <div class="main-layout">
+        <DialogsPanel />
+        <div class="right-panel-container">
+            <ChatPanel />
+            <ProfileCreationPanel />
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/scrollbar.js"></script>
+<script src="js/dialogs.js"></script>
+<script src="js/messages.js"></script>
+<script src="js/profiles.js"></script>
+<script src="js/data-method.js"></script>
+<script src="js/app.js"></script>
