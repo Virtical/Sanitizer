@@ -17,5 +17,5 @@ public interface IChatHistoryStorage
     Task<ChatSession> AddMessageAsync(string chatId, MessageRequest message);
 
     /// <summary>Удалить чат со всеми сообщениями.</summary>
-    Task DeleteChatAsync(string chatId);
+    Task<string> DeleteChatAsync(string chatId);
 }

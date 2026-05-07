@@ -20,6 +20,6 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
         return await chatStorage.GetByIdAsync(chatId);
     }
 
-    public Task DeleteChatAsync(string chatId) =>
+    public Task<string> DeleteChatAsync(string chatId) =>
         chatStorage.DeleteChatAsync(chatId);
 }

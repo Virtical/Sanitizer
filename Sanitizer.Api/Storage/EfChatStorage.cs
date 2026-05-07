@@ -32,7 +32,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         return entity.Id;
     }
 
-    public async Task DeleteChatAsync(string chatId)
+    public async Task<string> DeleteChatAsync(string chatId)
     {
         var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
         if (chat is not null)
@@ -40,6 +40,8 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
             db.Chats.Remove(chat);
             await db.SaveChangesAsync();
         }
+        
+        return chatId;
     }
 
     internal static ChatSession MapToModel(ChatEntity entity) => new()
