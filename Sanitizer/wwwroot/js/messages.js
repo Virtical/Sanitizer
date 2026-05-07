@@ -85,15 +85,15 @@ function toggleSanitizedMessage(dialogId, originalMsgId) {
     renderMessages();
 }
 
-function addMessage(text, type = 'sent') {
+async function addMessage(text, type = 'sent') {
     if (!text.trim() || !currentDialogId) return;
     const newId = 'msg_' + Date.now();
-    const sanitizedText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const sendMessageResponse = await apiSendMessage('1', text);
     const newMsg = {
         id: newId,
         text: text,
         type: type,
-        sanitized: sanitizedText,
+        sanitized: sendMessageResponse.sanitizedPrompt,
         isSanitizedCopy: false
     };
     if (!messages[currentDialogId]) messages[currentDialogId] = [];
@@ -105,9 +105,9 @@ function addMessage(text, type = 'sent') {
         setTimeout(() => {
             const replyMsg = {
                 id: 'reply_' + Date.now(),
-                text: 'Автоответ',
+                text: sendMessageResponse.response,
                 type: 'received',
-                sanitized: 'Автоответ',
+                sanitized: sendMessageResponse.response,
                 isSanitizedCopy: false
             };
             if (messages[currentDialogId]) {

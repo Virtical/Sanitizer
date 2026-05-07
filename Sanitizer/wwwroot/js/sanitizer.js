@@ -424,7 +424,7 @@ function renderMessages() {
             actionsDiv.className = 'message-actions';
             const eyeBtn = document.createElement('button');
             eyeBtn.className = 'eye-btn';
-            eyeBtn.innerHTML = '<img src="images/si_eye-line.svg" alt="Показать санитизированный текст" class="eye-icon">';
+            eyeBtn.innerHTML = '<img src="images/eye.svg" alt="Показать санитизированный текст" class="eye-icon">';
             const originalMsgId = msg.id;
             eyeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();

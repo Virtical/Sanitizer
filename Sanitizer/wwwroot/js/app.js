@@ -42,13 +42,13 @@ function showDialogsPanel() {
     }
 }
 
-function sendMessage() {
+async function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const emptyMessageInput = document.getElementById('emptyMessageInput');
     const text = (messageInput && messageInput.value.trim()) ? messageInput.value.trim() :
         (emptyMessageInput ? emptyMessageInput.value.trim() : '');
     if (text && currentDialogId) {
-        addMessage(text, 'sent');
+        await addMessage(text, 'sent');
         if (messageInput) messageInput.value = '';
         if (emptyMessageInput) emptyMessageInput.value = '';
     } else if (!currentDialogId) {
@@ -98,16 +98,11 @@ function initEventListeners() {
     if (saveProfileBtn) saveProfileBtn.addEventListener('click', saveNewProfile);
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (emptySendBtn) emptySendBtn.addEventListener('click', sendMessage);
-    if (messageInput) messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-    if (emptyMessageInput) emptyMessageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    if (messageInput) messageInput.addEventListener('keypress', async (e) => { if (e.key === 'Enter') await sendMessage(); });
+    if (emptyMessageInput) emptyMessageInput.addEventListener('keypress', async (e) => { if (e.key === 'Enter') await sendMessage(); });
     if (newChatBtn) newChatBtn.addEventListener('click', createNewDialog);
     if (userProfileBtn) userProfileBtn.addEventListener('click', () => {});
     document.addEventListener('click', handleClickOutside);
-}
-
-function initDOMElements() {
-    // Все DOM элементы уже используются напрямую в функциях
-    // Эта функция оставлена для совместимости
 }
 
 function initScrollbars() {
@@ -125,8 +120,6 @@ function initScrollbars() {
 }
 
 async function init() {
-    console.log('Sanitizer app initializing...');
-    initDOMElements();
     createInitialDialog();
     await initProfiles();
     renderDialogs();
@@ -136,7 +129,6 @@ async function init() {
     initDataMethodHandlers();
     showChatPanel();
     initScrollbars();
-    console.log('Sanitizer app initialized');
 }
 
 // Запуск после загрузки DOM
