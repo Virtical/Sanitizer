@@ -19,9 +19,20 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
     const editIcon = document.createElement('div');
     editIcon.className = 'profile-selected-edit';
     editIcon.innerHTML = '<img src="images/editing.svg" alt="Edit">';
-    editIcon.addEventListener('click', (e) => {
+    editIcon.addEventListener('click', async (e) => {
         e.stopPropagation();
-        console.log('Редактировать профиль:', currentProfile.name);
+        const newName = prompt('Новое название профиля:', currentProfile.name);
+        if (!newName?.trim()) return;
+        try {
+            const updated = await apiUpdateProfile(currentProfile.id, { ...currentProfile, name: newName.trim() });
+            const idx = allProfiles.findIndex(p => p.id === updated.id);
+            if (idx !== -1) allProfiles[idx] = updated;
+            currentProfile = updated;
+            updateProfileDropdowns();
+            updateProfileButtonText();
+        } catch (e) {
+            console.error(e);
+        }
     });
     selectedDiv.appendChild(editIcon);
     selectedDiv.addEventListener('click', () => {
@@ -111,23 +122,36 @@ function showChatPanel() {
     if (profileCreationPanel) profileCreationPanel.style.display = 'none';
 }
 
-function saveNewProfile() {
+async function saveNewProfile() {
     const newProfileNameInput = document.getElementById('newProfileName');
-    const newProfileNameValue = newProfileNameInput ? newProfileNameInput.value.trim() : '';
-    let profileName = newProfileNameValue !== '' ? newProfileNameValue : 'Профиль общения';
+    const profileName = newProfileNameInput?.value.trim() || 'Профиль общения';
 
-    const newProfile = {
-        id: getNextProfileId(),
+    const rules = {};
+    selectedDataTypes.forEach(dt => {
+        rules[dt] = {
+            strategy: selectedMethod?.value ?? 'Mask',
+            parameters: {}
+        };
+    });
+
+    const payload = {
         name: profileName,
-        dataTypes: [...selectedDataTypes],
-        method: selectedMethod ? selectedMethod.value : null
+        description: '',
+        reversible: false,
+        rules
     };
 
-    allProfiles.push(newProfile);
-    updateProfileDropdowns();
+    try {
+        const created = await apiCreateProfile(payload);
+        allProfiles.push(created);
+        currentProfile = created;
+    } catch (e) {
+        console.error(e);
+        return;
+    }
 
-    const profileChatText = document.querySelector('.profile-chat-text');
-    if (profileChatText) profileChatText.textContent = truncateText(currentProfile.name, 20);
+    updateProfileDropdowns();
+    updateProfileButtonText();
 
     selectedDataTypes = [];
     selectedMethod = null;
