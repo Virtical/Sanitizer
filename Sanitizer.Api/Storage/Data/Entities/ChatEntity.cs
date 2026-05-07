@@ -1,0 +1,10 @@
+namespace Sanitizer.Api.Storage.Data.Entities;
+
+public class ChatEntity
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Name { get; set; } = "Новый диалог";
+    public string? SanitizationProfileId { get; set; }
+
+    public List<MessageEntity> Messages { get; set; } = new();
+}

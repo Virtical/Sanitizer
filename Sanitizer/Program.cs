@@ -32,6 +32,9 @@ builder.Services.AddHttpClient<LlmProxyService>();
 
 builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
 builder.Services.AddScoped<IApiKeyStorage,  EfApiKeyStorage>();
+builder.Services.AddScoped<IChatStorage, EfChatStorage>();
+builder.Services.AddScoped<IMessageStorage, EfMessageStorage>();
+builder.Services.AddScoped<IChatHistoryStorage, ChatHistoryService>();
 
 builder.Services.AddSingleton<TokenStore>();
 builder.Services.AddSingleton<DetectorRegistry>();
