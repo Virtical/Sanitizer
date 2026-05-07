@@ -1,0 +1,60 @@
+<aside class="dialogs-panel" id="dialogsPanel">
+    <!-- Полный вид блока -->
+    <div class="dialogs-full" id="dialogsFull">
+        <div class="panel-top">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <img src="images/favicon.png" alt="Logo" class="logo-img">
+                </div>
+                <h2 class="logo-title">Sanitizer</h2>
+            </div>
+            <button class="hide-btn" id="hideDialogsBtn" title="Скрыть диалоги">
+                <img src="images/closure.svg" alt="Hide" class="hide-icon">
+            </button>
+        </div>
+
+        <button class="new-chat-btn" id="newChatBtn">
+            <span class="plus-icon">+</span>
+            <span class="new-chat-text">Новый чат</span>
+        </button>
+
+        <div class="history-title">История диалогов</div>
+
+        <div class="dialogs-history-wrapper">
+            <div class="dialogs-history" id="dialogsHistory">
+                <div class="dialogs-list" id="dialogsList"></div>
+            </div>
+        </div>
+
+        <div class="user-profile" id="userProfileBtn">
+            <div class="user-avatar">
+                <span class="user-initials">ИИ</span>
+            </div>
+            <div class="user-info">
+                <span class="user-name">Иван Иванов</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Свернутый вид блока -->
+    <div class="dialogs-collapsed" id="dialogsCollapsed" style="display: none;">
+        <div class="collapsed-top">
+            <div class="collapsed-logo">
+                <img src="images/Group 54.png" alt="Logo" class="collapsed-logo-img">
+            </div>
+            <button class="collapsed-hide-btn" id="showDialogsFromCollapsedBtn" title="Развернуть диалоги">
+                <img src="images/closure.svg" alt="Show" class="collapsed-hide-icon">
+            </button>
+            <button class="collapsed-new-chat-btn" id="collapsedNewChatBtn" title="Новый чат">
+                <img src="images/new-chat.svg" alt="New chat" class="collapsed-new-chat-icon">
+            </button>
+        </div>
+        <div class="collapsed-bottom">
+            <div class="collapsed-user-profile" id="collapsedUserProfileBtn">
+                <div class="collapsed-user-avatar">
+                    <span class="collapsed-user-initials">ИИ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,26 @@
+/* responsive.css - кастомные скроллбары и адаптивность */
+.dialogs-history-wrapper .custom-scrollbar,
+.messages-area-wrapper .custom-scrollbar {
+    position: absolute;
+    right: 4px;
+    top: 0;
+    width: 9px;
+    background: transparent;
+    border-radius: 20px;
+    z-index: 10;
+}
+
+.dialogs-history-wrapper .custom-scrollbar-thumb,
+.messages-area-wrapper .custom-scrollbar-thumb {
+    position: absolute;
+    width: 100%;
+    background: #037C4E;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.dialogs-history-wrapper .custom-scrollbar-thumb:hover,
+.messages-area-wrapper .custom-scrollbar-thumb:hover {
+    background: #02A065;
+}

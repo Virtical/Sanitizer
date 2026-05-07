@@ -1,0 +1,101 @@
+<div class="profile-creation-panel" id="profileCreationPanel">
+
+    <div class="profile-creation-content">
+        <h1 class="creation-title">Создание нового профиля</h1>
+        
+        <div class="creation-input-container">
+            <input type="text" class="creation-input" id="newProfileName" placeholder="Введите название профиля">
+        </div>
+        
+        <div class="creation-add-row">
+            <button class="add-icon-btn" id="addDataTypeBtn">
+                <span class="add-icon">+</span>
+            </button>
+            <span class="add-text" id="addDataTypeText">Добавить тип данных и метод санитизации</span>
+        </div>
+        
+        <!-- Контейнер для выбора типов данных и методов (скрыт изначально) -->
+        <div class="data-method-container" id="dataMethodContainer" style="display: none;">
+            <!-- Кнопка выбора типа данных -->
+            <div class="data-type-wrapper">
+                <div class="data-type-btn" id="dataTypeBtn">
+                    <span class="data-type-text">Выберите тип данных</span>
+                    <img src="images/black-arrow.svg" alt="▼" class="data-type-arrow">
+                </div>
+                <div class="data-type-dropdown" id="dataTypeDropdown">
+                    <div class="data-type-option" data-value="Email">
+                        <div class="checkbox"></div>
+                        <span>Email</span>
+                    </div>
+                    <div class="data-type-option" data-value="Phone">
+                        <div class="checkbox"></div>
+                        <span>Phone</span>
+                    </div>
+                    <div class="data-type-option" data-value="Card">
+                        <div class="checkbox"></div>
+                        <span>Card</span>
+                    </div>
+                    <div class="data-type-option" data-value="IP">
+                        <div class="checkbox"></div>
+                        <span>IP</span>
+                    </div>
+                    <div class="data-type-option" data-value="UUID">
+                        <div class="checkbox"></div>
+                        <span>UUID</span>
+                    </div>
+                    <div class="data-type-option" data-value="Names">
+                        <div class="checkbox"></div>
+                        <span>Names</span>
+                    </div>
+                    <div class="data-type-option" data-value="URL params">
+                        <div class="checkbox"></div>
+                        <span>URL params</span>
+                    </div>
+                    <div class="data-type-option" data-value="API keys / tokens">
+                        <div class="checkbox"></div>
+                        <span>API keys / tokens</span>
+                    </div>
+                    <div class="data-type-option" data-value="Контекстные секреты">
+                        <div class="checkbox"></div>
+                        <span>Контекстные секреты</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопка выбора метода санитизации -->
+            <div class="method-wrapper">
+                <div class="method-btn" id="methodBtn">
+                    <span class="method-text">Выберите метод санитизации</span>
+                    <img src="images/black-arrow.svg" alt="▼" class="method-arrow">
+                </div>
+                <div class="method-dropdown" id="methodDropdown">
+                    <div class="method-option" data-value="Mask">
+                        <div class="radio"></div>
+                        <span>Mask (маскирование)</span>
+                    </div>
+                    <div class="method-option" data-value="Replace">
+                        <div class="radio"></div>
+                        <span>Replace (замена)</span>
+                    </div>
+                    <div class="method-option" data-value="Hash">
+                        <div class="radio"></div>
+                        <span>Hash (хеширование)</span>
+                    </div>
+                    <div class="method-option" data-value="Tokenize">
+                        <div class="radio"></div>
+                        <span>Tokenize (токенизация)</span>
+                    </div>
+                    <div class="method-option" data-value="Remove">
+                        <div class="radio"></div>
+                        <span>Remove (удаление)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="creation-buttons-row">
+            <button class="creation-back-btn" id="backFromCreationBtn">Вернуться назад</button>
+            <button class="creation-save-btn" id="saveProfileBtn">Сохранить</button>
+        </div>
+    </div>
+</div>
