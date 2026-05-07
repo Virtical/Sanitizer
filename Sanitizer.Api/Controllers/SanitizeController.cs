@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -15,6 +16,7 @@ public class SanitizeController(SanitizerService sanitizerService,
 
     /// <summary>Санитизировать текст по профилю.</summary>
     [HttpPost]
+    [SwaggerIgnore]
     public async Task<IActionResult> Sanitize([FromBody] SanitizeRequest request)
     {
         var profile = await profileService.GetByIdAsync(request.ProfileId);
@@ -29,6 +31,7 @@ public class SanitizeController(SanitizerService sanitizerService,
     /// Работает только для профилей с Reversible=true (стратегия Tokenize).
     /// </summary>
     [HttpPost("restore")]
+    [SwaggerIgnore]
     public IActionResult Restore([FromBody] RestoreRequest request)
     {
         var restored = tokenStore.RestoreAll(request.SessionId, request.Text);
