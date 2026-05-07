@@ -1,0 +1,65 @@
+<!-- Шаблоны для клонирования через JavaScript -->
+<div style="display: none;">
+    <!-- Шаблон элемента диалога -->
+    <template id="dialog-item-template">
+        <div class="dialog-item">
+            <div class="dialog-name"></div>
+        </div>
+    </template>
+
+    <!-- Шаблон группы диалогов -->
+    <template id="dialog-group-template">
+        <div class="dialogs-group">
+            <div class="group-title"></div>
+            <div class="group-dialogs"></div>
+        </div>
+    </template>
+
+    <!-- Шаблон сообщения -->
+    <template id="message-template">
+        <div class="message">
+            <div class="message-bubble"></div>
+        </div>
+    </template>
+
+    <!-- Шаблон действий сообщения -->
+    <template id="message-actions-template">
+        <div class="message-actions">
+            <button class="eye-btn">
+                <img src="images/si_eye-line.svg" alt="Показать санитизированный текст" class="eye-icon">
+            </button>
+        </div>
+    </template>
+
+    <!-- Шаблон санитизированного сообщения -->
+    <template id="sanitized-message-template">
+        <div class="sanitized-message">
+            <div class="message-bubble sanitized-bubble"></div>
+        </div>
+    </template>
+
+    <!-- Шаблон выбранного профиля -->
+    <template id="profile-selected-template">
+        <div class="profile-selected-item">
+            <span class="profile-selected-name"></span>
+            <div class="profile-selected-edit">
+                <img src="images/editing.svg" alt="Edit">
+            </div>
+        </div>
+    </template>
+
+    <!-- Шаблон опции профиля -->
+    <template id="profile-option-template">
+        <div class="profile-option-item"></div>
+    </template>
+
+    <!-- Шаблон кнопки создания профиля -->
+    <template id="create-profile-btn-template">
+        <button class="create-new-profile-btn">
+            <div class="create-icon-box">
+                <span class="create-icon-plus">+</span>
+            </div>
+            <span class="create-btn-text">Создать новый профиль</span>
+        </button>
+    </template>
+</div>

@@ -6,34 +6,38 @@ function updateProfileDropdowns() {
 
 function updateProfileDropdown(dropdownElement, buttonElement) {
     if (!dropdownElement) return;
-    const dropdownContent = dropdownElement;
-    dropdownContent.innerHTML = '';
+    dropdownElement.innerHTML = '';
     
-    if (currentProfile != null)
-    {
-        const selectedDiv = document.createElement('div');
-        selectedDiv.className = 'profile-selected-item';
-        const selectedName = document.createElement('span');
-        selectedName.className = 'profile-selected-name';
-        selectedName.textContent = currentProfile.name
-        selectedDiv.appendChild(selectedName);
-        const editIcon = document.createElement('div');
-        editIcon.className = 'profile-selected-edit';
-        editIcon.innerHTML = '<img src="images/editing.svg" alt="Edit">';
-        selectedDiv.appendChild(editIcon);
+    if (currentProfile != null) {
+        const selectedClone = cloneTemplate('profile-selected-template');
+        if (!selectedClone) return;
+        
+        const selectedDiv = selectedClone.querySelector('.profile-selected-item');
+        const selectedName = selectedClone.querySelector('.profile-selected-name');
+        selectedName.textContent = currentProfile.name;
+        
+        const editIcon = selectedClone.querySelector('.profile-selected-edit');
+        editIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        
         selectedDiv.addEventListener('click', () => {
             dropdownElement.classList.remove('show');
         });
-        dropdownContent.appendChild(selectedDiv);
+        
+        dropdownElement.appendChild(selectedClone);
     }
 
     const otherProfiles = allProfiles.filter(p => p.id !== currentProfile.id);
     if (otherProfiles.length > 0) {
         const profilesList = document.createElement('div');
         profilesList.className = 'profiles-list';
+        
         otherProfiles.forEach(profile => {
-            const option = document.createElement('div');
-            option.className = 'profile-option-item';
+            const optionClone = cloneTemplate('profile-option-template');
+            if (!optionClone) return;
+            
+            const option = optionClone.querySelector('.profile-option-item');
             option.textContent = profile.name;
             option.addEventListener('click', () => {
                 currentProfile = profile;
@@ -44,14 +48,18 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
                 }
                 updateProfileDropdowns();
             });
-            profilesList.appendChild(option);
+            
+            profilesList.appendChild(optionClone);
         });
+        
         if (otherProfiles.length >= 8) {
             profilesList.classList.add('has-scroll');
         } else {
             profilesList.classList.remove('has-scroll');
         }
-        dropdownContent.appendChild(profilesList);
+        
+        dropdownElement.appendChild(profilesList);
+        
         if (otherProfiles.length >= 8) {
             setTimeout(() => createProfilesScrollbar(), 10);
         }
@@ -60,23 +68,19 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
     if (currentProfile != null) {
         const divider = document.createElement('div');
         divider.className = 'profile-divider-line';
-        dropdownContent.appendChild(divider);
+        dropdownElement.appendChild(divider);
     }
 
-    const createBtn = document.createElement('button');
-    createBtn.className = 'create-new-profile-btn';
-    createBtn.innerHTML = `
-        <div class="create-icon-box">
-            <span class="create-icon-plus">+</span>
-        </div>
-        <span class="create-btn-text">Создать новый профиль</span>
-    `;
-    createBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownElement.classList.remove('show');
-        openProfileCreation();
-    });
-    dropdownContent.appendChild(createBtn);
+    const createBtnClone = cloneTemplate('create-profile-btn-template');
+    if (createBtnClone) {
+        const createBtn = createBtnClone.querySelector('.create-new-profile-btn');
+        createBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownElement.classList.remove('show');
+            openProfileCreation();
+        });
+        dropdownElement.appendChild(createBtnClone);
+    }
 }
 
 function toggleProfileDropdown(dropdownElement) {

@@ -1,22 +1,3 @@
-// ==================== СОСТОЯНИЕ ПРИЛОЖЕНИЯ ====================
-let currentDialogId = null;
-let isDialogsHidden = false;
-let dialogs = [];
-let messages = {};
-
-let allProfiles = [
-    { id: 1, name: 'Профиль общения' },
-    { id: 2, name: 'Профиль общения' },
-    { id: 3, name: 'Профиль общения' },
-    { id: 4, name: 'Профиль общения' }
-];
-let currentProfile = allProfiles[0];
-let isProfileCreationVisible = false;
-let nextProfileId = 5;
-
-let selectedDataTypes = [];
-let selectedMethod = null;
-
 // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
 function getDateGroup(date) {
     const today = new Date();
