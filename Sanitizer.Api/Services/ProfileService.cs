@@ -13,7 +13,7 @@ public class ProfileService(IProfileStorage storage)
 
     public async Task<SanitizationProfile> CreateAsync(SanitizationProfile profile)
     {
-        profile.Id          = Guid.NewGuid().ToString();
+        profile.Id = Guid.NewGuid().ToString();
         profile.CreatedDate = DateTime.UtcNow;
         await storage.SaveAsync(profile);
         return profile;

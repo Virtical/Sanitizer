@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using Sanitizer.Api.Data;
-using Sanitizer.Api.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Storage.Data;
+using Sanitizer.Api.Storage.Data.Entities;
 
 namespace Sanitizer.Api.Storage;
 

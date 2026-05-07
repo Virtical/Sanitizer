@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Sanitizer.Api.Data;
-using Sanitizer.Api.Middleware;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.Storage;
+using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Strategies;
 using Sanitizer.Components;
 
@@ -17,18 +16,7 @@ builder.Services.AddControllers()
         o.JsonSerializerOptions.Converters.Add(
             new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new() { Title = "Sanitizer API", Version = "v1" });
-    c.AddSecurityRequirement(new()
-    {
-        {
-            new() { Reference = new() { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "ApiKey" } },
-            []
-        }
-    });
-    c.CustomSchemaIds(type => type.FullName);
-});
+builder.Services.AddSwaggerGen();
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins").Get<string[]>()
@@ -51,7 +39,6 @@ builder.Services.AddSingleton<StrategyFactory>();
 builder.Services.AddSingleton<DesanitizerService>();
 builder.Services.AddScoped<SanitizerService>();
 builder.Services.AddScoped<ProfileService>();
-builder.Services.AddScoped<ApiKeyService>();
 
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")

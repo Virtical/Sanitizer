@@ -1,8 +1,9 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Sanitizer.Api.Data;
-using Sanitizer.Api.Data.Entities;
+
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Storage.Data;
+using Sanitizer.Api.Storage.Data.Entities;
 
 namespace Sanitizer.Api.Storage;
 

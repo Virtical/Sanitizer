@@ -13,73 +13,50 @@ namespace Sanitizer.Api.Controllers;
 [Route("api/chat")]
 public class ChatController(SanitizerService sanitizerService,
                              ProfileService profileService,
-                             LlmProxyService llmProxy,
                              ILlmClient llmClient,
                              DesanitizerService desanitizer) : ControllerBase
 {
-    public record SanitizeRequest(string Text, string ProfileId);
-    public record RestoreRequest(string Text, string SessionId);
-
-    /// <summary>Санитизировать текст по профилю.</summary>
-    [HttpPost]
-    [SwaggerIgnore]
-    public async Task<IActionResult> Sanitize([FromBody] SanitizeRequest request)
+    [HttpPost("send")]
+    public async Task<IActionResult> Send([FromBody] ChatSendRequest request)
     {
-        var profile = await profileService.GetByIdAsync(request.ProfileId);
-        if (profile is null) return NotFound($"Profile '{request.ProfileId}' not found.");
-
-        var result = sanitizerService.Sanitize(request.Text, profile);
-        return Ok(result);
-    }
-
-    [HttpPost("completions")]
-    [SwaggerIgnore]
-    public async Task<IActionResult> Completions([FromBody] ChatRequest request, CancellationToken ct)
-    {
-        var profile = await profileService.GetByIdAsync(request.ProfileId);
-        if (profile is null) return NotFound($"Profile '{request.ProfileId}' not found.");
-
-        var allItems  = new List<SanitizedItem>();
-        string? sessionId = null;
-        var sanitizedMessages = new List<ChatMessage>();
-
-        foreach (var msg in request.Messages)
+        if (string.IsNullOrWhiteSpace(request.ProfileId))
         {
-            if (msg.Role != "user")
-            {
-                sanitizedMessages.Add(msg);
-                continue;
-            }
-
-            var result = sanitizerService.Sanitize(msg.Content, profile);
-            sessionId ??= result.SessionId;
-            allItems.AddRange(result.Items);
-            sanitizedMessages.Add(new ChatMessage(msg.Role, result.SanitizedText));
+            return BadRequest("ProfileId is required.");
         }
 
-        string assistantMessage;
+        if (string.IsNullOrEmpty(request.Message))
+        {
+            return BadRequest("Message is required.");
+        }
+
+        var profile = await profileService.GetByIdAsync(request.ProfileId);
+        if (profile is null)
+        {
+            return NotFound($"Profile '{request.ProfileId}' not found.");
+        }
+
+        SanitizationResult sanitization;
         try
         {
-            assistantMessage = await llmProxy.ChatAsync(request.LlmConfig, sanitizedMessages, ct);
+            sanitization = sanitizerService.Sanitize(request.Message, profile);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+
+        string raw;
+        try
+        {
+            raw = await llmClient.GetCompletionAsync(sanitization.SanitizedText);
         }
         catch (HttpRequestException ex)
         {
             return StatusCode(502, new { Error = "LLM provider error.", Details = ex.Message });
         }
 
-        return Ok(new ChatResponse
-        {
-            SessionId        = sessionId ?? string.Empty,
-            SanitizedRequest = sanitizedMessages.LastOrDefault(m => m.Role == "user")?.Content ?? string.Empty,
-            AssistantMessage = assistantMessage,
-            SanitizedItems   = allItems
-        });
-    }
+        var final = desanitizer.Desanitize(raw, sanitization.Context);
 
-    [HttpPost("send")]
-    public async Task<IActionResult> Send([FromBody] ChatSendRequest request)
-    {
-
-        return Ok(new ChatSendResponse("Санитизированный текст", "Автоответ"));
+        return Ok(new ChatSendResponse(sanitization.SanitizedText, final));
     }
 }
