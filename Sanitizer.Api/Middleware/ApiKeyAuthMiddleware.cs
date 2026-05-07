@@ -11,7 +11,7 @@ namespace Sanitizer.Api.Middleware;
 /// </summary>
 public class ApiKeyAuthMiddleware(RequestDelegate next, IConfiguration config)
 {
-    private static readonly string[] PublicPrefixes = ["/swagger", "/health"];
+    private static readonly string[] PublicPrefixes = ["/swagger", "/health", "/"];
 
     public async Task InvokeAsync(HttpContext context, ApiKeyService apiKeyService)
     {
