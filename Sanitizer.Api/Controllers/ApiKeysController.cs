@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Sanitizer.Api.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -14,6 +15,7 @@ public class ApiKeysController(ApiKeyService apiKeyService) : ControllerBase
 
     /// <summary>Список ключей (без открытых значений).</summary>
     [HttpGet]
+    [SwaggerIgnore]
     public async Task<IActionResult> GetAll()
     {
         if (!IsAdmin()) return Forbid();
@@ -26,6 +28,7 @@ public class ApiKeysController(ApiKeyService apiKeyService) : ControllerBase
     /// Открытый ключ возвращается единожды — сохраните его.
     /// </summary>
     [HttpPost]
+    [SwaggerIgnore]
     public async Task<IActionResult> Create([FromBody] CreateKeyRequest request)
     {
         if (!IsAdmin()) return Forbid();
@@ -40,6 +43,7 @@ public class ApiKeysController(ApiKeyService apiKeyService) : ControllerBase
 
     /// <summary>Деактивировать ключ.</summary>
     [HttpDelete("{id}")]
+    [SwaggerIgnore]
     public async Task<IActionResult> Deactivate(string id)
     {
         if (!IsAdmin()) return Forbid();

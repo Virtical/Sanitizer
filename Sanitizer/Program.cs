@@ -77,9 +77,6 @@ app.MapRazorComponents<App>()
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.MapGet("/health", () => Results.Ok(new { Status = "healthy", Timestamp = DateTime.UtcNow }));
-
 app.UseCors();
 app.MapControllers();
 
