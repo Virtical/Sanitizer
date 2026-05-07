@@ -19,40 +19,44 @@ function renderMessages() {
     const originalMessages = messages[currentDialogId].filter(msg => !msg.isSanitizedCopy);
 
     originalMessages.forEach((msg, idx) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${msg.type}`;
-        const bubble = document.createElement('div');
-        bubble.className = 'message-bubble';
+        const msgClone = cloneTemplate('message-template');
+        if (!msgClone) return;
+        
+        const msgDiv = msgClone.querySelector('.message');
+        const bubble = msgClone.querySelector('.message-bubble');
+        
+        msgDiv.classList.add(msg.type);
         bubble.textContent = msg.text;
-        msgDiv.appendChild(bubble);
 
         if (msg.type === 'sent') {
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'message-actions';
-            const eyeBtn = document.createElement('button');
-            eyeBtn.className = 'eye-btn';
-            eyeBtn.innerHTML = '<img src="images/si_eye-line.svg" alt="Показать санитизированный текст" class="eye-icon">';
-            const originalMsgId = msg.id;
-            eyeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleSanitizedMessage(currentDialogId, originalMsgId);
-            });
-            actionsDiv.appendChild(eyeBtn);
-            msgDiv.appendChild(actionsDiv);
+            const actionsClone = cloneTemplate('message-actions-template');
+            if (actionsClone) {
+                const actionsDiv = actionsClone.querySelector('.message-actions');
+                const eyeBtn = actionsClone.querySelector('.eye-btn');
+                const originalMsgId = msg.id;
+                
+                eyeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleSanitizedMessage(currentDialogId, originalMsgId);
+                });
+                
+                msgDiv.appendChild(actionsClone);
+            }
         }
 
         const sanitizedCopy = messages[currentDialogId].find(m => m.isSanitizedCopy && m.originalMessageId === msg.id);
         if (sanitizedCopy) {
-            const sanitizedDiv = document.createElement('div');
-            sanitizedDiv.className = 'sanitized-message';
-            const sanitizedBubble = document.createElement('div');
-            sanitizedBubble.className = 'message-bubble sanitized-bubble';
-            sanitizedBubble.textContent = sanitizedCopy.text;
-            sanitizedDiv.appendChild(sanitizedBubble);
-            msgDiv.appendChild(sanitizedDiv);
+            const sanitizedClone = cloneTemplate('sanitized-message-template');
+            if (sanitizedClone) {
+                const sanitizedBubble = sanitizedClone.querySelector('.sanitized-bubble');
+                sanitizedBubble.textContent = sanitizedCopy.text;
+                msgDiv.appendChild(sanitizedClone);
+            }
         }
-        messagesArea.appendChild(msgDiv);
+        
+        messagesArea.appendChild(msgClone);
     });
+    
     messagesArea.scrollTop = messagesArea.scrollHeight;
 }
 

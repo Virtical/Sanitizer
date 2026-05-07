@@ -47,3 +47,12 @@ function truncateText(text, maxLength = 20) {
 function getNextProfileId() {
     return nextProfileId++;
 }
+
+function cloneTemplate(templateId) {
+    const template = document.getElementById(templateId);
+    if (!template) {
+        console.error(`Template not found: ${templateId}`);
+        return null;
+    }
+    return template.content.cloneNode(true);
+}

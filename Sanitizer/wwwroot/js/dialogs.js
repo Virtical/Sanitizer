@@ -26,23 +26,29 @@ function renderDialogs() {
     });
 
     dialogsList.innerHTML = '';
+    
     sortedGroups.forEach(group => {
         const groupDialogs = grouped[group];
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'dialogs-group';
-        const titleDiv = document.createElement('div');
-        titleDiv.className = 'group-title';
+        const groupClone = cloneTemplate('dialog-group-template');
+        if (!groupClone) return;
+        
+        const groupDiv = groupClone.querySelector('.dialogs-group');
+        const titleDiv = groupClone.querySelector('.group-title');
+        const dialogsContainer = groupClone.querySelector('.group-dialogs');
+        
         titleDiv.textContent = getGroupTitle(group);
-        groupDiv.appendChild(titleDiv);
-        const dialogsContainer = document.createElement('div');
-        dialogsContainer.className = 'group-dialogs';
 
         groupDialogs.forEach(dialog => {
-            const dialogDiv = document.createElement('div');
-            dialogDiv.className = 'dialog-item';
+            const dialogClone = cloneTemplate('dialog-item-template');
+            if (!dialogClone) return;
+            
+            const dialogDiv = dialogClone.querySelector('.dialog-item');
+            const dialogName = dialogClone.querySelector('.dialog-name');
+            
             if (dialog.id === currentDialogId) dialogDiv.classList.add('active');
             dialogDiv.dataset.dialogId = dialog.id;
-            dialogDiv.innerHTML = `<div class="dialog-name">${escapeHtml(dialog.name)}</div>`;
+            dialogName.textContent = dialog.name;
+            
             dialogDiv.addEventListener('click', (e) => {
                 e.stopPropagation();
                 currentDialogId = dialog.id;
@@ -50,10 +56,11 @@ function renderDialogs() {
                 renderMessages();
                 if (isProfileCreationVisible) showChatPanel();
             });
-            dialogsContainer.appendChild(dialogDiv);
+            
+            dialogsContainer.appendChild(dialogClone);
         });
-        groupDiv.appendChild(dialogsContainer);
-        dialogsList.appendChild(groupDiv);
+        
+        dialogsList.appendChild(groupClone);
     });
 }
 
