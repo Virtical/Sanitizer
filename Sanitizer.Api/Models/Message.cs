@@ -7,7 +7,6 @@ public class Message
 
     public string Text { get; set; } = string.Empty;
     public MessageType Type { get; set; }
-
-    /// <summary>Порядковый номер сообщения в чате (0-based).</summary>
     public int OrderIndex { get; set; }
+    public string? OriginalMessageId { get; set; }
 }

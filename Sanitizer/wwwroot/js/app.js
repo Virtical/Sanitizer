@@ -124,7 +124,6 @@ async function init() {
     await createInitialDialog();
     await initProfiles();
     renderDialogs();
-    renderMessages();
     initEventListeners();
     initCollapseListeners();
     initDataMethodHandlers();

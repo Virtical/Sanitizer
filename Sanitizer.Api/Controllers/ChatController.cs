@@ -47,7 +47,7 @@ public class ChatController(SanitizerService sanitizerService,
             return BadRequest("Message is required.");
         }
 
-        await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
+        var message = await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
         {
             Text = request.Message,
             Type = MessageType.Sent,
@@ -64,6 +64,7 @@ public class ChatController(SanitizerService sanitizerService,
             {
                 Text = sanitization.SanitizedText,
                 Type = MessageType.Sanitized,
+                OriginalMessageId = message.Id
             });
         }
         catch (InvalidOperationException ex)

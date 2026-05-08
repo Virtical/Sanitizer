@@ -49,11 +49,11 @@ function renderDialogs() {
             dialogDiv.dataset.dialogId = dialog.id;
             dialogName.textContent = dialog.name;
             
-            dialogDiv.addEventListener('click', (e) => {
+            dialogDiv.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 currentDialogId = dialog.id;
                 renderDialogs();
-                renderMessages();
+                await renderMessages();
                 if (isProfileCreationVisible) showChatPanel();
             });
             
@@ -71,25 +71,10 @@ async function createNewDialog() {
         !currentDialogs.some(oldDialog => oldDialog.id === newDialog.id)
     )[0];
     
-    messages[newDialog.id] = [];
     currentDialogId = newDialog.id;
     renderDialogs();
-    renderMessages();
+    await renderMessages();
     if (isProfileCreationVisible) showChatPanel();
-}
-
-function updateDialogName(dialogId) {
-    const dialog = dialogs.find(d => d.id === dialogId);
-    if (!dialog || dialog.name !== 'Новый диалог') return;
-    const dialogMessages = messages[dialogId];
-    if (!dialogMessages) return;
-    const firstUserMessage = dialogMessages.find(msg => msg.type === 'sent' && !msg.isSanitizedCopy);
-    if (firstUserMessage && firstUserMessage.text) {
-        let newName = firstUserMessage.text.trim();
-        if (newName.length > 30) newName = newName.substring(0, 27) + '...';
-        dialog.name = newName;
-        renderDialogs();
-    }
 }
 
 async function createInitialDialog() {
@@ -97,10 +82,9 @@ async function createInitialDialog() {
     
     if (dialogs.length > 0){
         let newDialog = dialogs[0];
-        messages[newDialog.id] = [];
         currentDialogId = newDialog.id;
         renderDialogs();
-        renderMessages();
+        await renderMessages();
         if (isProfileCreationVisible) showChatPanel();
     }
 }

@@ -62,6 +62,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
                 ChatId = m.ChatId,
                 Text = m.Text,
                 Type = m.Type,
+                OriginalMessageId = m.OriginalMessageId,
                 OrderIndex = m.OrderIndex
             }).ToList()
     };

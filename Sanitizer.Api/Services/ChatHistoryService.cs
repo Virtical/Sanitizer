@@ -17,10 +17,9 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
     public Task<List<ChatInfo>> SaveChatAsync(string name) =>
         chatStorage.SaveChatAsync(name);
 
-    public async Task<ChatSession> AddMessageAsync(string chatId, MessageRequest message)
+    public async Task<Message> AddMessageAsync(string chatId, MessageRequest message)
     {
-        await messageStorage.AddMessageAsync(chatId, message);
-        return await chatStorage.GetByIdAsync(chatId);
+        return await messageStorage.AddMessageAsync(chatId, message);
     }
 
     public Task<string> DeleteChatAsync(string chatId) =>
