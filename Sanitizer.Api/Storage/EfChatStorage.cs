@@ -10,7 +10,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
     public async Task<List<ChatInfo>> GetAllAsync()
     {
         var entities = await db.Chats.AsNoTracking().ToListAsync();
-        return entities.Select(e => new ChatInfo { Id = e.Id, Name = e.Name }).ToList();
+        return entities.Select(e => new ChatInfo { Id = e.Id, Name = e.Name, CreatedAt = e.CreatedAt}).ToList();
     }
 
     public async Task<ChatSession> GetByIdAsync(string chatId)
