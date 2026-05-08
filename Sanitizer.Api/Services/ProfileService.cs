@@ -8,8 +8,16 @@ public class ProfileService(IProfileStorage storage)
     public Task<List<SanitizationProfile>> GetAllAsync() =>
         storage.GetAllAsync();
 
-    public async Task<SanitizationProfile?> GetByIdAsync(string id) =>
-        (await storage.GetAllAsync()).FirstOrDefault(p => p.Id == id);
+    public async Task<SanitizationProfile> GetByIdAsync(string? id)
+    {
+        if (id is null)
+        {
+            return new SanitizationProfile();
+        }
+        var r = (await storage.GetAllAsync()).FirstOrDefault(p => p.Id == id);
+        return r ?? new SanitizationProfile();
+    }
+
 
     public async Task<SanitizationProfile> CreateAsync(SanitizationProfile profile)
     {

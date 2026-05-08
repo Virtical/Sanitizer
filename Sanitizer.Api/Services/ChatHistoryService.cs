@@ -3,7 +3,7 @@ using Sanitizer.Api.Storage;
 
 namespace Sanitizer.Api.Services;
 
-public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messageStorage) : IChatHistoryStorage
+public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messageStorage)
 {
     public Task<List<ChatInfo>> GetAllAsync() =>
         chatStorage.GetAllAsync();
@@ -11,7 +11,10 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
     public Task<ChatSession> GetByIdAsync(string chatId) =>
         chatStorage.GetByIdAsync(chatId);
 
-    public Task<string> SaveChatAsync(string name) =>
+    public Task<string?> GetProfileIdAsync(string chatId) =>
+        chatStorage.GetProfileIdAsync(chatId);
+
+    public Task<List<ChatInfo>> SaveChatAsync(string name) =>
         chatStorage.SaveChatAsync(name);
 
     public async Task<ChatSession> AddMessageAsync(string chatId, MessageRequest message)
