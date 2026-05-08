@@ -17,7 +17,7 @@ async function renderMessages() {
     if (!messagesArea) return;
 
     messagesArea.innerHTML = '';
-    const originalMessages = serverData.messages.filter(msg => msg.type === 'Sent' || msg.type === 'Answer');
+    const originalMessages = serverData.messages.filter(m => m.type === 'Sent' || m.type === 'Answer');
 
     originalMessages.forEach((msg, idx) => {
         const msgClone = cloneTemplate('message-template');
@@ -44,7 +44,7 @@ async function renderMessages() {
             }
         }
 
-        const sanitizedCopy = serverData.messages.filter(msg => msg.type === 'Sanitized');
+        const sanitizedCopy = sanitizedMessages.find(m => m.originalMessageId === msg.id);
         if (sanitizedCopy) {
             const sanitizedClone = cloneTemplate('sanitized-message-template');
             if (sanitizedClone) {
