@@ -24,12 +24,18 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         return MapToModel(entity);
     }
 
-    public async Task<string> SaveChatAsync(string name)
+    public async Task<string?> GetProfileIdAsync(string chatId)
+    {
+        var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
+        return chat?.SanitizationProfileId;
+    }
+    
+    public async Task<List<ChatInfo>> SaveChatAsync(string name)
     {
         var entity = new ChatEntity { Name = name };
         db.Chats.Add(entity);
         await db.SaveChangesAsync();
-        return entity.Id;
+        return await GetAllAsync();
     }
 
     public async Task<string> DeleteChatAsync(string chatId)

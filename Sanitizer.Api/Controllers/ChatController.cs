@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -29,6 +30,7 @@ public class ChatController(SanitizerService sanitizerService,
         => Ok(await chatHistoryService.SaveChatAsync(name));
 
     [HttpDelete("{chatId}")]
+    [SwaggerIgnore]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute]string chatId)
         => Ok(await chatHistoryService.DeleteChatAsync(chatId));
     
@@ -45,12 +47,6 @@ public class ChatController(SanitizerService sanitizerService,
             return BadRequest("Message is required.");
         }
 
-        var profile = await profileService.GetByIdAsync(request.ChatId);
-        if (profile is null)
-        {
-            return NotFound($"Profile '{request.ChatId}' not found.");
-        }
-
         await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
         {
             Text = request.Message,
@@ -60,18 +56,20 @@ public class ChatController(SanitizerService sanitizerService,
         SanitizationResult sanitization;
         try
         {
+            var profileId = await chatHistoryService.GetProfileIdAsync(request.ChatId);
+            var profile = await profileService.GetByIdAsync(profileId);
+            
             sanitization = sanitizerService.Sanitize(request.Message, profile);
+            await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
+            {
+                Text = sanitization.SanitizedText,
+                Type = MessageType.Sanitized,
+            });
         }
         catch (InvalidOperationException ex)
         {
             return BadRequest(new { Error = ex.Message });
         }
-        
-        await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
-        {
-            Text = sanitization.SanitizedText,
-            Type = MessageType.Sanitized,
-        });
 
         string raw;
         try

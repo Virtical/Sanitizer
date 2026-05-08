@@ -34,7 +34,6 @@ builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
 builder.Services.AddScoped<IApiKeyStorage,  EfApiKeyStorage>();
 builder.Services.AddScoped<IChatStorage, EfChatStorage>();
 builder.Services.AddScoped<IMessageStorage, EfMessageStorage>();
-builder.Services.AddScoped<IChatHistoryStorage, ChatHistoryService>();
 
 builder.Services.AddSingleton<TokenStore>();
 builder.Services.AddSingleton<DetectorRegistry>();
@@ -42,6 +41,7 @@ builder.Services.AddSingleton<StrategyFactory>();
 builder.Services.AddSingleton<DesanitizerService>();
 builder.Services.AddScoped<SanitizerService>();
 builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<ChatHistoryService>();
 
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
