@@ -2,7 +2,7 @@
 let currentDialogId = null;
 let isDialogsHidden = false;
 let dialogs = [];
-let messages = {};
+let sanitizedMessages = [];
 
 let allProfiles = [];
 let currentProfile = null

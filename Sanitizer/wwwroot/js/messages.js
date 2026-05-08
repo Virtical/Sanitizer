@@ -1,6 +1,7 @@
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
-function renderMessages() {
-    const hasMessages = currentDialogId && messages[currentDialogId] && messages[currentDialogId].length > 0;
+async function renderMessages() {
+    const serverData = await apiGetMessages(currentDialogId);
+    const hasMessages = serverData.messages.length > 0;
     const emptyState = document.getElementById('chatEmptyState');
     const messagesWrapper = document.getElementById('messagesWrapper');
     const messagesArea = document.getElementById('messagesArea');
@@ -16,7 +17,7 @@ function renderMessages() {
     if (!messagesArea) return;
 
     messagesArea.innerHTML = '';
-    const originalMessages = messages[currentDialogId].filter(msg => !msg.isSanitizedCopy);
+    const originalMessages = serverData.messages.filter(msg => msg.type === 'Sent' || msg.type === 'Answer');
 
     originalMessages.forEach((msg, idx) => {
         const msgClone = cloneTemplate('message-template');
@@ -25,26 +26,25 @@ function renderMessages() {
         const msgDiv = msgClone.querySelector('.message');
         const bubble = msgClone.querySelector('.message-bubble');
         
-        msgDiv.classList.add(msg.type);
+        msgDiv.classList.add(msg.type.toLowerCase());
         bubble.textContent = msg.text;
 
-        if (msg.type === 'sent') {
+        if (msg.type === 'Sent') {
             const actionsClone = cloneTemplate('message-actions-template');
             if (actionsClone) {
                 const actionsDiv = actionsClone.querySelector('.message-actions');
                 const eyeBtn = actionsClone.querySelector('.eye-btn');
-                const originalMsgId = msg.id;
                 
-                eyeBtn.addEventListener('click', (e) => {
+                eyeBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    toggleSanitizedMessage(currentDialogId, originalMsgId);
+                    await toggleSanitizedMessage(serverData.messages, msg.id);
                 });
                 
                 msgDiv.appendChild(actionsClone);
             }
         }
 
-        const sanitizedCopy = messages[currentDialogId].find(m => m.isSanitizedCopy && m.originalMessageId === msg.id);
+        const sanitizedCopy = serverData.messages.filter(msg => msg.type === 'Sanitized');
         if (sanitizedCopy) {
             const sanitizedClone = cloneTemplate('sanitized-message-template');
             if (sanitizedClone) {
@@ -60,60 +60,28 @@ function renderMessages() {
     messagesArea.scrollTop = messagesArea.scrollHeight;
 }
 
-function toggleSanitizedMessage(dialogId, originalMsgId) {
-    if (!messages[dialogId]) return;
-    const sanitizedIndex = messages[dialogId].findIndex(m => m.isSanitizedCopy && m.originalMessageId === originalMsgId);
-    const originalMsg = messages[dialogId].find(m => m.id === originalMsgId);
+async function toggleSanitizedMessage(messages, originalMsgId) {
+    const sanitizedIndex = sanitizedMessages.findIndex(m => m.originalMessageId === originalMsgId);
+    const originalMsg = messages.find(m => m.id === originalMsgId);
     if (!originalMsg) return;
 
     if (sanitizedIndex !== -1) {
-        const newMessages = [...messages[dialogId]];
-        newMessages.splice(sanitizedIndex, 1);
-        messages[dialogId] = newMessages;
+         sanitizedMessages.splice(sanitizedIndex, 1);
     } else {
+        const sanitizedMsg = messages.find(m => m.originalMessageId === originalMsgId);
         const newMsg = {
-            id: `sanitized_${Date.now()}_${originalMsgId}`,
-            text: originalMsg.sanitized,
-            type: originalMsg.type,
-            isSanitizedCopy: true,
-            originalMessageId: originalMsg.id
+            id: sanitizedMsg.id,
+            text: sanitizedMsg.text,
+            type: sanitizedMsg.type,
+            originalMessageId: sanitizedMsg.originalMessageId,
         };
-        const newMessages = [...messages[dialogId]];
-        newMessages.push(newMsg);
-        messages[dialogId] = newMessages;
+        sanitizedMessages.push(newMsg);
     }
-    renderMessages();
+    await renderMessages();
 }
 
 async function addMessage(text, type = 'sent') {
     if (!text.trim() || !currentDialogId) return;
-    const newId = 'msg_' + Date.now();
     const sendMessageResponse = await apiSendMessage(currentDialogId, text);
-    const newMsg = {
-        id: newId,
-        text: text,
-        type: type,
-        sanitized: sendMessageResponse.sanitizedPrompt,
-        isSanitizedCopy: false
-    };
-    if (!messages[currentDialogId]) messages[currentDialogId] = [];
-    messages[currentDialogId].push(newMsg);
-    renderMessages();
-
-    if (type === 'sent') {
-        updateDialogName(currentDialogId);
-        setTimeout(() => {
-            const replyMsg = {
-                id: 'reply_' + Date.now(),
-                text: sendMessageResponse.response,
-                type: 'received',
-                sanitized: sendMessageResponse.response,
-                isSanitizedCopy: false
-            };
-            if (messages[currentDialogId]) {
-                messages[currentDialogId].push(replyMsg);
-                renderMessages();
-            }
-        }, 300);
-    }
+    await renderMessages();
 }

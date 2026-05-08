@@ -23,6 +23,7 @@ public class EfMessageStorage(SanitizerDbContext db) : IMessageStorage
             ChatId = chatId,
             Text = message.Text,
             Type = message.Type,
+            OriginalMessageId = message.OriginalMessageId,
             OrderIndex = maxIndex + 1
         };
 
@@ -35,6 +36,7 @@ public class EfMessageStorage(SanitizerDbContext db) : IMessageStorage
             ChatId = entity.ChatId,
             Text = entity.Text,
             Type = entity.Type,
+            OriginalMessageId = entity.OriginalMessageId,
             OrderIndex = entity.OrderIndex
         };
     }

@@ -8,8 +8,8 @@ public class MessageEntity
     
     public string ChatId { get; set; } = string.Empty;
     public ChatEntity? Chat { get; set; }
-    
     public string Text { get; set; } = string.Empty;
     public MessageType Type { get; set; }
     public int OrderIndex { get; set; }
+    public string? OriginalMessageId { get; set; }
 }
