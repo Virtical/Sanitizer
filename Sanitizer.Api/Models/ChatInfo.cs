@@ -6,4 +6,6 @@ public class ChatInfo
 
     /// <summary>Название чата (обычно — первое сообщение пользователя, до 30 символов).</summary>
     public string Name { get; set; } = "Новый диалог";
+    
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

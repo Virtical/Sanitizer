@@ -65,15 +65,9 @@ function renderDialogs() {
 }
 
 async function createNewDialog() {
-    const dialogName = 'Новый диалог';
     let currentDialogs = dialogs;
-    const savedDialog = await apiSaveDialog(dialogName);
-    const newArray = savedDialog.map(dialog => ({
-        ...dialog,
-        createdAt: new Date().toISOString()
-    }));
-    dialogs = newArray;
-    let newDialog = newArray.filter(newDialog =>
+    dialogs = await apiSaveDialog('Новый диалог');
+    let newDialog = dialogs.filter(newDialog =>
         !currentDialogs.some(oldDialog => oldDialog.id === newDialog.id)
     )[0];
     
@@ -99,12 +93,7 @@ function updateDialogName(dialogId) {
 }
 
 async function createInitialDialog() {
-    const dialogName = 'Новый диалог';
-    const savedDialog = await apiGetDialog(dialogName);
-    dialogs = savedDialog.map(dialog => ({
-        ...dialog,
-        createdAt: new Date().toISOString()
-    }));
+    dialogs = await apiGetDialog('Новый диалог');
 
     if (dialogs.length > 0){
         let newDialog = dialogs[0];
