@@ -120,7 +120,7 @@ function initScrollbars() {
 }
 
 async function init() {
-    createInitialDialog();
+    await createInitialDialog();
     await initProfiles();
     renderDialogs();
     renderMessages();
@@ -135,5 +135,7 @@ async function init() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => init());
 } else {
-    init();
+    (async () => {
+        await init();
+    })();
 }

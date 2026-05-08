@@ -64,16 +64,21 @@ function renderDialogs() {
     });
 }
 
-function createNewDialog() {
-    const newId = Date.now().toString();
-    const now = new Date();
-    dialogs.unshift({
-        id: newId,
-        name: 'Новый диалог',
-        createdAt: now.toISOString()
-    });
-    messages[newId] = [];
-    currentDialogId = newId;
+async function createNewDialog() {
+    const dialogName = 'Новый диалог';
+    let currentDialogs = dialogs;
+    const savedDialog = await apiSaveDialog(dialogName);
+    const newArray = savedDialog.map(dialog => ({
+        ...dialog,
+        createdAt: new Date().toISOString()
+    }));
+    dialogs = newArray;
+    let newDialog = newArray.filter(newDialog =>
+        !currentDialogs.some(oldDialog => oldDialog.id === newDialog.id)
+    )[0];
+    
+    messages[newDialog.id] = [];
+    currentDialogId = newDialog.id;
     renderDialogs();
     renderMessages();
     if (isProfileCreationVisible) showChatPanel();
@@ -93,16 +98,22 @@ function updateDialogName(dialogId) {
     }
 }
 
-function createInitialDialog() {
-    const initialId = 'initial_1';
-    const now = new Date();
-    dialogs.push({
-        id: initialId,
-        name: 'Новый диалог',
-        createdAt: now.toISOString()
-    });
-    messages[initialId] = [];
-    currentDialogId = initialId;
+async function createInitialDialog() {
+    const dialogName = 'Новый диалог';
+    const savedDialog = await apiGetDialog(dialogName);
+    dialogs = savedDialog.map(dialog => ({
+        ...dialog,
+        createdAt: new Date().toISOString()
+    }));
+
+    if (dialogs.length > 0){
+        let newDialog = dialogs[0];
+        messages[newDialog.id] = [];
+        currentDialogId = newDialog.id;
+        renderDialogs();
+        renderMessages();
+        if (isProfileCreationVisible) showChatPanel();
+    }
 }
 
 // ==================== УПРАВЛЕНИЕ СВОРАЧИВАНИЕМ БЛОКА 2 ====================
