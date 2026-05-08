@@ -1,11 +1,11 @@
 const CHAT_API_BASE = 'http://localhost:5127/api/chat';
 
-async function apiSendMessage(profileId, message) {
+async function apiSendMessage(chatId, message) {
     const resp = await fetch(`${CHAT_API_BASE}/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            profileId: profileId,
+            chatId: chatId,
             message: message
         })
     });

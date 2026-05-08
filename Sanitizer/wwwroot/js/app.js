@@ -47,6 +47,7 @@ async function sendMessage() {
     const emptyMessageInput = document.getElementById('emptyMessageInput');
     const text = (messageInput && messageInput.value.trim()) ? messageInput.value.trim() :
         (emptyMessageInput ? emptyMessageInput.value.trim() : '');
+    
     if (text && currentDialogId) {
         await addMessage(text, 'sent');
         if (messageInput) messageInput.value = '';

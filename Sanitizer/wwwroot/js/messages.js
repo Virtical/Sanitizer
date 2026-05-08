@@ -88,7 +88,7 @@ function toggleSanitizedMessage(dialogId, originalMsgId) {
 async function addMessage(text, type = 'sent') {
     if (!text.trim() || !currentDialogId) return;
     const newId = 'msg_' + Date.now();
-    const sendMessageResponse = await apiSendMessage('1', text);
+    const sendMessageResponse = await apiSendMessage(currentDialogId, text);
     const newMsg = {
         id: newId,
         text: text,

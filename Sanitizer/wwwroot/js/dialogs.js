@@ -93,8 +93,8 @@ function updateDialogName(dialogId) {
 }
 
 async function createInitialDialog() {
-    dialogs = await apiGetDialog('Новый диалог');
-
+    dialogs = await apiGetDialog();
+    
     if (dialogs.length > 0){
         let newDialog = dialogs[0];
         messages[newDialog.id] = [];
