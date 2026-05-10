@@ -4,14 +4,14 @@
     top: calc(100% + 12px);
     right: 0;
     width: 280px;
-    background-color: #F5F5F5;
-    border: 2px solid #5B5B5B;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-primary);
     border-radius: 35px;
     display: none;
     flex-direction: column;
     z-index: 100;
     overflow: visible;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px var(--shadow-default);
 }
 
 .profile-dropdown.show {
@@ -25,7 +25,7 @@
     padding: 10px 16px;
     cursor: pointer;
     transition: background 0.2s;
-    background: #037C4E;
+    background: var(--accent-primary);
     margin: 8px 12px;
     border-radius: 20px;
     gap: 8px;
@@ -37,7 +37,7 @@
     font-weight: 600;
     font-size: 18px;
     line-height: 100%;
-    color: #FFFFFF;
+    color: var(--text-white);
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -79,7 +79,7 @@
     font-weight: 600;
     font-size: 18px;
     line-height: 100%;
-    color: #000000;
+    color: var(--text-primary);
     transition: background 0.2s;
     background: transparent;
     border-radius: 20px;
@@ -91,12 +91,12 @@
 }
 
 .profile-option-item:hover {
-    background-color: #E8E8E8;
+    background-color: var(--bg-secondary);
 }
 
 .profile-divider-line {
     height: 1px;
-    background-color: #5B5B5B;
+    background-color: var(--border-primary);
     margin: 8px 12px;
     flex-shrink: 0;
 }
@@ -119,13 +119,13 @@
 }
 
 .create-new-profile-btn:hover {
-    background-color: #E8E8E8;
+    background-color: var(--bg-secondary);
 }
 
 .create-icon-box {
     width: 24px;
     height: 24px;
-    background: #D9D9D9;
+    background: var(--border-checkbox);
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -138,7 +138,7 @@
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
-    color: #000000;
+    color: var(--text-primary);
 }
 
 .create-btn-text {
@@ -146,6 +146,6 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 100%;
-    color: #000000;
+    color: var(--text-primary);
     white-space: nowrap;
 }

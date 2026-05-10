@@ -14,7 +14,7 @@ html, body {
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #d4d4d4;
+    background-color: var(--bg-tertiary);
 }
 
 .page {

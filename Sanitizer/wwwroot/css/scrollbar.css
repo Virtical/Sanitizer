@@ -14,7 +14,7 @@
 .messages-area-wrapper .custom-scrollbar-thumb {
     position: absolute;
     width: 100%;
-    background: #037C4E;
+    background: var(--accent-primary);
     border-radius: 20px;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -22,5 +22,5 @@
 
 .dialogs-history-wrapper .custom-scrollbar-thumb:hover,
 .messages-area-wrapper .custom-scrollbar-thumb:hover {
-    background: #02A065;
+    background: var(--accent-hover);
 }
