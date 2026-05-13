@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -9,21 +10,21 @@ namespace Sanitizer.Api.Controllers;
 [Route("api/profiles")]
 public class ProfilesController(ProfileService profileService) : ControllerBase
 {
-    /// <summary>Список всех профилей.</summary>
     [HttpGet]
+    [SwaggerOperation(Summary = "Получение существующий профилей")]
     public async Task<IActionResult> GetAll() =>
         Ok(await profileService.GetAllAsync());
 
-    /// <summary>Получить профиль по ID.</summary>
+    [SwaggerOperation(Summary = "Получение профиля")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
     {
         var profile = await profileService.GetByIdAsync(id);
-        return profile is null ? NotFound() : Ok(profile);
+        return Ok(profile);
     }
 
-    /// <summary>Создать новый профиль.</summary>
     [HttpPost]
+    [SwaggerOperation(Summary = "Создание профиля")]
     public async Task<IActionResult> Create([FromBody] SanitizationProfile profile)
     {
         if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
@@ -32,9 +33,9 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
         var created = await profileService.CreateAsync(profile);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
-
-    /// <summary>Обновить существующий профиль.</summary>
+    
     [HttpPut("{id}")]
+    [SwaggerOperation(Summary = "Обновление профиля")]
     public async Task<IActionResult> Update(string id, [FromBody] SanitizationProfile profile)
     {
         if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
@@ -43,9 +44,9 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
         var updated = await profileService.UpdateAsync(id, profile);
         return updated is null ? NotFound() : Ok(updated);
     }
-
-    /// <summary>Удалить профиль.</summary>
+    
     [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Удаление профиля")]
     public async Task<IActionResult> Delete(string id)
     {
         var deleted = await profileService.DeleteAsync(id);

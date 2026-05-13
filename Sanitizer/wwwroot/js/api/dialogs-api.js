@@ -1,7 +1,7 @@
 const DIALOGS_API_BASE = 'http://localhost:5127/api/chat';
 
 async function apiSaveDialog(dialogName) {
-    const resp = await fetch(`${DIALOGS_API_BASE}/save`, {
+    const resp = await fetch(`${DIALOGS_API_BASE}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dialogName)

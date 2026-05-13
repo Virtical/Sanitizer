@@ -18,23 +18,33 @@ public class ChatController(SanitizerService sanitizerService,
                              ChatHistoryService chatHistoryService) : ControllerBase
 {
     [HttpGet]
+    [SwaggerOperation(Summary = "Получение названий диалогов")]
     public async Task<IActionResult> GetAllAsync()
         => Ok(await chatHistoryService.GetAllAsync());
     
     [HttpGet("{chatId}")]
+    [SwaggerOperation(Summary = "Получение сообщений диалога")]
     public async Task<IActionResult> GetByIdAsync([FromRoute]string chatId)
         => Ok(await chatHistoryService.GetByIdAsync(chatId));
     
-    [HttpPost("save")]
-    public async Task<IActionResult> SaveChatAsync([FromBody]string name)
+    [HttpPost]
+    [SwaggerOperation(Summary = "Создание диалога")]
+    public async Task<IActionResult> CreateAsync([FromBody]string name)
         => Ok(await chatHistoryService.SaveChatAsync(name));
+    
+    [HttpPut("{chatId}")]
+    [SwaggerOperation(Summary = "Изменения названия диалога")]
+    public async Task<IActionResult> UpdateAsync([FromRoute]string chatId, [FromBody]string name)
+        => Ok(await chatHistoryService.UpdateAsync(chatId, name));
 
     [HttpDelete("{chatId}")]
+    [SwaggerOperation(Summary = "Удаление диалога")]
     [SwaggerIgnore]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute]string chatId)
         => Ok(await chatHistoryService.DeleteChatAsync(chatId));
     
     [HttpPost("send")]
+    [SwaggerOperation(Summary = "Отправка сообщений")]
     public async Task<IActionResult> Send([FromBody] ChatSendRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.ChatId))

@@ -6,7 +6,8 @@ public interface IChatStorage
 {
     Task<List<ChatInfo>> GetAllAsync();
     Task<ChatSession> GetByIdAsync(string chatId);
-    Task<List<ChatInfo>> SaveChatAsync(string name);
+    Task SaveChatAsync(string name);
+    Task UpdateAsync(string id, string name);
     Task<string> DeleteChatAsync(string chatId);
     Task<string?> GetProfileIdAsync(string chatId);
 }
