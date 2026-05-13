@@ -28,24 +28,10 @@ function getGroupTitle(group) {
     }
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
-
 function truncateText(text, maxLength = 20) {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength - 3) + '...';
-}
-
-function getNextProfileId() {
-    return nextProfileId++;
 }
 
 function cloneTemplate(templateId) {
