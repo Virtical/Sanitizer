@@ -49,7 +49,7 @@ async function sendMessage() {
         (emptyMessageInput ? emptyMessageInput.value.trim() : '');
     
     if (text && currentDialogId) {
-        await addMessage(text, 'sent');
+        await addMessage(text);
         if (messageInput) messageInput.value = '';
         if (emptyMessageInput) emptyMessageInput.value = '';
     } else if (!currentDialogId) {

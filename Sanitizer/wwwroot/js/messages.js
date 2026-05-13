@@ -19,7 +19,7 @@ async function renderMessages() {
     messagesArea.innerHTML = '';
     const originalMessages = serverData.messages.filter(m => m.type === 'Sent' || m.type === 'Answer');
 
-    originalMessages.forEach((msg, idx) => {
+    originalMessages.forEach((msg) => {
         const msgClone = cloneTemplate('message-template');
         if (!msgClone) return;
         
@@ -32,7 +32,6 @@ async function renderMessages() {
         if (msg.type === 'Sent') {
             const actionsClone = cloneTemplate('message-actions-template');
             if (actionsClone) {
-                const actionsDiv = actionsClone.querySelector('.message-actions');
                 const eyeBtn = actionsClone.querySelector('.eye-btn');
                 
                 eyeBtn.addEventListener('click', async (e) => {
@@ -80,8 +79,8 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     await renderMessages();
 }
 
-async function addMessage(text, type = 'sent') {
+async function addMessage(text) {
     if (!text.trim() || !currentDialogId) return;
-    const sendMessageResponse = await apiSendMessage(currentDialogId, text);
+    await apiSendMessage(currentDialogId, text);
     await renderMessages();
 }

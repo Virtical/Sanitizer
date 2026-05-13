@@ -13,10 +13,10 @@ function initDataMethodHandlers() {
     const toggleDataMethodContainer = () => {
         if (dataMethodContainer.style.display === 'none' || dataMethodContainer.style.display === '') {
             dataMethodContainer.style.display = 'flex';
-            addDataTypeBtn.style.background = '#02A065';
+            addDataTypeBtn.style.background = 'var(--accent-hover)';
         } else {
             dataMethodContainer.style.display = 'none';
-            addDataTypeBtn.style.background = '#037C4E';
+            addDataTypeBtn.style.background = 'var(--accent-primary)';
         }
     };
     addDataTypeBtn.addEventListener('click', toggleDataMethodContainer);

@@ -32,7 +32,6 @@ function renderDialogs() {
         const groupClone = cloneTemplate('dialog-group-template');
         if (!groupClone) return;
         
-        const groupDiv = groupClone.querySelector('.dialogs-group');
         const titleDiv = groupClone.querySelector('.group-title');
         const dialogsContainer = groupClone.querySelector('.group-dialogs');
         
@@ -83,10 +82,14 @@ async function createInitialDialog() {
     if (dialogs.length > 0){
         let newDialog = dialogs[0];
         currentDialogId = newDialog.id;
-        renderDialogs();
-        await renderMessages();
-        if (isProfileCreationVisible) showChatPanel();
+    } else {
+        dialogs = await apiSaveDialog('Новый диалог');
+        currentDialogId =  dialogs[0].id;
     }
+
+    renderDialogs();
+    await renderMessages();
+    if (isProfileCreationVisible) showChatPanel();
 }
 
 // ==================== УПРАВЛЕНИЕ СВОРАЧИВАНИЕМ БЛОКА 2 ====================

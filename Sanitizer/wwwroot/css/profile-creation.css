@@ -300,5 +300,5 @@
 }
 
 .creation-back-btn:hover, .creation-save-btn:hover {
-    background-color: var(--bg-button-hover);
+    background-color: var(--bg-hover);
 }
