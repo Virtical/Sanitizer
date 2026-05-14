@@ -22,7 +22,6 @@ public class ProfileService(IProfileStorage storage)
     public async Task<SanitizationProfile> CreateAsync(SanitizationProfile profile)
     {
         profile.Id = Guid.NewGuid().ToString();
-        profile.CreatedDate = DateTime.UtcNow;
         await storage.SaveAsync(profile);
         return profile;
     }
@@ -30,10 +29,8 @@ public class ProfileService(IProfileStorage storage)
     public async Task<SanitizationProfile?> UpdateAsync(string id, SanitizationProfile updated)
     {
         var existing = await GetByIdAsync(id);
-        if (existing is null) return null;
 
-        updated.Id          = id;
-        updated.CreatedDate = existing.CreatedDate;
+        updated.Id = id;
         await storage.SaveAsync(updated);
         return updated;
     }

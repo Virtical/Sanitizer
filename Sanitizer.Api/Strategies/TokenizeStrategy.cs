@@ -9,9 +9,8 @@ namespace Sanitizer.Api.Strategies;
 /// </summary>
 public class TokenizeStrategy(TokenStore tokenStore) : ISanitizationStrategy
 {
-    public string Apply(string value, DetectorType type, Dictionary<string, string> parameters, string sessionId)
+    public string Apply(string value, DetectorType type, string sessionId)
     {
-        var ttl = int.Parse(parameters.GetValueOrDefault("ttlSeconds", "3600"));
-        return tokenStore.GetOrCreate(sessionId, value, type, ttl);
+        return tokenStore.GetOrCreate(sessionId, value, type);
     }
 }

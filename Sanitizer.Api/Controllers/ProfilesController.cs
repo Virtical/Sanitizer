@@ -25,26 +25,30 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
 
     [HttpPost]
     [SwaggerOperation(Summary = "Создание профиля")]
-    public async Task<IActionResult> Create([FromBody] SanitizationProfile profile)
+    public async Task<IActionResult> Create([FromBody] ProfileCreateRequest request)
     {
-        if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
-            return BadRequest("Profile.Reversible=false but one or more rules use Tokenize.");
+        var profile = new SanitizationProfile
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = request.Name,
+            Rules = request.Rules
+        };
 
-        var created = await profileService.CreateAsync(profile);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        await profileService.CreateAsync(profile);
+        return await GetAll();
     }
     
+    [SwaggerIgnore]
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление профиля")]
     public async Task<IActionResult> Update(string id, [FromBody] SanitizationProfile profile)
     {
-        if (!profile.Reversible && profile.Rules.Values.Any(r => r.Strategy == StrategyType.Tokenize))
-            return BadRequest("Profile.Reversible=false but one or more rules use Tokenize.");
-
         var updated = await profileService.UpdateAsync(id, profile);
         return updated is null ? NotFound() : Ok(updated);
     }
-    
+
+    /// <summary>Удалить профиль.</summary>
+    [SwaggerIgnore]
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Удаление профиля")]
     public async Task<IActionResult> Delete(string id)

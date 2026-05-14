@@ -32,7 +32,9 @@ async function apiUpdateDialogName(chatId, newName) {
     const resp = await fetch(`${DIALOGS_API_BASE}/${chatId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newName)
+        body: JSON.stringify({
+            name: newName
+        })
     });
 
     if (!resp.ok) {

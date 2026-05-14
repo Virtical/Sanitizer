@@ -11,37 +11,35 @@ namespace Sanitizer.Api.Strategies;
 /// </summary>
 public class MaskStrategy : ISanitizationStrategy
 {
-    public string Apply(string value, DetectorType type, Dictionary<string, string> parameters, string _)
+    public string Apply(string value, DetectorType type, string _)
     {
-        var maskChar = parameters.GetValueOrDefault("maskChar", "*")[0];
         return type switch
         {
-            DetectorType.Email     => MaskEmail(value, maskChar, parameters),
-            DetectorType.Phone     => MaskPhone(value, maskChar),
-            DetectorType.Card      => MaskCard(value, maskChar),
-            DetectorType.IpAddress => MaskIp(value, maskChar),
-            _                      => MaskDefault(value, maskChar, parameters)
+            DetectorType.Email => MaskEmail(value, '*'),
+            DetectorType.Phone => MaskPhone(value, '*'),
+            DetectorType.Card => MaskCard(value, '*'),
+            DetectorType.IpAddress => MaskIp(value, '*'),
+            _ => MaskDefault(value, '*')
         };
     }
 
-    private static string MaskEmail(string value, char maskChar, Dictionary<string, string> parameters)
+    private static string MaskEmail(string value, char maskChar)
     {
         var atIdx = value.LastIndexOf('@');
-        if (atIdx <= 0) return MaskDefault(value, maskChar, parameters);
-
-        var visibleStart = int.Parse(parameters.GetValueOrDefault("visibleStart", "2"));
+        if (atIdx <= 0) return MaskDefault(value, maskChar);
+        
         var local = value[..atIdx];
         var domain = value[atIdx..];
 
-        var visible = local.Length > visibleStart ? local[..visibleStart] : local;
-        var masked  = local.Length > visibleStart ? new string(maskChar, local.Length - visibleStart) : string.Empty;
+        var visible = local.Length > 2 ? local[..2] : local;
+        var masked  = local.Length > 2 ? new string(maskChar, local.Length - 2) : string.Empty;
         return visible + masked + domain;
     }
 
     private static string MaskPhone(string value, char maskChar)
     {
         var digits = value.Select((c, i) => (c, i)).Where(x => char.IsDigit(x.c)).ToList();
-        if (digits.Count < 4) return MaskDefault(value, maskChar, new());
+        if (digits.Count < 4) return MaskDefault(value, maskChar);
 
         var keepPositions = new HashSet<int>(digits.TakeLast(4).Select(x => x.i));
         return new string(value
@@ -51,7 +49,7 @@ public class MaskStrategy : ISanitizationStrategy
 
     private static string MaskCard(string value, char maskChar)
     {
-        if (value.Count(char.IsDigit) != 16) return MaskDefault(value, maskChar, new());
+        if (value.Count(char.IsDigit) != 16) return MaskDefault(value, maskChar);
 
         var digitIdx = 0;
         return new string(value.Select(c =>
@@ -77,16 +75,13 @@ public class MaskStrategy : ISanitizationStrategy
         return string.Join(":", groups);
     }
 
-    private static string MaskDefault(string value, char maskChar, Dictionary<string, string> parameters)
+    private static string MaskDefault(string value, char maskChar)
     {
-        var visibleStart = int.Parse(parameters.GetValueOrDefault("visibleStart", "2"));
-        var visibleEnd   = int.Parse(parameters.GetValueOrDefault("visibleEnd",   "2"));
-
-        if (value.Length <= visibleStart + visibleEnd)
+        if (value.Length <= 4)
             return new string(maskChar, value.Length);
 
-        return value[..visibleStart]
-               + new string(maskChar, value.Length - visibleStart - visibleEnd)
-               + value[^visibleEnd..];
+        return value[..2]
+               + new string(maskChar, value.Length - 4)
+               + value[^2..];
     }
 }

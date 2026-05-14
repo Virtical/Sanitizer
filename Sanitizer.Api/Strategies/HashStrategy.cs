@@ -10,19 +10,13 @@ namespace Sanitizer.Api.Strategies;
 /// </summary>
 public class HashStrategy : ISanitizationStrategy
 {
-    public string Apply(string value, DetectorType _, Dictionary<string, string> parameters, string __)
+    public string Apply(string value, DetectorType _, string __)
     {
-        var algorithm = parameters.GetValueOrDefault("algorithm", "sha256");
-        var encoding  = parameters.GetValueOrDefault("encoding",  "hex");
-        var length    = int.Parse(parameters.GetValueOrDefault("length", "16"));
-
         var bytes    = Encoding.UTF8.GetBytes(value);
-        var hashBytes = algorithm == "sha512" ? SHA512.HashData(bytes) : SHA256.HashData(bytes);
+        var hashBytes = SHA256.HashData(bytes);
 
-        var full = encoding == "base64"
-            ? Convert.ToBase64String(hashBytes)
-            : Convert.ToHexString(hashBytes).ToLowerInvariant();
+        var full = Convert.ToHexString(hashBytes).ToLowerInvariant();
 
-        return full.Length > length ? full[..length] : full;
+        return full.Length > 16 ? full[..16] : full;
     }
 }

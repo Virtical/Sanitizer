@@ -4,5 +4,5 @@ namespace Sanitizer.Api.Strategies;
 
 public interface ISanitizationStrategy
 {
-    string Apply(string value, DetectorType type, Dictionary<string, string> parameters, string sessionId);
+    string Apply(string value, DetectorType type, string sessionId);
 }

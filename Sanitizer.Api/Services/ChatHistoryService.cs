@@ -8,9 +8,18 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
     public Task<List<ChatInfo>> GetAllAsync() =>
         chatStorage.GetAllAsync();
 
-    public async Task<List<ChatInfo>> UpdateAsync(string id, string name)
+    public async Task<List<ChatInfo>> UpdateAsync(string id, UpdateRequest request)
     {
-        await chatStorage.UpdateAsync(id, name);
+        if (request.Name is not null)
+        {
+            await chatStorage.UpdateNameAsync(id, request.Name);
+        }
+        
+        if (request.ProfileId is not null)
+        {
+            await chatStorage.UpdateProfileIdAsync(id, request.ProfileId);
+        }
+
         return await GetAllAsync();
     }
 
