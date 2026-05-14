@@ -132,9 +132,8 @@ async function saveNewProfile() {
     };
 
     try {
-        const created = await apiCreateProfile(payload);
-        allProfiles.push(created);
-        currentProfile = created;
+        allProfiles = await apiCreateProfile(payload);
+        currentProfile = allProfiles.find(p => p.name === profileName);
     } catch (e) {
         console.error(e);
         return;
@@ -149,7 +148,7 @@ async function saveNewProfile() {
     const dataMethodContainer = document.getElementById('dataMethodContainer');
     if (dataMethodContainer) dataMethodContainer.style.display = 'none';
     const addDataTypeBtn = document.getElementById('addDataTypeBtn');
-    if (addDataTypeBtn) addDataTypeBtn.style.background = '#037C4E';
+    if (addDataTypeBtn) addDataTypeBtn.style.background = 'var(--accent-primary)';
 
     document.querySelectorAll('.data-type-option').forEach(opt => opt.classList.remove('selected'));
     document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('selected'));
