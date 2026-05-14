@@ -57,11 +57,7 @@ public class ChatController(SanitizerService sanitizerService,
             return BadRequest("Message is required.");
         }
 
-        var message = await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
-        {
-            Text = request.Message,
-            Type = MessageType.Sent,
-        });
+        var message = await chatHistoryService.AddMessageAsync(request.ChatId, MessageRequest.CreateSent(request.Message));
 
         SanitizationResult sanitization;
         try
@@ -70,12 +66,7 @@ public class ChatController(SanitizerService sanitizerService,
             var profile = await profileService.GetByIdAsync(profileId);
             
             sanitization = sanitizerService.Sanitize(request.Message, profile);
-            await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
-            {
-                Text = sanitization.SanitizedText,
-                Type = MessageType.Sanitized,
-                OriginalMessageId = message.Id
-            });
+            await chatHistoryService.AddMessageAsync(request.ChatId, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
         }
         catch (InvalidOperationException ex)
         {
@@ -93,11 +84,7 @@ public class ChatController(SanitizerService sanitizerService,
         }
 
         var final = desanitizer.Desanitize(raw, sanitization.Context);
-        await chatHistoryService.AddMessageAsync(request.ChatId, new MessageRequest
-        {
-            Text = final,
-            Type = MessageType.Answer,
-        });
+        await chatHistoryService.AddMessageAsync(request.ChatId, MessageRequest.CreateAnswer(final));
 
         return Ok(await chatHistoryService.GetByIdAsync(request.ChatId));
     }
