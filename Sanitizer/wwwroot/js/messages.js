@@ -79,8 +79,24 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     await renderMessages();
 }
 
+async function updateDialogName(dialogId) {
+    const dialog = dialogs.find(d => d.id === dialogId);
+    if (!dialog || dialog.name !== 'Новый диалог') return;
+    const serverData = await apiGetMessages(dialogId);
+    const firstUserMessage = serverData.messages.find(msg => msg.type === 'Sent');
+    let newName = firstUserMessage.text.trim();
+    if (newName.length > 30) newName = newName.substring(0, 27) + '...';
+    try {
+        dialogs = await apiUpdateDialogName(dialogId, newName);
+        renderDialogs();
+    } catch (error) {
+        console.error('Ошибка обновления названия диалога:', error);
+    }
+}
+
 async function addMessage(text) {
     if (!text.trim() || !currentDialogId) return;
     await apiSendMessage(currentDialogId, text);
     await renderMessages();
+    await updateDialogName(currentDialogId);
 }

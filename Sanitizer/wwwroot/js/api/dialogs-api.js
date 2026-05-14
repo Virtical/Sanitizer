@@ -27,3 +27,18 @@ async function apiGetDialog() {
     
     return await resp.json();
 }
+
+async function apiUpdateDialogName(chatId, newName) {
+    const resp = await fetch(`${DIALOGS_API_BASE}/${chatId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newName)
+    });
+
+    if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(`Ошибка обновления названия диалога: ${resp.status} ${errorText}`);
+    }
+
+    return await resp.json();
+}
