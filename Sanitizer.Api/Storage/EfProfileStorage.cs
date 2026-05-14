@@ -9,11 +9,6 @@ namespace Sanitizer.Api.Storage;
 
 public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
 {
-    private static readonly JsonSerializerOptions JsonOpts = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     public async Task<List<SanitizationProfile>> GetAllAsync()
     {
         var entities = await db.Profiles
@@ -37,9 +32,6 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
         else
         {
             existing.Name = profile.Name;
-            existing.Description = profile.Description;
-            existing.CreatedDate = profile.CreatedDate;
-            existing.Reversible = profile.Reversible;
 
             db.Rules.RemoveRange(existing.Rules);
             existing.Rules = profile.Rules.Select(r => new SanitizationRuleEntity
@@ -47,7 +39,6 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
                 ProfileId = existing.Id,
                 DetectorType = r.Key,
                 StrategyType = r.Value.Strategy,
-                ParametersJson = JsonSerializer.Serialize(r.Value.Parameters ?? new(), JsonOpts)
             }).ToList();
         }
 
@@ -69,19 +60,14 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
         {
             Id = e.Id,
             Name = e.Name,
-            Description = e.Description,
-            CreatedDate = e.CreatedDate,
-            Reversible = e.Reversible,
             Rules = new()
         };
 
         foreach (var r in e.Rules)
         {
-            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(r.ParametersJson, JsonOpts) ?? new();
             model.Rules[r.DetectorType] = new StrategyConfig
             {
                 Strategy = r.StrategyType,
-                Parameters = dict
             };
         }
 
@@ -94,9 +80,6 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
         {
             Id = p.Id,
             Name = p.Name,
-            Description = p.Description,
-            CreatedDate = p.CreatedDate,
-            Reversible = p.Reversible,
         };
 
         e.Rules = p.Rules.Select(r => new SanitizationRuleEntity
@@ -104,7 +87,6 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
             ProfileId = e.Id,
             DetectorType = r.Key,
             StrategyType = r.Value.Strategy,
-            ParametersJson = JsonSerializer.Serialize(r.Value.Parameters ?? new(), JsonOpts)
         }).ToList();
 
         return e;

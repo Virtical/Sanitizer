@@ -33,13 +33,13 @@ public class ChatController(SanitizerService sanitizerService,
         => Ok(await chatHistoryService.SaveChatAsync(name));
     
     [HttpPut("{chatId}")]
-    [SwaggerOperation(Summary = "Изменения названия диалога")]
-    public async Task<IActionResult> UpdateAsync([FromRoute]string chatId, [FromBody]string name)
-        => Ok(await chatHistoryService.UpdateAsync(chatId, name));
+    [SwaggerOperation(Summary = "Изменения диалога")]
+    public async Task<IActionResult> UpdateAsync([FromRoute]string chatId, [FromBody]UpdateRequest request)
+        => Ok(await chatHistoryService.UpdateAsync(chatId, request));
 
+    [SwaggerIgnore]
     [HttpDelete("{chatId}")]
     [SwaggerOperation(Summary = "Удаление диалога")]
-    [SwaggerIgnore]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute]string chatId)
         => Ok(await chatHistoryService.DeleteChatAsync(chatId));
     

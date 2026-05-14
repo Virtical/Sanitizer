@@ -11,7 +11,4 @@ public class SanitizationRuleEntity
 
     public DetectorType DetectorType { get; set; }
     public StrategyType StrategyType { get; set; }
-
-    /// <summary>Параметры стратегии в JSON.</summary>
-    public string ParametersJson { get; set; } = "{}";
 }

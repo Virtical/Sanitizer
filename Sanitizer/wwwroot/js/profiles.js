@@ -128,8 +128,6 @@ async function saveNewProfile() {
 
     const payload = {
         name: profileName,
-        description: '',
-        reversible: false,
         rules
     };
 

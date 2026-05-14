@@ -10,7 +10,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
     public async Task<List<ChatInfo>> GetAllAsync()
     {
         var entities = await db.Chats.AsNoTracking().ToListAsync();
-        return entities.Select(e => new ChatInfo { Id = e.Id, Name = e.Name, CreatedAt = e.CreatedAt}).ToList();
+        return entities.Select(e => new ChatInfo { Id = e.Id, Name = e.Name, CreatedAt = e.CreatedAt, ProfileId = e.ProfileId }).ToList();
     }
 
     public async Task<ChatSession> GetByIdAsync(string chatId)
@@ -24,7 +24,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         return MapToModel(entity);
     }
     
-    public async Task UpdateAsync(string id, string name)
+    public async Task UpdateNameAsync(string id, string name)
     {
         var entity = await db.Chats.FirstOrDefaultAsync(c => c.Id == id)
                      ?? throw new KeyNotFoundException($"Chat with id {id} not found");
@@ -32,11 +32,20 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         entity.Name = name;
         await db.SaveChangesAsync();
     }
+    
+    public async Task UpdateProfileIdAsync(string id, string profileId)
+    {
+        var entity = await db.Chats.FirstOrDefaultAsync(c => c.Id == id)
+                     ?? throw new KeyNotFoundException($"Chat with id {id} not found");
 
+        entity.ProfileId = profileId;
+        await db.SaveChangesAsync();
+    }
+    
     public async Task<string?> GetProfileIdAsync(string chatId)
     {
         var chat = await db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
-        return chat?.SanitizationProfileId;
+        return chat?.ProfileId;
     }
     
     public async Task SaveChatAsync(string name)
@@ -61,7 +70,7 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
     internal static ChatSession MapToModel(ChatEntity entity) => new()
     {
         Id = entity.Id,
-        SanitizationProfileId = entity.SanitizationProfileId,
+        SanitizationProfileId = entity.ProfileId,
         Messages = entity.Messages
             .OrderBy(m => m.OrderIndex)
             .Select(m => new Message

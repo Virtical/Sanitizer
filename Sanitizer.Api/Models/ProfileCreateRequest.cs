@@ -1,8 +1,7 @@
 namespace Sanitizer.Api.Models;
 
-public class SanitizationProfile
+public class ProfileCreateRequest
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public Dictionary<DetectorType, StrategyConfig> Rules { get; set; } = new();
 }

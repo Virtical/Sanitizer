@@ -77,6 +77,7 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
         sanitizedMessages.push(newMsg);
     }
     await renderMessages();
+    await updateDialogName(currentDialogId);
 }
 
 async function updateDialogName(dialogId) {

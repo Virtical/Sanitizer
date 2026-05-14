@@ -13,7 +13,7 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
 {
     public SanitizationResult Sanitize(string text, SanitizationProfile profile)
     {
-        var sessionId = profile.Reversible ? Guid.NewGuid().ToString() : string.Empty;
+        var sessionId = Guid.NewGuid().ToString();
 
         // 1. Собираем все совпадения по активным правилам
         var allMatches = profile.Rules
@@ -31,11 +31,8 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
 
         foreach (var (match, type, config) in nonOverlapping)
         {
-            if (!profile.Reversible && config.Strategy == StrategyType.Tokenize)
-                throw new InvalidOperationException("Profile.Reversible=false but rule uses Tokenize strategy.");
-
             var strategy  = strategyFactory.Create(config.Strategy);
-            var sanitized = strategy.Apply(match.Value, type, config.Parameters, sessionId);
+            var sanitized = strategy.Apply(match.Value, type, sessionId);
 
             items.Add(new SanitizedItem
             {
@@ -51,17 +48,15 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
                 .Insert(match.Position, sanitized);
         }
 
-        var context = profile.Reversible
-            ? new SanitizationContext { SessionId = sessionId }
-            : null;
+        var context = new SanitizationContext { SessionId = sessionId };
 
         return new SanitizationResult
         {
             OriginalText  = text,
             SanitizedText = sanitizedText,
-            SessionId     = profile.Reversible ? sessionId : null,
-            Context       = context,
-            Items         = items.OrderBy(x => x.Position).ToList()
+            SessionId = sessionId,
+            Context = context,
+            Items = items.OrderBy(x => x.Position).ToList()
         };
     }
 
