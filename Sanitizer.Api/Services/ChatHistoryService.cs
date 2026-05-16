@@ -1,4 +1,7 @@
+using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Chat;
+using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Storage;
 
 namespace Sanitizer.Api.Services;
@@ -8,16 +11,16 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
     public Task<List<ChatInfo>> GetAllAsync() =>
         chatStorage.GetAllAsync();
 
-    public async Task<List<ChatInfo>> UpdateAsync(string id, UpdateRequest request)
+    public async Task<List<ChatInfo>> UpdateAsync(string id, UpdateChatRequest chatRequest)
     {
-        if (request.Name is not null)
+        if (chatRequest.Name is not null)
         {
-            await chatStorage.UpdateNameAsync(id, request.Name);
+            await chatStorage.UpdateNameAsync(id, chatRequest.Name);
         }
         
-        if (request.ProfileId is not null)
+        if (chatRequest.ProfileId is not null)
         {
-            await chatStorage.UpdateProfileIdAsync(id, request.ProfileId);
+            await chatStorage.UpdateProfileIdAsync(id, chatRequest.ProfileId);
         }
 
         return await GetAllAsync();
@@ -29,10 +32,16 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
     public Task<string?> GetProfileIdAsync(string chatId) =>
         chatStorage.GetProfileIdAsync(chatId);
 
-    public async Task<List<ChatInfo>> SaveChatAsync(string name)
+    public async Task<ChatInfo> SaveChatAsync(string name)
     {
-        await chatStorage.SaveChatAsync(name);
-        return await GetAllAsync();
+        var chatEntity = await chatStorage.SaveChatAsync(name);
+        return new ChatInfo
+        {
+            Id = chatEntity.Id,
+            Name = chatEntity.Name,
+            ProfileId = chatEntity.ProfileId,
+            CreatedAt = chatEntity.CreatedAt
+        };
     }
 
     public async Task<Message> AddMessageAsync(string chatId, MessageRequest message)

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Chat;
+using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Storage.Data.Entities;
 
@@ -48,11 +50,13 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         return chat?.ProfileId;
     }
     
-    public async Task SaveChatAsync(string name)
+    public async Task<ChatEntity> SaveChatAsync(string name)
     {
         var entity = new ChatEntity { Name = name };
         db.Chats.Add(entity);
         await db.SaveChangesAsync();
+
+        return entity;
     }
 
     public async Task<string> DeleteChatAsync(string chatId)

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Services;
 using Swashbuckle.AspNetCore.Annotations;
@@ -15,35 +16,20 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
     public async Task<IActionResult> GetAll() =>
         Ok(await profileService.GetAllAsync());
 
-    [SwaggerOperation(Summary = "Получение профиля")]
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id)
-    {
-        var profile = await profileService.GetByIdAsync(id);
-        return Ok(profile);
-    }
-
     [HttpPost]
     [SwaggerOperation(Summary = "Создание профиля")]
-    public async Task<IActionResult> Create([FromBody] ProfileCreateRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProfileRequest request)
     {
-        var profile = new SanitizationProfile
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = request.Name,
-            Rules = request.Rules
-        };
-
-        await profileService.CreateAsync(profile);
+        await profileService.CreateAsync(request);
         return await GetAll();
     }
     
     [SwaggerIgnore]
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление профиля")]
-    public async Task<IActionResult> Update(string id, [FromBody] SanitizationProfile profile)
+    public async Task<IActionResult> Update([FromRoute]string id, [FromBody] UpdateProfileRequest profileRequest)
     {
-        var updated = await profileService.UpdateAsync(id, profile);
+        var updated = await profileService.UpdateAsync(id, profileRequest);
         return updated is null ? NotFound() : Ok(updated);
     }
 
@@ -51,7 +37,7 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
     [SwaggerIgnore]
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Удаление профиля")]
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete([FromRoute]string id)
     {
         var deleted = await profileService.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();

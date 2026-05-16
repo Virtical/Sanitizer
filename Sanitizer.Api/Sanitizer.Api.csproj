@@ -13,4 +13,14 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Models\StrategyType.cs" />
+    <Compile Remove="Models\ChatInfo.cs" />
+    <Compile Remove="Models\ChatModels.cs" />
+    <Compile Remove="Models\ChatSendModels.cs" />
+    <Compile Remove="Models\ChatSession.cs" />
+    <Compile Remove="Models\MessageType.cs" />
+    <Compile Remove="Models\ProfileCreateRequest.cs" />
+    <Compile Remove="Models\SanitizationProfile.cs" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Strategy;
 
 namespace Sanitizer.Api.Storage.Data.Entities;
 

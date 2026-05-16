@@ -1,4 +1,5 @@
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Services;
 
 namespace Sanitizer.Api.Strategies;

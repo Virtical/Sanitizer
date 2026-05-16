@@ -15,18 +15,3 @@ async function apiCreateProfile(profile) {
     if (!resp.ok) throw new Error('Ошибка создания профиля');
     return resp.json();
 }
-
-async function apiUpdateProfile(id, profile) {
-    const resp = await fetch(`${PROFILES_API_BASE}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile)
-    });
-    if (!resp.ok) throw new Error('Ошибка обновления профиля');
-    return resp.json();
-}
-
-async function apiDeleteProfile(id) {
-    const resp = await fetch(`${PROFILES_API_BASE}/${id}`, { method: 'DELETE' });
-    return resp.ok;
-}
