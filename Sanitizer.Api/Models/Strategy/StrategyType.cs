@@ -1,4 +1,4 @@
-namespace Sanitizer.Api.Models;
+namespace Sanitizer.Api.Models.Strategy;
 
 public enum StrategyType
 {

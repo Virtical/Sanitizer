@@ -1,3 +1,5 @@
+using Sanitizer.Api.Models.Strategy;
+
 namespace Sanitizer.Api.Models;
 
 public class SanitizationResult

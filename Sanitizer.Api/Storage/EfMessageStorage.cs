@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Storage.Data.Entities;
 

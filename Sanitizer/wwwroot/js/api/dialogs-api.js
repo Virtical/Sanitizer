@@ -4,7 +4,9 @@ async function apiSaveDialog(dialogName) {
     const resp = await fetch(`${DIALOGS_API_BASE}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dialogName)
+        body: JSON.stringify({
+            name: dialogName
+        })
     });
 
     if (!resp.ok) {

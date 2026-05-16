@@ -1,4 +1,7 @@
+using Sanitizer.Api.Controllers.Client.Requests;
+using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Strategies;
 using Sanitizer.Service.Detectors;
 
@@ -11,12 +14,12 @@ namespace Sanitizer.Api.Services;
 /// </summary>
 public class SanitizerService(DetectorRegistry registry, StrategyFactory strategyFactory)
 {
-    public SanitizationResult Sanitize(string text, SanitizationProfile profile)
+    public SanitizationResult Sanitize(string text, ProfileResponse profileRequest)
     {
         var sessionId = Guid.NewGuid().ToString();
 
         // 1. Собираем все совпадения по активным правилам
-        var allMatches = profile.Rules
+        var allMatches = profileRequest.Rules
             .SelectMany(rule =>
                 registry.Get(rule.Key).Find(text)
                     .Select(m => (Match: m, Type: rule.Key, Config: rule.Value)))

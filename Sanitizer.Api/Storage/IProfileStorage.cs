@@ -1,10 +1,13 @@
+using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Storage.Data.Entities;
 
 namespace Sanitizer.Api.Storage;
 
 public interface IProfileStorage
 {
-    Task<List<SanitizationProfile>> GetAllAsync();
-    Task SaveAsync(SanitizationProfile profile);
+    Task<SanitizationProfileEntity[]> GetAllAsync();
+    Task<SanitizationProfileEntity?> GetByIdAsync(string id);
+    Task SaveAsync(SanitizationProfileEntity profileRequest);
     Task<bool> DeleteAsync(string id);
 }

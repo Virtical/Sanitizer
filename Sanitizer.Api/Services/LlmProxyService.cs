@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Chat;
 
 namespace Sanitizer.Api.Services;
 

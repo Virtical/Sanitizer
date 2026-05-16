@@ -1,7 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-
+using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Models;
+using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Storage.Data.Entities;
 
@@ -9,37 +10,36 @@ namespace Sanitizer.Api.Storage;
 
 public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
 {
-    public async Task<List<SanitizationProfile>> GetAllAsync()
+    public async Task<SanitizationProfileEntity[]> GetAllAsync()
     {
-        var entities = await db.Profiles
+        return await db.Profiles
             .Include(p => p.Rules)
             .AsNoTracking()
-            .ToListAsync();
-
-        return entities.Select(MapToModel).ToList();
+            .ToArrayAsync();
     }
 
-    public async Task SaveAsync(SanitizationProfile profile)
+    public async Task<SanitizationProfileEntity?> GetByIdAsync(string id)
+    {
+        return await db.Profiles
+            .Include(p => p.Rules)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
+
+    public async Task SaveAsync(SanitizationProfileEntity entity)
     {
         var existing = await db.Profiles
             .Include(p => p.Rules)
-            .FirstOrDefaultAsync(p => p.Id == profile.Id);
+            .FirstOrDefaultAsync(p => p.Id == entity.Id);
 
         if (existing is null)
         {
-            db.Profiles.Add(MapToEntity(profile));
+            db.Profiles.Add(entity);
         }
         else
         {
-            existing.Name = profile.Name;
-
+            existing.Name = entity.Name;
             db.Rules.RemoveRange(existing.Rules);
-            existing.Rules = profile.Rules.Select(r => new SanitizationRuleEntity
-            {
-                ProfileId = existing.Id,
-                DetectorType = r.Key,
-                StrategyType = r.Value.Strategy,
-            }).ToList();
+            existing.Rules = entity.Rules;
         }
 
         await db.SaveChangesAsync();
@@ -52,43 +52,5 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
         db.Profiles.Remove(existing);
         await db.SaveChangesAsync();
         return true;
-    }
-
-    private static SanitizationProfile MapToModel(SanitizationProfileEntity e)
-    {
-        var model = new SanitizationProfile
-        {
-            Id = e.Id,
-            Name = e.Name,
-            Rules = new()
-        };
-
-        foreach (var r in e.Rules)
-        {
-            model.Rules[r.DetectorType] = new StrategyConfig
-            {
-                Strategy = r.StrategyType,
-            };
-        }
-
-        return model;
-    }
-
-    private static SanitizationProfileEntity MapToEntity(SanitizationProfile p)
-    {
-        var e = new SanitizationProfileEntity
-        {
-            Id = p.Id,
-            Name = p.Name,
-        };
-
-        e.Rules = p.Rules.Select(r => new SanitizationRuleEntity
-        {
-            ProfileId = e.Id,
-            DetectorType = r.Key,
-            StrategyType = r.Value.Strategy,
-        }).ToList();
-
-        return e;
     }
 }
