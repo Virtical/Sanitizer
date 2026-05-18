@@ -13,11 +13,6 @@ public class ChatHistoryService(IChatStorage chatStorage, IMessageStorage messag
 
     public async Task<List<ChatInfo>> UpdateAsync(string id, UpdateChatRequest chatRequest)
     {
-        if (chatRequest.Name is not null)
-        {
-            await chatStorage.UpdateNameAsync(id, chatRequest.Name);
-        }
-        
         if (chatRequest.ProfileId is not null)
         {
             await chatStorage.UpdateProfileIdAsync(id, chatRequest.ProfileId);
