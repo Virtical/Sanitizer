@@ -26,15 +26,6 @@ public class EfChatStorage(SanitizerDbContext db) : IChatStorage
         return MapToModel(entity);
     }
     
-    public async Task UpdateNameAsync(string id, string name)
-    {
-        var entity = await db.Chats.FirstOrDefaultAsync(c => c.Id == id)
-                     ?? throw new KeyNotFoundException($"Chat with id {id} not found");
-
-        entity.Name = name;
-        await db.SaveChangesAsync();
-    }
-    
     public async Task UpdateProfileIdAsync(string id, string profileId)
     {
         var entity = await db.Chats.FirstOrDefaultAsync(c => c.Id == id)

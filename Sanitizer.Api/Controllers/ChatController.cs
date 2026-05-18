@@ -30,7 +30,12 @@ public class ChatController(SanitizerService sanitizerService,
     [SwaggerOperation(Summary = "Получение сообщений диалога")]
     public async Task<IActionResult> GetByIdAsync([FromRoute]string id)
         => Ok(await chatHistoryService.GetByIdAsync(id));
-
+    
+    [HttpPut("{id}")]
+    [SwaggerOperation(Summary = "Изменение диалога")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] string id, [FromBody] UpdateChatRequest request)
+        => Ok(await chatHistoryService.UpdateAsync(id, request));
+    
     [SwaggerIgnore]
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Удаление диалога")]
