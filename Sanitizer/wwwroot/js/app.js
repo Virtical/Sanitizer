@@ -48,12 +48,10 @@ async function sendMessage() {
     const text = (messageInput && messageInput.value.trim()) ? messageInput.value.trim() :
         (emptyMessageInput ? emptyMessageInput.value.trim() : '');
     
-    if (text && currentDialogId) {
+    if (text) {
         await addMessage(text);
         if (messageInput) messageInput.value = '';
         if (emptyMessageInput) emptyMessageInput.value = '';
-    } else if (!currentDialogId) {
-        alert('Сначала создайте или выберите диалог');
     }
 }
 
@@ -121,7 +119,8 @@ function initScrollbars() {
 }
 
 async function init() {
-    await createInitialDialog();
+    await loadDialogs();
+    createNewDialog();
     await initProfiles();
     renderDialogs();
     initEventListeners();

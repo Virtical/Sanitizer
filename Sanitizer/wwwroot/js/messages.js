@@ -1,6 +1,6 @@
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
-async function renderMessages() {
-    const serverData = await apiGetMessages(currentDialogId);
+async function renderMessages(data = null) {
+    const serverData = data || await apiGetMessages(currentDialogId);
     const hasMessages = serverData.messages.length > 0;
     const emptyState = document.getElementById('chatEmptyState');
     const messagesWrapper = document.getElementById('messagesWrapper');
@@ -77,27 +77,24 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
         sanitizedMessages.push(newMsg);
     }
     await renderMessages();
-    await updateDialogName(currentDialogId);
-}
-
-async function updateDialogName(dialogId) {
-    const dialog = dialogs.find(d => d.id === dialogId);
-    if (!dialog || dialog.name !== 'Новый диалог') return;
-    const serverData = await apiGetMessages(dialogId);
-    const firstUserMessage = serverData.messages.find(msg => msg.type === 'Sent');
-    let newName = firstUserMessage.text.trim();
-    if (newName.length > 30) newName = newName.substring(0, 27) + '...';
-    try {
-        dialogs = await apiUpdateDialogName(dialogId, newName);
-        renderDialogs();
-    } catch (error) {
-        console.error('Ошибка обновления названия диалога:', error);
-    }
 }
 
 async function addMessage(text) {
-    if (!text.trim() || !currentDialogId) return;
-    await apiSendMessage(currentDialogId, text);
-    await renderMessages();
-    await updateDialogName(currentDialogId);
+    if (!text.trim()) return;
+
+    if (!currentDialogId) {
+        try {
+            const result = await apiCreateDialog(text);
+            await loadDialogs();
+            currentDialogId = result.id;
+            await renderMessages(result);
+            renderDialogs();
+        } catch (error) {
+            console.error('Ошибка создания чата:', error);
+        }
+        return;
+    }
+
+    const result = await apiSendMessage(currentDialogId, text);
+    await renderMessages(result);
 }
