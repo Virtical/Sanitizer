@@ -63,33 +63,28 @@ function renderDialogs() {
     });
 }
 
-async function createNewDialog() {
-    let currentDialogs = dialogs;
-    dialogs = await apiSaveDialog('Новый диалог');
-    let newDialog = dialogs.filter(newDialog =>
-        !currentDialogs.some(oldDialog => oldDialog.id === newDialog.id)
-    )[0];
+function createNewDialog() {
+    currentDialogId = null;
+    const messagesArea = document.getElementById('messagesArea');
+    const emptyState = document.getElementById('chatEmptyState');
+    const messagesWrapper = document.getElementById('messagesWrapper');
+
+    messagesArea.innerHTML = '';
+    emptyState.style.display = 'flex';
+    messagesWrapper.style.display = 'none';
     
-    currentDialogId = newDialog.id;
     renderDialogs();
-    await renderMessages();
-    if (isProfileCreationVisible) showChatPanel();
 }
 
-async function createInitialDialog() {
-    dialogs = await apiGetDialog();
-    
-    if (dialogs.length > 0){
-        let newDialog = dialogs[0];
-        currentDialogId = newDialog.id;
-    } else {
-        dialogs = await apiSaveDialog('Новый диалог');
-        currentDialogId =  dialogs[0].id;
+async function loadDialogs() {
+    try {
+        dialogs = await apiGetDialog();
+        renderDialogs();
+    } catch (error) {
+        console.error('Ошибка загрузки диалогов:', error);
+        dialogs = [];
+        renderDialogs();
     }
-
-    renderDialogs();
-    await renderMessages();
-    if (isProfileCreationVisible) showChatPanel();
 }
 
 // ==================== УПРАВЛЕНИЕ СВОРАЧИВАНИЕМ БЛОКА 2 ====================
