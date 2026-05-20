@@ -1,10 +1,10 @@
 // ==================== УПРАВЛЕНИЕ ПРОФИЛЯМИ ====================
 function updateProfileDropdowns() {
-    updateProfileDropdown(document.getElementById('profileDropdown'), document.getElementById('profileChatBtn'));
-    updateProfileDropdown(document.getElementById('profileDropdownCreation'), document.getElementById('profileChatBtnCreation'));
+    updateProfileDropdown(document.getElementById('profileDropdown'));
+    updateProfileDropdown(document.getElementById('profileDropdownCreation'));
 }
 
-function updateProfileDropdown(dropdownElement, buttonElement) {
+function updateProfileDropdown(dropdownElement) {
     if (!dropdownElement) return;
     dropdownElement.innerHTML = '';
     
@@ -39,14 +39,19 @@ function updateProfileDropdown(dropdownElement, buttonElement) {
             
             const option = optionClone.querySelector('.profile-option-item');
             option.textContent = profile.name;
-            option.addEventListener('click', () => {
+            option.addEventListener('click', async () => {
                 currentProfile = profile;
-                dropdownElement.classList.remove('show');
-                if (buttonElement) {
-                    const profileChatText = buttonElement.querySelector('.profile-chat-text');
-                    if (profileChatText) profileChatText.textContent = truncateText(currentProfile.name, 20);
-                }
+                updateProfileButtonText();
                 updateProfileDropdowns();
+                dropdownElement.classList.remove('show');
+                
+                if (currentDialogId) {
+                    try {
+                        await apiUpdateDialogProfile(currentDialogId, currentProfile.id);
+                    } catch (error) {
+                        console.error('Ошибка привязки профиля:', error);
+                    }
+                }
             });
             
             profilesList.appendChild(optionClone);
@@ -133,7 +138,14 @@ async function saveNewProfile() {
 
     try {
         allProfiles = await apiCreateProfile(payload);
-        currentProfile = allProfiles.find(p => p.name === profileName);
+        currentProfile = allProfiles[allProfiles.length - 1];
+        if (currentDialogId && currentProfile) {
+            try {
+                await apiUpdateDialogProfile(currentDialogId, currentProfile.id);
+            } catch (error) {
+                console.error('Ошибка привязки нового профиля к диалогу:', error);
+            }
+        }
     } catch (e) {
         console.error(e);
         return;

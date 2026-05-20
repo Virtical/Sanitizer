@@ -1,6 +1,13 @@
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
 async function renderMessages(data = null) {
     const serverData = data || await apiGetMessages(currentDialogId);
+    const profileToShow = allProfiles.find(p => p.id === serverData.sanitizationProfileId) || currentProfile;
+    if (!currentProfile || currentProfile.id !== profileToShow.id) {
+        currentProfile = profileToShow;
+        updateProfileButtonText();
+        updateProfileDropdowns();
+    }
+    
     const hasMessages = serverData.messages.length > 0;
     const emptyState = document.getElementById('chatEmptyState');
     const messagesWrapper = document.getElementById('messagesWrapper');
@@ -87,6 +94,15 @@ async function addMessage(text) {
             const result = await apiCreateDialog(text);
             await loadDialogs();
             currentDialogId = result.id;
+            
+            if (currentProfile) {
+                try {
+                    await apiUpdateDialogProfile(currentDialogId, currentProfile.id);
+                } catch (error) {
+                    console.error('Ошибка привязки профиля к новому диалогу:', error);
+                }
+            }
+
             await renderMessages(result);
             renderDialogs();
         } catch (error) {
