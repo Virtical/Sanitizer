@@ -46,3 +46,20 @@ async function apiGetMessages(chatId) {
 
     return resp.json();
 }
+
+async function apiUpdateDialogProfile(dialogId, profileId) {
+    const resp = await fetch(`${CHAT_API_BASE}/${dialogId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            profileId: profileId
+        })
+    });
+
+    if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(`Ошибка привязки профиля: ${resp.status} ${errorText}`);
+    }
+
+    return resp.json();
+}
