@@ -34,7 +34,7 @@ async function renderMessages(data = null) {
         const bubble = msgClone.querySelector('.message-bubble');
         
         msgDiv.classList.add(msg.type.toLowerCase());
-        bubble.textContent = msg.text;
+        bubble.innerHTML = marked.parse(msg.text);
 
         if (msg.type === 'Sent') {
             const actionsClone = cloneTemplate('message-actions-template');
@@ -55,7 +55,7 @@ async function renderMessages(data = null) {
             const sanitizedClone = cloneTemplate('sanitized-message-template');
             if (sanitizedClone) {
                 const sanitizedBubble = sanitizedClone.querySelector('.sanitized-bubble');
-                sanitizedBubble.textContent = sanitizedCopy.text;
+                sanitizedBubble.innerHTML = marked.parse(sanitizedCopy.text);
                 msgDiv.appendChild(sanitizedClone);
             }
         }
