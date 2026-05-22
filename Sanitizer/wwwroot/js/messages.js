@@ -1,3 +1,4 @@
+/* global marked */
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
 async function renderMessages(data = null) {
     const serverData = data || await apiGetMessages(currentDialogId);
