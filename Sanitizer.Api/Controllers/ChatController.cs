@@ -1,11 +1,13 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using OpenAI.Chat;
 using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
-using Sanitizer.Api.Models.Chat;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using AiChatMessage = OpenAI.Chat.ChatMessage;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -17,9 +19,9 @@ namespace Sanitizer.Api.Controllers;
 [Route("api/chat")]
 public class ChatController(SanitizerService sanitizerService,
                              ProfileService profileService,
-                             ILlmClient llmClient,
                              DesanitizerService desanitizer,
-                             ChatHistoryService chatHistoryService) : ControllerBase
+                             ChatHistoryService chatHistoryService,
+                             ChatClient openAiClient) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(Summary = "Получение названий диалогов")]
@@ -44,17 +46,19 @@ public class ChatController(SanitizerService sanitizerService,
 
     [HttpPost("send")]
     [SwaggerOperation(Summary = "Отправка сообщений и создание чата")]
-    public async Task<IActionResult> Send([FromBody] SendMessageRequest messageRequest)
+    public async Task Send([FromBody] SendMessageRequest messageRequest)
         => await Send(null, messageRequest);
     
     
     [HttpPost("send/{id}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
-    public async Task<IActionResult> Send([FromRoute]string? id, [FromBody] SendMessageRequest messageRequest)
+    public async Task Send([FromRoute]string? id, [FromBody] SendMessageRequest messageRequest)
     {
         if (string.IsNullOrEmpty(messageRequest.Message))
         {
-            return BadRequest("Message is required.");
+            Response.StatusCode = 400;
+            await Response.WriteAsync("Message is required");
+            return;
         }
 
         if (id is null)
@@ -88,22 +92,47 @@ public class ChatController(SanitizerService sanitizerService,
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { Error = ex.Message });
+            Response.StatusCode = 400;
+            await Response.WriteAsync(ex.Message);
+            return;
         }
 
         string raw;
         try
         {
-            raw = await llmClient.GetCompletionAsync(sanitization.SanitizedText);
+            Response.ContentType = "text/plain";
+            Response.Headers.Append("Cache-Control", "no-cache");
+
+            var messages = new List<AiChatMessage>
+            {
+                AiChatMessage.CreateSystemMessage("Ты полезный ассистент"),
+                AiChatMessage.CreateUserMessage(sanitization.SanitizedText)
+            };
+        
+            var fullResponse = new StringBuilder();
+            await foreach (var update in openAiClient.CompleteChatStreamingAsync(messages))
+            {
+                foreach (var content in update.ContentUpdate)
+                {
+                    if (!string.IsNullOrEmpty(content.Text))
+                    {
+                        await Response.WriteAsync(content.Text);
+                        await Response.Body.FlushAsync();
+                        fullResponse.Append(content.Text);
+                    }
+                }
+            }
+        
+            raw = fullResponse.ToString();
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex)
         {
-            return StatusCode(502, new { Error = "LLM provider error.", Details = ex.Message });
+            Response.StatusCode = 400;
+            await Response.WriteAsync(ex.Message);
+            return;
         }
 
         var final = desanitizer.Desanitize(raw, sanitization.Context);
         await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(final));
-
-        return Ok(await chatHistoryService.GetByIdAsync(id));
     }
 }
