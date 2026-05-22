@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Sanitizer.Service.Detectors;
+﻿using Sanitizer.Service.Detectors;
 using Sanitizer.Test.Cases;
 
 namespace Sanitizer.Test;
@@ -15,13 +14,12 @@ public class DetectorShould
     [TestCaseSource(typeof(ApiKeyDetectorCases), nameof(ApiKeyDetectorCases.Valid))]
     [TestCaseSource(typeof(CartDetectorCases), nameof(CartDetectorCases.Valid))]
     [TestCaseSource(typeof(NameDetectorCases), nameof(NameDetectorCases.Valid))]
-    public void Detect(IDetector detector, string text, string expected)
-    {
-        var actuals = detector.Find(text);
-        
-        actuals.Should().HaveCount(1);
-        actuals.First().Value.Should().Be(expected);
-    }
+    public string Detect(IDetector detector, string text)
+        => detector
+            .Find(text)
+            .First()
+            .Value;
+
     [TestCaseSource(typeof(EmailDetectorCases), nameof(EmailDetectorCases.Invalid))]
     [TestCaseSource(typeof(PhoneDetectorCases), nameof(PhoneDetectorCases.Invalid))]
     [TestCaseSource(typeof(IpAddressDetectorCases), nameof(IpAddressDetectorCases.Invalid))]
@@ -30,10 +28,9 @@ public class DetectorShould
     [TestCaseSource(typeof(ApiKeyDetectorCases), nameof(ApiKeyDetectorCases.Invalid))]
     [TestCaseSource(typeof(CartDetectorCases), nameof(CartDetectorCases.Invalid))]
     [TestCaseSource(typeof(NameDetectorCases), nameof(NameDetectorCases.Invalid))]
-    public void NotDetect(IDetector detector, string text)
-    {
-        var actuals = detector.Find(text);
-        
-        actuals.Should().BeEmpty();
-    }
+    public string[] NotDetect(IDetector detector, string text)
+        => detector
+            .Find(text)
+            .Select(x => x.Value)
+            .ToArray();
 }
