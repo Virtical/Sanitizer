@@ -9,9 +9,9 @@ public class OpenAiLlmClient(LlmProxyService proxy, IConfiguration config) : ILl
     {
         var llmConfig = new LlmConfig
         {
-            ApiKey  = config["Llm:ApiKey"]  ?? string.Empty,
-            Model   = config["Llm:Model"]   ?? "gpt-4o-mini",
-            BaseUrl = config["Llm:BaseUrl"] ?? "https://api.openai.com"
+            ApiKey  = config["Llm:ApiKey"]  ?? throw new NullReferenceException(),
+            Model   = config["Llm:Model"]   ?? throw new NullReferenceException(),
+            BaseUrl = config["Llm:BaseUrl"] ?? throw new NullReferenceException()
         };
 
         return proxy.ChatAsync(llmConfig, [new ChatMessage("user", prompt)], ct);

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OpenAI.Chat;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.Storage;
 using Sanitizer.Api.Storage.Data;
@@ -45,9 +46,13 @@ builder.Services.AddScoped<ChatHistoryService>();
 
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
-    builder.Services.AddScoped<ILlmClient, OpenAiLlmClient>();
+{
+    builder.Services.AddSingleton(new ChatClient(builder.Configuration["Llm:Model"], builder.Configuration["Llm:ApiKey"]));
+}
 else
+{
     builder.Services.AddSingleton<ILlmClient, StubLlmClient>();
+}
 
 var app = builder.Build();
 
