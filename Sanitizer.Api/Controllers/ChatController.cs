@@ -28,6 +28,11 @@ public class ChatController(SanitizerService sanitizerService,
     public async Task<IActionResult> GetAllAsync()
         => Ok(await chatHistoryService.GetAllAsync());
     
+    [HttpPost]
+    [SwaggerOperation(Summary = "Создание диалога")]
+    public async Task<IActionResult> CreateAsync([FromRoute]CreateChatRequest request)
+        => Ok(await chatHistoryService.SaveChatAsync(request.Name));
+    
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Получение сообщений диалога")]
     public async Task<IActionResult> GetByIdAsync([FromRoute]string id)
@@ -43,32 +48,23 @@ public class ChatController(SanitizerService sanitizerService,
     [SwaggerOperation(Summary = "Удаление диалога")]
     public async Task<IActionResult> DeleteByIdAsync([FromRoute]string id)
         => Ok(await chatHistoryService.DeleteChatAsync(id));
-
-    [HttpPost("send")]
-    [SwaggerOperation(Summary = "Отправка сообщений и создание чата")]
-    public async Task Send([FromBody] SendMessageRequest messageRequest)
-        => await Send(null, messageRequest);
-    
     
     [HttpPost("send/{id}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
-    public async Task Send([FromRoute]string? id, [FromBody] SendMessageRequest messageRequest)
+    public async Task Send([FromRoute]string id, [FromBody] SendMessageRequest messageRequest)
     {
+        if (string.IsNullOrEmpty(id))
+        {
+            Response.StatusCode = 400;
+            await Response.WriteAsync("id is required");
+            return;
+        }
+        
         if (string.IsNullOrEmpty(messageRequest.Message))
         {
             Response.StatusCode = 400;
             await Response.WriteAsync("Message is required");
             return;
-        }
-
-        if (id is null)
-        {
-            var name = messageRequest.Message.Length >= 27
-                ? messageRequest.Message[..27] + "..."
-                : messageRequest.Message;
-
-            var chat = await chatHistoryService.SaveChatAsync(name);
-            id = chat.Id;
         }
 
         var message = await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateSent(messageRequest.Message));
