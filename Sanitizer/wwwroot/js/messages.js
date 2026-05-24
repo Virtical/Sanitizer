@@ -87,15 +87,66 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     await renderMessages();
 }
 
+/**
+ * Оптимистично отрисовывает сообщение пользователя и пустой бабл ответа.
+ * Возвращает ссылку на DOM-элемент бабла ответа для дальнейшего обновления.
+ * @param {string} text - текст отправленного сообщения
+ * @returns {HTMLElement|null} - бабл ответа (.message-bubble внутри .answer)
+ */
+function appendOptimisticMessages(text) {
+    const emptyState = document.getElementById('chatEmptyState');
+    const messagesWrapper = document.getElementById('messagesWrapper');
+    const messagesArea = document.getElementById('messagesArea');
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (messagesWrapper) messagesWrapper.style.display = 'flex';
+    if (!messagesArea) return null;
+
+    // Сообщение пользователя
+    const sentClone = cloneTemplate('message-template');
+    if (sentClone) {
+        const sentDiv = sentClone.querySelector('.message');
+        const sentBubble = sentClone.querySelector('.message-bubble');
+        sentDiv.classList.add('sent');
+        sentBubble.innerHTML = marked.parse(text);
+        messagesArea.appendChild(sentClone);
+    }
+
+    // Пустой бабл ответа ассистента
+    const ansClone = cloneTemplate('message-template');
+    if (!ansClone) return null;
+
+    const ansDiv = ansClone.querySelector('.message');
+    const ansBubble = ansClone.querySelector('.message-bubble');
+    ansDiv.classList.add('answer');
+    ansBubble.innerHTML = '';
+    messagesArea.appendChild(ansClone);
+
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+    return ansBubble;
+}
+
 async function addMessage(text) {
     if (!text.trim()) return;
 
-    if (!currentDialogId) {
-        try {
-            const result = await apiCreateDialog(text);
+    const messagesArea = document.getElementById('messagesArea');
+    const answerBubble = appendOptimisticMessages(text);
+
+    // Колбэк для обновления бабла ответа в реальном времени
+    const onChunk = (_chunk, fullText) => {
+        if (answerBubble) {
+            answerBubble.innerHTML = marked.parse(fullText);
+            if (messagesArea) messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+    };
+
+    try {
+        if (!currentDialogId) {
+            // Новый диалог — получаем id из заголовка X-Chat-Id
+            const { chatId } = await apiCreateDialog(text, onChunk);
+            currentDialogId = chatId;
             await loadDialogs();
-            currentDialogId = result.id;
-            
+
             if (currentProfile) {
                 try {
                     await apiUpdateDialogProfile(currentDialogId, currentProfile.id);
@@ -103,15 +154,22 @@ async function addMessage(text) {
                     console.error('Ошибка привязки профиля к новому диалогу:', error);
                 }
             }
-
-            await renderMessages(result);
-            renderDialogs();
-        } catch (error) {
-            console.error('Ошибка создания чата:', error);
+        } else {
+            // Существующий диалог
+            await apiSendMessage(currentDialogId, text, onChunk);
         }
-        return;
-    }
 
-    const result = await apiSendMessage(currentDialogId, text);
-    await renderMessages(result);
+        // Финальная синхронизация с сервером:
+        // получаем канонические данные (id сообщений, sanitized-копии для кнопки «глаза» и т.п.)
+        const serverData = await apiGetMessages(currentDialogId);
+        await renderMessages(serverData);
+        renderDialogs();
+    } catch (error) {
+        console.error('Ошибка отправки:', error);
+        if (answerBubble) {
+            answerBubble.classList.remove('message-bubble');
+            answerBubble.classList.add('message-error');
+            answerBubble.textContent = error.message;
+        }
+    }
 }
