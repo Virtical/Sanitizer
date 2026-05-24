@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
+using Sanitizer;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.Storage;
 using Sanitizer.Api.Storage.Data;
@@ -44,6 +45,8 @@ builder.Services.AddScoped<SanitizerService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<ChatHistoryService>();
 
+
+
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
 {
@@ -74,5 +77,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors();
 app.MapControllers();
+
+await app.AddDefaultProfiles();
 
 app.Run();
