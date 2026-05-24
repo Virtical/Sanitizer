@@ -30,8 +30,8 @@ public class ChatController(SanitizerService sanitizerService,
     
     [HttpPost]
     [SwaggerOperation(Summary = "Создание диалога")]
-    public async Task<IActionResult> CreateAsync([FromRoute]CreateChatRequest request)
-        => Ok(await chatHistoryService.SaveChatAsync(request.Name));
+    public async Task<IActionResult> CreateAsync([FromBody]CreateChatRequest request)
+        => Ok((await chatHistoryService.SaveChatAsync(request.Name)).Id);
     
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Получение сообщений диалога")]
