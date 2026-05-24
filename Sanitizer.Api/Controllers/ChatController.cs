@@ -100,6 +100,8 @@ public class ChatController(SanitizerService sanitizerService,
         string raw;
         try
         {
+            // Заголовок X-Chat-Id должен быть установлен ДО первого WriteAsync
+            Response.Headers.Append("X-Chat-Id", id);
             Response.ContentType = "text/plain";
             Response.Headers.Append("Cache-Control", "no-cache");
 
