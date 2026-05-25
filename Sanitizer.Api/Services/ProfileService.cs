@@ -1,3 +1,4 @@
+using Sanitizer.Api.Auth;
 using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
@@ -7,23 +8,18 @@ using Sanitizer.Api.Storage.Data.Entities;
 
 namespace Sanitizer.Api.Services;
 
-public class ProfileService(IProfileStorage storage)
+public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKeyContext)
 {
     public async Task<ProfileResponse[]> GetAllAsync()
     {
-        var entities = await storage.GetAllAsync();
-        return entities.Select(MapToModel).ToArray();
+        var entities = await storage.GetAllAsync(apiKeyContext.ApiKeyId);
+        return entities.Select(MapToResponse).ToArray();
     }
-    
-    public async Task<ProfileResponse> GetByIdAsync(string id)
+
+    public async Task<ProfileResponse?> GetByIdAsync(string id)
     {
-        var existing = await storage.GetByIdAsync(id);
-        if (existing is null)
-        {
-            throw new Exception($"Profile with id={id} not found");
-        }
-        
-        return MapToModel(existing);
+        var existing = await storage.GetByIdAsync(id, apiKeyContext.ApiKeyId);
+        return existing is null ? null : MapToResponse(existing);
     }
 
     public async Task CreateAsync(CreateProfileRequest profileRequest)
@@ -33,6 +29,7 @@ public class ProfileService(IProfileStorage storage)
         {
             Id = id,
             Name = profileRequest.Name,
+            ApiKeyId = apiKeyContext.ApiKeyId,
             Rules = profileRequest.Rules.Select(r => new SanitizationRuleEntity
             {
                 ProfileId = id,
@@ -44,18 +41,16 @@ public class ProfileService(IProfileStorage storage)
         await storage.SaveAsync(entity);
     }
 
-    public async Task<ProfileResponse[]> UpdateAsync(string id, UpdateProfileRequest updated)
+    public async Task<ProfileResponse?> UpdateAsync(string id, UpdateProfileRequest updated)
     {
-        var existing = await storage.GetByIdAsync(id);
-        if (existing is null)
-        {
-            throw new Exception($"Profile with id={id} not found");
-        }
-        
+        var existing = await storage.GetByIdAsync(id, apiKeyContext.ApiKeyId);
+        if (existing is null) return null;
+
         var entity = new SanitizationProfileEntity
         {
             Id = id,
             Name = updated.Name,
+            ApiKeyId = apiKeyContext.ApiKeyId,
             Rules = updated.Rules.Select(r => new SanitizationRuleEntity
             {
                 ProfileId = id,
@@ -65,12 +60,13 @@ public class ProfileService(IProfileStorage storage)
         };
 
         await storage.SaveAsync(entity);
-        return await GetAllAsync();
+        return await GetByIdAsync(id);
     }
 
-    public Task<bool> DeleteAsync(string id) => storage.DeleteAsync(id);
-    
-    private static ProfileResponse MapToModel(SanitizationProfileEntity e)
+    public Task<bool> DeleteAsync(string id) =>
+        storage.DeleteAsync(id, apiKeyContext.ApiKeyId);
+
+    private static ProfileResponse MapToResponse(SanitizationProfileEntity e)
     {
         var model = new ProfileResponse
         {

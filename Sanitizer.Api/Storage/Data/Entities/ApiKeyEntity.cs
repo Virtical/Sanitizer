@@ -1,13 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Sanitizer.Api.Storage.Data.Entities;
 
-public class ApiKeyEntity
+/// <summary>EF-сущность API-ключа.</summary>
+public sealed class ApiKeyEntity
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Name { get; set; } = string.Empty;
-    public string KeyHash { get; set; } = string.Empty;
+    /// <summary>Сам ключ в формате GUID — используется как Id и как токен доступа.</summary>
+    [Key]
+    public Guid Id { get; set; } = Guid.NewGuid();
 
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public DateTime? ExpiresAt { get; set; }
+    [Required, MaxLength(256)]
+    public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

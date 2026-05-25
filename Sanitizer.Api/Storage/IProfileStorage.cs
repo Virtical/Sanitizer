@@ -1,13 +1,24 @@
-using Sanitizer.Api.Controllers.Client.Requests;
-using Sanitizer.Api.Models;
 using Sanitizer.Api.Storage.Data.Entities;
 
 namespace Sanitizer.Api.Storage;
 
 public interface IProfileStorage
 {
-    Task<SanitizationProfileEntity[]> GetAllAsync();
-    Task<SanitizationProfileEntity?> GetByIdAsync(string id);
-    Task SaveAsync(SanitizationProfileEntity profileRequest);
-    Task<bool> DeleteAsync(string id);
+    /// <summary>Получить все профили, принадлежащие указанному API-ключу.</summary>
+    Task<SanitizationProfileEntity[]> GetAllAsync(Guid apiKeyId);
+
+    /// <summary>
+    /// Получить профиль по id.
+    /// Возвращает null, если профиль не найден или принадлежит другому ключу.
+    /// </summary>
+    Task<SanitizationProfileEntity?> GetByIdAsync(string id, Guid apiKeyId);
+
+    /// <summary>Сохранить (создать или обновить) профиль.</summary>
+    Task SaveAsync(SanitizationProfileEntity profile);
+
+    /// <summary>
+    /// Удалить профиль.
+    /// Возвращает false, если профиль не найден или принадлежит другому ключу.
+    /// </summary>
+    Task<bool> DeleteAsync(string id, Guid apiKeyId);
 }

@@ -1,4 +1,4 @@
-﻿namespace Sanitizer.Api.Models.Chat;
+namespace Sanitizer.Api.Models.Chat;
 
 public class ChatInfo
 {

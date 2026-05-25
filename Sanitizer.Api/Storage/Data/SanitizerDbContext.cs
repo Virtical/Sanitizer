@@ -13,28 +13,46 @@ public class SanitizerDbContext(DbContextOptions<SanitizerDbContext> options) : 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SanitizationProfileEntity>()
-            .HasMany(p => p.Rules)
-            .WithOne(r => r.Profile)
-            .HasForeignKey(r => r.ProfileId)
-            .OnDelete(DeleteBehavior.Cascade);
+        base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<SanitizationRuleEntity>()
-            .HasIndex(r => new { r.ProfileId, r.DetectorType })
-            .IsUnique();
+        modelBuilder.Entity<SanitizationProfileEntity>(b =>
+        {
+            b.HasKey(p => p.Id);
+            b.Property(p => p.ApiKeyId).IsRequired();
+            b.HasIndex(p => p.ApiKeyId);
 
-        modelBuilder.Entity<ApiKeyEntity>()
-            .HasIndex(k => k.KeyHash)
-            .IsUnique(false);
+            b.HasMany(p => p.Rules)
+                .WithOne(r => r.Profile)
+                .HasForeignKey(r => r.ProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
-        modelBuilder.Entity<ChatEntity>()
-            .HasMany(c => c.Messages)
-            .WithOne(m => m.Chat)
-            .HasForeignKey(m => m.ChatId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<SanitizationRuleEntity>(b =>
+        {
+            b.HasIndex(r => new { r.ProfileId, r.DetectorType }).IsUnique();
+        });
 
-        modelBuilder.Entity<MessageEntity>()
-            .HasIndex(m => new { m.ChatId, m.OrderIndex })
-            .IsUnique();
+        modelBuilder.Entity<ApiKeyEntity>(b =>
+        {
+            b.HasKey(k => k.Id);
+            b.HasIndex(k => k.IsActive);
+        });
+
+        modelBuilder.Entity<ChatEntity>(b =>
+        {
+            b.HasKey(c => c.Id);
+            b.Property(c => c.ApiKeyId).IsRequired();
+            b.HasIndex(c => c.ApiKeyId);
+
+            b.HasMany(c => c.Messages)
+                .WithOne(m => m.Chat)
+                .HasForeignKey(m => m.ChatId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MessageEntity>(b =>
+        {
+            b.HasIndex(m => new { m.ChatId, m.OrderIndex }).IsUnique();
+        });
     }
 }
