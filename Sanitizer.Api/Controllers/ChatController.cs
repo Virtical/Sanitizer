@@ -17,41 +17,49 @@ namespace Sanitizer.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/chat")]
-public class ChatController(SanitizerService sanitizerService,
-                             ProfileService profileService,
-                             DesanitizerService desanitizer,
-                             ChatHistoryService chatHistoryService,
-                             ChatClient openAiClient) : ControllerBase
+public class ChatController(
+    SanitizerService sanitizerService,
+    ProfileService profileService,
+    DesanitizerService desanitizer,
+    ChatHistoryService chatHistoryService,
+    ChatClient openAiClient) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(Summary = "Получение названий диалогов")]
     public async Task<IActionResult> GetAllAsync()
         => Ok(await chatHistoryService.GetAllAsync());
-    
+
     [HttpPost]
     [SwaggerOperation(Summary = "Создание диалога")]
-    public async Task<IActionResult> CreateAsync([FromBody]CreateChatRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateChatRequest request)
         => Ok((await chatHistoryService.SaveChatAsync(request.Name)).Id);
-    
+
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Получение сообщений диалога")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute]string id)
-        => Ok(await chatHistoryService.GetByIdAsync(id));
-    
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
+    {
+        var chat = await chatHistoryService.GetByIdAsync(id);
+        return chat is null ? NotFound() : Ok(chat);
+    }
+
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Изменение диалога")]
-    public async Task<IActionResult> UpdateAsync([FromRoute] string id, [FromBody] UpdateChatRequest request)
+    public async Task<IActionResult> UpdateAsync(
+        [FromRoute] string id,
+        [FromBody] UpdateChatRequest request)
         => Ok(await chatHistoryService.UpdateAsync(id, request));
-    
-    [SwaggerIgnore]
+
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Удаление диалога")]
-    public async Task<IActionResult> DeleteByIdAsync([FromRoute]string id)
-        => Ok(await chatHistoryService.DeleteChatAsync(id));
-    
+    public async Task<IActionResult> DeleteByIdAsync([FromRoute] string id)
+    {
+        var deleted = await chatHistoryService.DeleteChatAsync(id);
+        return deleted ? Ok(id) : NotFound();
+    }
+
     [HttpPost("send/{id}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
-    public async Task Send([FromRoute]string id, [FromBody] SendMessageRequest messageRequest)
+    public async Task Send([FromRoute] string id, [FromBody] SendMessageRequest messageRequest)
     {
         if (string.IsNullOrEmpty(id))
         {
@@ -59,7 +67,7 @@ public class ChatController(SanitizerService sanitizerService,
             await Response.WriteAsync("id is required");
             return;
         }
-        
+
         if (string.IsNullOrEmpty(messageRequest.Message))
         {
             Response.StatusCode = 400;
@@ -67,24 +75,20 @@ public class ChatController(SanitizerService sanitizerService,
             return;
         }
 
-        var message = await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateSent(messageRequest.Message));
+        var message = await chatHistoryService.AddMessageAsync(
+            id, MessageRequest.CreateSent(messageRequest.Message));
 
         SanitizationResult sanitization;
         try
         {
             var profileId = await chatHistoryService.GetProfileIdAsync(id);
-            ProfileResponse profile;
-            if (profileId is not null)
-            {
-                profile = await profileService.GetByIdAsync(profileId);
-            }
-            else
-            {
-                profile = ProfileResponse.Default;
-            }
-            
+            ProfileResponse profile = profileId is not null
+                ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
+                : ProfileResponse.Default;
+
             sanitization = sanitizerService.Sanitize(messageRequest.Message, profile);
-            await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
+            await chatHistoryService.AddMessageAsync(
+                id, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
         }
         catch (InvalidOperationException ex)
         {
@@ -96,7 +100,6 @@ public class ChatController(SanitizerService sanitizerService,
         string raw;
         try
         {
-            // Заголовок X-Chat-Id должен быть установлен ДО первого WriteAsync
             Response.Headers.Append("X-Chat-Id", id);
             Response.ContentType = "text/plain";
             Response.Headers.Append("Cache-Control", "no-cache");
@@ -106,7 +109,7 @@ public class ChatController(SanitizerService sanitizerService,
                 AiChatMessage.CreateSystemMessage("Ты полезный ассистент"),
                 AiChatMessage.CreateUserMessage(sanitization.SanitizedText)
             };
-        
+
             var fullResponse = new StringBuilder();
             await foreach (var update in openAiClient.CompleteChatStreamingAsync(messages))
             {
@@ -120,7 +123,7 @@ public class ChatController(SanitizerService sanitizerService,
                     }
                 }
             }
-        
+
             raw = fullResponse.ToString();
         }
         catch (Exception ex)

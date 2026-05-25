@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Storage.Data.Entities;
@@ -8,12 +7,12 @@ namespace Sanitizer.Api.Storage;
 
 public class EfMessageStorage(SanitizerDbContext db) : IMessageStorage
 {
-    public async Task<Message> AddMessageAsync(string chatId, MessageRequest message)
+    public async Task<Message> AddMessageAsync(string chatId, MessageRequest message, Guid apiKeyId)
     {
         var chat = await db.Chats
             .Include(c => c.Messages)
-            .FirstOrDefaultAsync(c => c.Id == chatId)
-            ?? throw new KeyNotFoundException($"Chat with id {chatId} not found");
+            .FirstOrDefaultAsync(c => c.Id == chatId && c.ApiKeyId == apiKeyId)
+            ?? throw new KeyNotFoundException($"Чат с id {chatId} не найден.");
 
         var maxIndex = chat.Messages.Any()
             ? chat.Messages.Max(m => m.OrderIndex)
@@ -21,6 +20,7 @@ public class EfMessageStorage(SanitizerDbContext db) : IMessageStorage
 
         var entity = new MessageEntity
         {
+            Id = Guid.NewGuid().ToString(),
             ChatId = chatId,
             Text = message.Text,
             Type = message.Type,
