@@ -12,7 +12,15 @@ public sealed class ApiKeyEntity
     [Required, MaxLength(256)]
     public string Name { get; set; } = string.Empty;
 
+    /// <summary>SHA-256 хеш ключа в hex-формате.</summary>
+    [Required, MaxLength(64)]
+    public string KeyHash { get; set; } = string.Empty;
+
     public bool IsActive { get; set; } = true;
 
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime? ExpiresAt { get; set; }
 }
