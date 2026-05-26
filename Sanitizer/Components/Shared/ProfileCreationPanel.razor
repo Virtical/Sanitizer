@@ -4,94 +4,132 @@
         <h1 class="creation-title">Создание нового профиля</h1>
         
         <div class="creation-input-container">
+            <img src="images/person.svg" alt="Person" class="input-icon">
             <input type="text" class="creation-input" id="newProfileName" placeholder="Введите название профиля">
         </div>
+    
+        <div class="rules-header" id="rulesHeader">
+            <h2 class="rules-title">Правила обработки данных</h2>
+        </div>
         
-        <div class="creation-add-row">
-            <button class="add-icon-btn" id="addDataTypeBtn">
+        <div class="data-method-container" id="rulesContainer"></div>
+        
+        <button class="add-icon-btn" id="addDataTypeBtn">
+            <div class="creation-add-row">
+                <img src="images/green-circle.png" alt="" class="btn-circle">
                 <span class="add-icon">+</span>
-            </button>
-            <span class="add-text" id="addDataTypeText">Добавить тип данных и метод санитизации</span>
-        </div>
-        
-        <!-- Контейнер для выбора типов данных и методов (скрыт изначально) -->
-        <div class="data-method-container" id="dataMethodContainer" style="display: none;">
-            <!-- Кнопка выбора типа данных -->
-            <div class="data-type-wrapper">
-                <div class="data-type-btn" id="dataTypeBtn">
-                    <span class="data-type-text">Выберите тип данных</span>
-                    <img src="images/black-arrow.svg" alt="▼" class="data-type-arrow">
-                </div>
-                <div class="data-type-dropdown" id="dataTypeDropdown">
-                    <div class="data-type-option" data-value="Email">
-                        <div class="checkbox"></div>
-                        <span>Email</span>
-                    </div>
-                    <div class="data-type-option" data-value="Phone">
-                        <div class="checkbox"></div>
-                        <span>Phone</span>
-                    </div>
-                    <div class="data-type-option" data-value="Card">
-                        <div class="checkbox"></div>
-                        <span>Card</span>
-                    </div>
-                    <div class="data-type-option" data-value="IpAddress">
-                        <div class="checkbox"></div>
-                        <span>IP</span>
-                    </div>
-                    <div class="data-type-option" data-value="Guid">
-                        <div class="checkbox"></div>
-                        <span>UUID</span>
-                    </div>
-                    <div class="data-type-option" data-value="Name">
-                        <div class="checkbox"></div>
-                        <span>Names</span>
-                    </div>
-                    <div class="data-type-option" data-value="Url">
-                        <div class="checkbox"></div>
-                        <span>URL params</span>
-                    </div>
-                    <div class="data-type-option" data-value="ApiKey">
-                        <div class="checkbox"></div>
-                        <span>API keys / tokens</span>
-                    </div>
-                </div>
             </div>
-            
-            <!-- Кнопка выбора метода санитизации -->
-            <div class="method-wrapper">
-                <div class="method-btn" id="methodBtn">
-                    <span class="method-text">Выберите метод санитизации</span>
-                    <img src="images/black-arrow.svg" alt="▼" class="method-arrow">
-                </div>
-                <div class="method-dropdown" id="methodDropdown">
-                    <div class="method-option" data-value="Mask">
-                        <div class="radio"></div>
-                        <span>Mask (маскирование)</span>
-                    </div>
-                    <div class="method-option" data-value="Replace">
-                        <div class="radio"></div>
-                        <span>Replace (замена)</span>
-                    </div>
-                    <div class="method-option" data-value="Hash">
-                        <div class="radio"></div>
-                        <span>Hash (хеширование)</span>
-                    </div>
-                    <div class="method-option" data-value="Tokenize">
-                        <div class="radio"></div>
-                        <span>Tokenize (токенизация)</span>
-                    </div>
-                    <div class="method-option" data-value="Remove">
-                        <div class="radio"></div>
-                        <span>Remove (удаление)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <span class="add-text">Добавить тип данных</span>
+        </button>
         
         <div class="creation-buttons-row">
-            <button class="creation-back-btn" id="backFromCreationBtn">Вернуться назад</button>
-            <button class="creation-save-btn" id="saveProfileBtn">Сохранить</button>
+            <button class="action-btn creation-back-btn" id="backFromCreationBtn">Вернуться назад</button>
+            <button class="action-btn creation-save-btn" id="saveProfileBtn">Сохранить профиль</button>
         </div>
     </div>
 </div>
+
+<div class="data-type-wrapper" id="dataTypeModal">
+    <div class="modal-overlay"></div>
+    <div class="data-type-btn">
+        <div class="data-type-header">
+            <h3 class="data-type-text">Выберите тип данных</h3>
+            <button class="data-type-close-btn" id="closeDataTypeModalBtn">
+                <img src="images/cross.svg" alt="Закрыть" class="close-icon">
+            </button>
+        </div>
+        <div class="data-type-dropdown">
+            <div class="data-type-option" data-value="Email">
+                <img src="images/email-icon.svg" alt="Email" class="option-icon">
+                <span class="option-title">Email <span class="option-description">(Электронная почта)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Phone">
+                <img src="images/phone-icon.svg" alt="Phone" class="option-icon">
+                <span class="option-title">Phone <span class="option-description">(Номера телефонов)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Card">
+                <img src="images/card-icon.svg" alt="Card" class="option-icon">
+                <span class="option-title">Card <span class="option-description">(Номера карт)</span></span>
+            </div>
+            <div class="data-type-option" data-value="IpAddress">
+                <img src="images/ip-icon.svg" alt="IP" class="option-icon">
+                <span class="option-title">IP <span class="option-description">(IP-адреса)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Guid">
+                <img src="images/uuid-icon.svg" alt="UUID" class="option-icon">
+                <span class="option-title">UUID <span class="option-description">(Уникальный идентификатор)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Name">
+                <img src="images/person.svg" alt="Names" class="option-icon">
+                <span class="option-title">Names <span class="option-description">(Имена и ФИО)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Url">
+                <img src="images/url-icon.svg" alt="URL" class="option-icon">
+                <span class="option-title">URL params <span class="option-description">(Адреса веб-страниц)</span></span>
+            </div>
+            <div class="data-type-option" data-value="ApiKey">
+                <img src="images/api-icon.svg" alt="API" class="option-icon">
+                <span class="option-title">API keys/tokens <span class="option-description">(API ключи и токены)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Context">
+                <img src="images/context-icon.svg" alt="Context" class="option-icon">
+                <span class="option-title">Контекстные секреты</span>
+            </div>
+            <div class="data-type-option" data-value="Regex">
+                <img src="images/regex-icon.svg" alt="Regex" class="option-icon">
+                <span class="option-title">Regex <span class="option-description">(Создание собственных типов)</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="rule-card-template">
+    <div class="rule-card">
+        <div class="rule-icon-wrapper">
+            <img src="" alt="" class="rule-icon">
+        </div>
+        <div class="rule-type"></div>
+
+        <div class="method-wrapper">
+            <div class="method-btn">
+                <span class="method-text">Выберите метод санитизации</span>
+                <img src="images/black-arrow.svg" alt="▼" class="method-arrow">
+            </div>
+            <div class="method-dropdown">
+                <div class="method-option" data-value="Mask">
+                    <img src="images/mask.svg" alt="Mask" class="option-icon">
+                    <span class="option-title">Mask <span class="option-description">(Маскирование)</span></span>
+                </div>
+                <div class="method-option" data-value="Replace">
+                    <img src="images/replace.svg" alt="Replace" class="option-icon">
+                    <span class="option-title">Replace <span class="option-description">(Замена)</span></span>
+                </div>
+                <div class="method-option" data-value="Hash">
+                    <img src="images/hash.svg" alt="Hash" class="option-icon">
+                    <span class="option-title">Hash <span class="option-description">(Хэширование)</span></span>
+                </div>
+                <div class="method-option" data-value="Tokenize">
+                    <img src="images/tokenize.svg" alt="Tokenize" class="option-icon">
+                    <span class="option-title">Tokenize <span class="option-description">(Токенизация)</span></span>
+                </div>
+                <div class="method-option" data-value="Remove">
+                    <img src="images/remove.svg" alt="Remove" class="option-icon">
+                    <span class="option-title">Remove <span class="option-description">(Remove)</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="move-buttons">
+            <button class="move-up-btn">
+                <img src="images/black-arrow.svg" alt="Вверх" class="move-icon up">
+            </button>
+            <button class="move-down-btn">
+                <img src="images/black-arrow.svg" alt="Вниз" class="move-icon down">
+            </button>
+        </div>
+
+        <button class="delete-rule-btn">
+            <img src="images/trash.svg" alt="Удалить" class="delete-icon">
+        </button>
+    </div>
+</template>

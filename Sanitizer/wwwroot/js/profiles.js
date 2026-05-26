@@ -121,12 +121,17 @@ function showChatPanel() {
 
 async function saveNewProfile() {
     const newProfileNameInput = document.getElementById('newProfileName');
-    const profileName = newProfileNameInput?.value.trim() || 'Профиль общения';
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const profileName = newProfileNameInput?.value.trim();
 
+    if (!saveBtn.classList.contains('active')) return;
+    
     const rules = {};
-    selectedDataTypes.forEach(dt => {
-        rules[dt] = {
-            strategy: selectedMethod?.value ?? 'Mask',
+    const cards = document.querySelectorAll('.rule-card');
+
+    cards.forEach(dt => {
+        rules[dt.dataset.dataType] = {
+            strategy: dt.dataset.method,
             parameters: {}
         };
     });
@@ -146,32 +151,14 @@ async function saveNewProfile() {
                 console.error('Ошибка привязки нового профиля к диалогу:', error);
             }
         }
+
+        updateProfileDropdowns();
+        updateProfileButtonText();
+        resetProfileCreationForm();
+        showChatPanel();
     } catch (e) {
         console.error(e);
-        return;
     }
-
-    updateProfileDropdowns();
-    updateProfileButtonText();
-
-    selectedDataTypes = [];
-    selectedMethod = null;
-
-    const dataMethodContainer = document.getElementById('dataMethodContainer');
-    if (dataMethodContainer) dataMethodContainer.style.display = 'none';
-    const addDataTypeBtn = document.getElementById('addDataTypeBtn');
-    if (addDataTypeBtn) addDataTypeBtn.style.background = 'var(--accent-primary)';
-
-    document.querySelectorAll('.data-type-option').forEach(opt => opt.classList.remove('selected'));
-    document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('selected'));
-
-    const dataTypeText = document.querySelector('.data-type-text');
-    if (dataTypeText) dataTypeText.textContent = 'Выберите тип данных';
-    const methodText = document.querySelector('.method-text');
-    if (methodText) methodText.textContent = 'Выберите метод санитизации';
-
-    showChatPanel();
-    if (newProfileNameInput) newProfileNameInput.value = '';
 }
 
 function updateProfileButtonText() {

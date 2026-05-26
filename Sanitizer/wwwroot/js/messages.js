@@ -143,8 +143,7 @@ async function addMessage(text) {
     try {
         if (!currentDialogId) {
             // Новый диалог — получаем id из заголовка X-Chat-Id
-            const { chatId } = await apiCreateDialog(text, onChunk);
-            currentDialogId = chatId;
+            currentDialogId = await apiCreateDialog(text, onChunk);
             await loadDialogs();
 
             if (currentProfile) {
@@ -154,10 +153,10 @@ async function addMessage(text) {
                     console.error('Ошибка привязки профиля к новому диалогу:', error);
                 }
             }
-        } else {
-            // Существующий диалог
-            await apiSendMessage(currentDialogId, text, onChunk);
         }
+        
+        // Существующий диалог
+        await apiSendMessage(currentDialogId, text, onChunk);
 
         // Финальная синхронизация с сервером:
         // получаем канонические данные (id сообщений, sanitized-копии для кнопки «глаза» и т.п.)
