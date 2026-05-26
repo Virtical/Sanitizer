@@ -1,13 +1,12 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using OpenAI.Chat;
+using Microsoft.Extensions.AI;
 using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Services;
 using Swashbuckle.AspNetCore.Annotations;
-using AiChatMessage = OpenAI.Chat.ChatMessage;
 
 namespace Sanitizer.Api.Controllers;
 
@@ -22,7 +21,7 @@ public class ChatController(
     ProfileService profileService,
     DesanitizerService desanitizer,
     ChatHistoryService chatHistoryService,
-    ChatClient openAiClient) : ControllerBase
+    IChatClient chatClient) : ControllerBase
 {
     [HttpGet]
     [SwaggerOperation(Summary = "Получение названий диалогов")]
@@ -103,24 +102,22 @@ public class ChatController(
             Response.Headers.Append("X-Chat-Id", id);
             Response.ContentType = "text/plain";
             Response.Headers.Append("Cache-Control", "no-cache");
-
-            var messages = new List<AiChatMessage>
+            
+            var messages = new List<ChatMessage>
             {
-                AiChatMessage.CreateSystemMessage("Ты полезный ассистент"),
-                AiChatMessage.CreateUserMessage(sanitization.SanitizedText)
+                new(ChatRole.System, "Ты полезный ассистент"),
+                new(ChatRole.User, sanitization.SanitizedText)
             };
 
             var fullResponse = new StringBuilder();
-            await foreach (var update in openAiClient.CompleteChatStreamingAsync(messages))
+            
+            await foreach (var update in chatClient.GetStreamingResponseAsync(messages))
             {
-                foreach (var content in update.ContentUpdate)
+                if (!string.IsNullOrEmpty(update.Text))
                 {
-                    if (!string.IsNullOrEmpty(content.Text))
-                    {
-                        await Response.WriteAsync(content.Text);
-                        await Response.Body.FlushAsync();
-                        fullResponse.Append(content.Text);
-                    }
+                    await Response.WriteAsync(update.Text);
+                    await Response.Body.FlushAsync();
+                    fullResponse.Append(update.Text);
                 }
             }
 

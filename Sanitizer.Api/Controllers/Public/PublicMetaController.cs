@@ -8,7 +8,7 @@ namespace Sanitizer.Api.Controllers.Public;
 
 /// <summary>Метаинформация о доступных детекторах и стратегиях (публичный API).</summary>
 [ApiController]
-[Route("api/public/v1/meta")]
+[Route("api/public/meta")]
 [Tags("Public – Meta")]
 public class PublicMetaController(DetectorRegistry detectorRegistry) : ControllerBase
 {
@@ -27,6 +27,6 @@ public class PublicMetaController(DetectorRegistry detectorRegistry) : Controlle
                 allStrategies))
             .ToArray();
 
-        return Ok(new MetaDto(detectors, allStrategies));
+        return Ok(new MetaDto(detectors));
     }
 }

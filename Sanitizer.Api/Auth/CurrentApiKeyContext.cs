@@ -9,7 +9,7 @@ namespace Sanitizer.Api.Auth;
 public sealed class CurrentApiKeyContext : ICurrentApiKeyContext
 {
     /// <inheritdoc />
-    public Guid ApiKeyId { get; private set; } = Guid.Empty;
+    public Guid ApiKeyId { get; private set; } = Guid.NewGuid();
 
     /// <summary>
     /// Устанавливает идентификатор API-ключа для текущего запроса.
