@@ -57,9 +57,8 @@
 }
 
 .profile-chat-arrow {
-    width: 14px;
-    height: auto;
-    flex-shrink: 0;
+    font-size: 20px;
+    margin-right: 20px;
 }
 
 .chat-empty-state {
@@ -125,17 +124,9 @@
     justify-content: center;
 }
 
-.send-circle {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-}
-
-.send-arrow {
-    position: relative;
-    width: 18px;
-    height: 20px;
-    z-index: 1;
+.bi-arrow-up-circle-fill {
+    font-size: 36px;
+    color: var(--accent-primary);
 }
 
 .messages-area-wrapper {
@@ -223,9 +214,9 @@
     opacity: 0.7;
 }
 
-.eye-icon {
-    width: 36px;
-    height: 36px;
+.bi-eye {
+    font-size: 36px;
+    color: var(--text-tertiary);
 }
 
 .message-error {
@@ -300,19 +291,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.send-btn .send-circle {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-}
-
-.send-btn .send-arrow {
-    position: relative;
-    width: 18px;
-    height: 20px;
-    z-index: 1;
 }
 
 .no-dialogs {

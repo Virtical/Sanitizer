@@ -115,20 +115,19 @@ function addRuleCard(dataType, dataTypeDisplay) {
 
     // Устанавливаем иконку в зависимости от типа данных
     const iconMap = {
-        'Email': 'images/email-icon.svg',
-        'Phone': 'images/phone-icon.svg',
-        'Card': 'images/card-icon.svg',
-        'IpAddress': 'images/ip-icon.svg',
-        'Guid': 'images/uuid-icon.svg',
-        'Name': 'images/person.svg',
-        'Url': 'images/url-icon.svg',
-        'ApiKey': 'images/api-icon.svg',
-        'Context': 'images/context-icon.svg',
-        'Regex': 'images/regex-icon.svg'
+        'Email': 'bi-envelope',
+        'Phone': 'bi-telephone',
+        'Card': 'bi-credit-card',
+        'IpAddress': 'bi-globe',
+        'Guid': 'bi-person-lines-fill',
+        'Name': 'bi-person',
+        'Url': 'bi-link-45deg',
+        'ApiKey': 'bi-key',
+        'Context': 'bi-lock',
+        'Regex': 'bi-regex'
     };
 
-    ruleIcon.src = iconMap[dataType] || 'images/default-icon.svg';
-    ruleIcon.alt = dataTypeDisplay;
+    ruleIcon.className = `bi ${iconMap[dataType]} rule-icon`;
 
     // Устанавливаем тип данных (только название без скобок)
     ruleTypeSpan.textContent = dataTypeDisplay;
