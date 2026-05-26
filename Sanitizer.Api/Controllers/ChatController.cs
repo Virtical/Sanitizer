@@ -6,6 +6,7 @@ using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Services;
+using Sanitizer.Api.ToolCalls;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Sanitizer.Api.Controllers;
@@ -108,10 +109,15 @@ public class ChatController(
                 new(ChatRole.System, "Ты полезный ассистент"),
                 new(ChatRole.User, sanitization.SanitizedText)
             };
+            
+            var options = new ChatOptions
+            {
+                Tools = ChatFunctionFactory.CreateTools()
+            };
 
             var fullResponse = new StringBuilder();
             
-            await foreach (var update in chatClient.GetStreamingResponseAsync(messages))
+            await foreach (var update in chatClient.GetStreamingResponseAsync(messages, options))
             {
                 if (!string.IsNullOrEmpty(update.Text))
                 {
