@@ -8,7 +8,6 @@ public interface ICurrentApiKeyContext
 {
     /// <summary>
     /// Идентификатор API-ключа текущего запроса.
-    /// <see cref="Guid.Empty"/> — внутренний (UI/Razor) запрос вне публичного API.
     /// </summary>
     Guid ApiKeyId { get; }
 }

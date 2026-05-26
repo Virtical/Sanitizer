@@ -4,4 +4,4 @@ namespace Sanitizer.Api.Controllers.Public.Dto;
 public record DetectorMetaDto(string Type, string[] Strategies);
 
 /// <summary>Метаинформация о возможностях API.</summary>
-public record MetaDto(DetectorMetaDto[] Detectors, string[] Strategies);
+public record MetaDto(DetectorMetaDto[] Detectors);

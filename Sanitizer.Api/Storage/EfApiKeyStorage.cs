@@ -15,7 +15,7 @@ public class EfApiKeyStorage(SanitizerDbContext db) : IApiKeyStorage
 
     public async Task SaveAsync(ApiKey key)
     {
-        var existing = await db.ApiKeys.FirstOrDefaultAsync(k => k.Id == key.Id);
+        var existing = await db.ApiKeys.FirstOrDefaultAsync(k => k.Id.ToString() == key.Id);
         if (existing is null)
         {
             db.ApiKeys.Add(MapToEntity(key));
@@ -34,7 +34,7 @@ public class EfApiKeyStorage(SanitizerDbContext db) : IApiKeyStorage
 
     private static ApiKey MapToModel(ApiKeyEntity e) => new()
     {
-        Id = e.Id,
+        Id = e.Id.ToString(),
         Name = e.Name,
         KeyHash = e.KeyHash,
         CreatedDate = e.CreatedDate,
@@ -44,7 +44,7 @@ public class EfApiKeyStorage(SanitizerDbContext db) : IApiKeyStorage
 
     private static ApiKeyEntity MapToEntity(ApiKey m) => new()
     {
-        Id = m.Id,
+        Id = Guid.Parse(m.Id),
         Name = m.Name,
         KeyHash = m.KeyHash,
         CreatedDate = m.CreatedDate,

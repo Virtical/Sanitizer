@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using OpenAI.Chat;
 using Sanitizer;
@@ -9,6 +8,10 @@ using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Strategies;
 using Sanitizer.Components;
 using System.Threading.RateLimiting;
+using Microsoft.Extensions.AI;
+using Microsoft.OpenApi.Models;
+using OpenAI;
+using Sanitizer.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,25 +31,25 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
 
-    c.SwaggerDoc("internal", new() { Title = "Sanitizer Internal API", Version = "internal" });
-    c.SwaggerDoc("v1", new() { Title = "Sanitizer Public API", Version = "v1" });
+    c.SwaggerDoc("internal", new OpenApiInfo { Title = "Sanitizer Internal API" });
+    c.SwaggerDoc("public", new OpenApiInfo { Title = "Sanitizer Public API" });
 
-    c.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
-        Name = "X-Api-Key",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Name = "X-Auth-Token",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
         Description = "Публичный API-ключ в формате GUID"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                Reference = new OpenApiReference
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "ApiKey"
                 }
             },
@@ -59,16 +62,19 @@ builder.Services.AddSwaggerGen(c =>
     {
         var isPublic = apiDesc.RelativePath?
             .StartsWith("api/public/", StringComparison.OrdinalIgnoreCase) ?? false;
-        return docName == "v1" ? isPublic : !isPublic;
+        return docName == "public" ? isPublic : !isPublic;
     });
 });
 
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:3000", "http://localhost:5173"];
-
-builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
-    p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()   // любые источники
+            .AllowAnyMethod()   // любые HTTP методы (GET, POST, PUT, DELETE и т.д.)
+            .AllowAnyHeader();  // любые заголовки
+    });
+});
 
 builder.Services.AddDbContext<SanitizerDbContext>(opt =>
     opt.UseInMemoryDatabase("SanitizerDb"));
@@ -109,6 +115,7 @@ builder.Services.AddScoped<ICurrentApiKeyContext>(sp =>
     sp.GetRequiredService<CurrentApiKeyContext>());
 
 builder.Services.AddSingleton<TokenStore>();
+builder.Services.AddScoped<ApiKeyService>();
 builder.Services.AddSingleton<DetectorRegistry>();
 builder.Services.AddSingleton<StrategyFactory>();
 builder.Services.AddSingleton<DesanitizerService>();
@@ -119,9 +126,14 @@ builder.Services.AddScoped<ChatHistoryService>();
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
 {
-    builder.Services.AddSingleton(new ChatClient(
-        builder.Configuration["Llm:Model"],
-        builder.Configuration["Llm:ApiKey"]));
+    builder.Services.AddSingleton<IChatClient>(_ 
+        => new OpenAIClient(builder.Configuration["Llm:ApiKey"])
+            .GetChatClient(builder.Configuration["Llm:Model"])
+            .AsIChatClient()
+            .AsBuilder()
+            .UseFunctionInvocation()
+            .Build()
+        );
 }
 else
 {
@@ -146,14 +158,18 @@ app.MapRazorComponents<App>()
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Public API v1");
+    c.SwaggerEndpoint("/swagger/public/swagger.json", "Public API");
     c.SwaggerEndpoint("/swagger/internal/swagger.json", "Internal API");
 });
 
-app.UseCors();
+app.UseCors("AllowAll");
 
-// Middleware аутентификации публичного API (только для /api/public/*)
-app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.UseMiddleware<ApiKeyAuthMiddleware>();
+    appBuilder.UseRouting();
+    appBuilder.UseEndpoints(endpoints => endpoints.MapControllers());
+});
 
 app.UseRateLimiter();
 app.MapControllers();
