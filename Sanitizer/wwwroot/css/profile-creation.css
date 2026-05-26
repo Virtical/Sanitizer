@@ -41,8 +41,8 @@
     left: 24px;
     top: 50%;
     transform: translateY(-50%);
-    width: 26px;
-    height: 26px;
+    font-size: 26px;
+    color: var(--text-tertiary);
     z-index: 1;
 }
 
@@ -100,22 +100,12 @@
     justify-content: center;
 }
 
-.btn-circle {
-    width: 29px;
-    height: 29px;
+.bi-plus-circle-fill {
+    font-size: 29px;
+    color: var(--accent-primary);
     position: absolute;
     top: 0;
     left: 0;
-}
-
-.add-icon {
-    position: relative;
-    font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 600;
-    font-size: 25px;
-    line-height: 100%;
-    color: var(--text-white);
-    z-index: 1;
 }
 
 .add-text {
@@ -166,9 +156,8 @@
 }
 
 .rule-icon {
-    width: 20px;
-    height: 20px;
-    filter: brightness(0) saturate(100%) invert(29%) sepia(91%) saturate(1234%) hue-rotate(118deg) brightness(94%) contrast(96%);
+    font-size: 24px;
+    color: var(--icon);
 }
 
 
@@ -233,8 +222,7 @@
 }
 
 .method-arrow {
-    width: 14px;
-    height: 20px;
+    font-size: 20px;
     transition: transform 0.2s;
 }
 
@@ -390,9 +378,8 @@
     transition: opacity 0.2s;
 }
 
-.close-icon {
-    width: 11px;
-    height: 11px;
+.bi-x {
+    font-size: 25px;
 }
 
 .data-type-dropdown {
@@ -452,6 +439,13 @@
     display: none;
 }
 
+/* Иконки на карточках с правилами */
+
+.option-icon {
+    font-size: 22px; 
+    color: var(--text-tertiary);
+}
+
 /* Блок с кнопками перемещения */
 .move-buttons {
     visibility: hidden;
@@ -494,8 +488,7 @@
 }
 
 .move-icon {
-    width: 14px;
-    height: 14px;
+    font-size: 14px;
     transition: transform 0.2s;
 }
 
@@ -522,6 +515,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.delete-icon {
+    font-size: 26px;
+    color: var(--color-delete);
 }
 
 @media (max-width: 1000px) {
@@ -559,8 +557,7 @@
     }
 
     .input-icon {
-        width: 22px;
-        height: 22px;
+        font-size: 22px;
         left: 18px;
     }
 
@@ -572,12 +569,8 @@
         font-size: 18px;
     }
 
-    .btn-circle {
-        width: 26px;
-    }
-
-    .add-icon {
-        font-size: 22px;
+    .bi-plus-circle-fill {
+        font-size: 26px;
     }
 
     .rule-type {
@@ -615,8 +608,7 @@
     }
 
     .input-icon {
-        width: 20px;
-        height: 20px;
+        font-size: 20px;
         left: 14px;
     }
 
@@ -628,12 +620,8 @@
         font-size: 16px;
     }
 
-    .btn-circle {
-        width: 24px;
-    }
-
-    .add-icon {
-        font-size: 20px;
+    .bi-plus-circle-fill {
+        font-size: 24px;
     }
 
     .rules-title {
@@ -649,8 +637,7 @@
     }
 
     .method-arrow {
-        width: 16px;
-        height: 16px;
+        font-size: 16px;
     }
 
     .action-btn {
