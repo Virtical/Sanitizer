@@ -11,9 +11,12 @@
 
     --accent-primary: #037C4E;
     --accent-hover: #02A065;
+    --accent-secondary: #D6EBDF;
+    --icon: #1C7E34;
 
     --border-primary: #5B5B5B;
     --border-checkbox: #D9D9D9;
 
     --shadow-default: rgba(0, 0, 0, 0.1);
+    --overlay-backdrop: rgba(0, 0, 0, 0.5);
 }

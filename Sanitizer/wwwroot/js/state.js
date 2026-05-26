@@ -8,9 +8,6 @@ let allProfiles = [];
 let currentProfile = null
 let isProfileCreationVisible = false;
 
-let selectedDataTypes = [];
-let selectedMethod = null;
-
 let isDialogsCollapsed = false;
 
 async function initProfiles() {
