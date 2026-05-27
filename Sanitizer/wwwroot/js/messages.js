@@ -1,5 +1,9 @@
 /* global marked */
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
+
+// Флаг ожидания ответа от сервера
+let isWaitingForResponse = false;
+
 async function renderMessages(data = null) {
     const serverData = data || await apiGetMessages(currentDialogId);
     const profileToShow = allProfiles.find(p => p.id === serverData.sanitizationProfileId) || currentProfile;
@@ -126,8 +130,49 @@ function appendOptimisticMessages(text) {
     return ansBubble;
 }
 
+// Обновление состояния кнопки отправки
+function updateSendButtonState() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const emptySendBtn = document.getElementById('emptySendBtn');
+
+    const text = (messageInput.value.trim()) || (emptyMessageInput.value.trim()) || '';
+    const hasText = text.length > 0;
+    const isActive = hasText && !isWaitingForResponse;
+
+    sendBtn.disabled = !isActive;
+    emptySendBtn.disabled = !isActive;
+}
+
+// Блокировка кнопок во время ожидания
+function blockButtons() {
+    isWaitingForResponse = true;
+    updateSendButtonState();
+}
+
+// Разблокировка кнопок после ответа
+function unblockButtons() {
+    isWaitingForResponse = false;
+    updateSendButtonState();
+}
+
+// Очистка полей ввода
+function clearMessageInput() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+
+    messageInput.value = '';
+    emptyMessageInput.value = '';
+}
+
+
 async function addMessage(text) {
     if (!text.trim()) return;
+    if (isWaitingForResponse) return;
+
+    blockButtons();
+    clearMessageInput();
 
     const messagesArea = document.getElementById('messagesArea');
     const answerBubble = appendOptimisticMessages(text);
@@ -163,6 +208,7 @@ async function addMessage(text) {
         const serverData = await apiGetMessages(currentDialogId);
         await renderMessages(serverData);
         renderDialogs();
+        unblockButtons();
     } catch (error) {
         console.error('Ошибка отправки:', error);
         if (answerBubble) {
@@ -170,5 +216,7 @@ async function addMessage(text) {
             answerBubble.classList.add('message-error');
             answerBubble.textContent = error.message;
         }
+        
+        unblockButtons();
     }
 }
