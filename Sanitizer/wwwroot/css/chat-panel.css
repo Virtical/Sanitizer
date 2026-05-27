@@ -293,6 +293,14 @@
     justify-content: center;
 }
 
+.send-btn:disabled, .empty-send-btn:disabled {
+    pointer-events: none;
+}
+
+.send-btn:disabled i, .empty-send-btn:disabled i {
+    color: var(--text-tertiary);
+}
+
 .no-dialogs {
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
