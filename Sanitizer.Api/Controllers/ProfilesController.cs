@@ -24,7 +24,6 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
         return await GetAll();
     }
     
-    [SwaggerIgnore]
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление профиля")]
     public async Task<IActionResult> Update([FromRoute]string id, [FromBody] UpdateProfileRequest profileRequest)

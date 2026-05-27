@@ -1,0 +1,83 @@
+<div class="profile-creation-panel" id="profileEditPanel">
+    <div class="profile-creation-content">
+        <h1 class="creation-title">Редактирование профиля</h1>
+        
+        <div class="creation-input-container">
+            <i class="bi bi-person input-icon"></i>
+            <input type="text" class="creation-input" id="editProfileName" placeholder="Введите название профиля">
+        </div>
+    
+        <div class="rules-header" id="editRulesHeader">
+            <h2 class="rules-title">Правила обработки данных</h2>
+        </div>
+        
+        <div class="data-method-container" id="editRulesContainer"></div>
+        
+        <button class="add-icon-btn" id="editAddDataTypeBtn">
+            <div class="creation-add-row">
+                <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <span class="add-text">Добавить тип данных</span>
+        </button>
+        
+        <div class="creation-buttons-row">
+            <button class="action-btn creation-back-btn" id="cancelEditBtn">Вернуться назад</button>
+            <button class="action-btn creation-save-btn" id="saveEditBtn">Сохранить изменения</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования -->
+<div class="data-type-wrapper" id="editDataTypeModal">
+    <div class="modal-overlay"></div>
+    <div class="data-type-btn">
+        <div class="data-type-header">
+            <h3 class="data-type-text">Выберите тип данных</h3>
+            <button class="data-type-close-btn">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="data-type-dropdown">
+            <div class="data-type-option" data-value="Email">
+                <i class="bi bi-envelope option-icon"></i>
+                <span class="option-title">Email <span class="option-description">(Электронная почта)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Phone">
+                <i class="bi bi-telephone option-icon"></i>
+                <span class="option-title">Phone <span class="option-description">(Номера телефонов)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Card">
+                <i class="bi bi-credit-card option-icon"></i>
+                <span class="option-title">Card <span class="option-description">(Номера карт)</span></span>
+            </div>
+            <div class="data-type-option" data-value="IpAddress">
+                <i class="bi bi-globe option-icon"></i>
+                <span class="option-title">IP <span class="option-description">(IP-адреса)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Guid">
+                <i class="bi bi-person-lines-fill option-icon"></i>
+                <span class="option-title">UUID <span class="option-description">(Уникальный идентификатор)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Name">
+                <i class="bi bi-person option-icon"></i>
+                <span class="option-title">Names <span class="option-description">(Имена и ФИО)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Url">
+                <i class="bi bi-link-45deg option-icon"></i>
+                <span class="option-title">URL params <span class="option-description">(Адреса веб-страниц)</span></span>
+            </div>
+            <div class="data-type-option" data-value="ApiKey">
+                <i class="bi bi-key option-icon"></i>
+                <span class="option-title">API keys/tokens <span class="option-description">(API ключи и токены)</span></span>
+            </div>
+            <div class="data-type-option" data-value="Context">
+                <i class="bi bi-lock option-icon"></i>
+                <span class="option-title">Контекстные секреты</span>
+            </div>
+            <div class="data-type-option" data-value="Regex">
+                <i class="bi bi-regex option-icon"></i>
+                <span class="option-title">Regex <span class="option-description">(Создание собственных типов)</span></span>
+            </div>
+        </div>
+    </div>
+</div>

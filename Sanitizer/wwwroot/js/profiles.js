@@ -19,6 +19,7 @@ function updateProfileDropdown(dropdownElement) {
         const editIcon = selectedClone.querySelector('.profile-selected-edit');
         editIcon.addEventListener('click', (e) => {
             e.stopPropagation();
+            openProfileEdit();
         });
         
         selectedDiv.addEventListener('click', () => {
