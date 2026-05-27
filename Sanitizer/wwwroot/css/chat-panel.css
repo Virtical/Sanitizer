@@ -8,6 +8,7 @@
     width: 100%;
     min-height: 0;
     position: relative;
+    border-left: 1px solid var(--text-tertiary);
 }
 
 .chat-header {
@@ -28,7 +29,7 @@
     width: 280px;
     height: 48px;
     background: var(--bg-primary);
-    border: 2px solid var(--border-primary);
+    border: 2px solid var(--text-tertiary);
     border-radius: 50px;
     cursor: pointer;
     display: flex;
@@ -81,7 +82,7 @@
 
 .empty-input-container {
     position: relative;
-    width: 700px;
+    width: 100%;
     max-width: 80%;
 }
 
@@ -219,6 +220,10 @@
     color: var(--text-tertiary);
 }
 
+.eye-btn.active .bi-eye {
+    color: var(--accent-primary);
+}
+
 .message-error {
     background: #ffe5e5;
     border: 2px solid #d32f2f;
@@ -240,13 +245,30 @@
 
 .sanitized-message .message-bubble {
     background: var(--bg-primary) !important;
-    box-shadow: 0 0 4px 2px var(--accent-primary) !important;
     color: var(--text-primary) !important;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 600;
     font-size: 20px;
     line-height: 100%;
-    border: none !important;
+    border: 1px solid var(--accent-primary);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Стилизация скроллбара для санитизированного сообщения */
+.sanitized-message .message-bubble::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sanitized-message .message-bubble::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    margin-block: 13px;
+}
+
+.sanitized-message .message-bubble::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 20px;
 }
 
 .input-container {

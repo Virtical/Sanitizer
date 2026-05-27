@@ -39,12 +39,16 @@ async function renderMessages(data = null) {
         const bubble = msgClone.querySelector('.message-bubble');
         
         msgDiv.classList.add(msg.type.toLowerCase());
+        msgDiv.setAttribute('data-message-id', msg.id);
         bubble.innerHTML = marked.parse(msg.text);
 
         if (msg.type === 'Sent') {
             const actionsClone = cloneTemplate('message-actions-template');
             if (actionsClone) {
                 const eyeBtn = actionsClone.querySelector('.eye-btn');
+
+                const hasSanitized = sanitizedMessages.some(m => m.originalMessageId === msg.id);
+                if (hasSanitized) eyeBtn.classList.add('active');
                 
                 eyeBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -76,8 +80,11 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     const originalMsg = messages.find(m => m.id === originalMsgId);
     if (!originalMsg) return;
 
+    const eyeBtn = document.querySelector(`.message.sent[data-message-id="${originalMsgId}"] .eye-btn`);
+
     if (sanitizedIndex !== -1) {
          sanitizedMessages.splice(sanitizedIndex, 1);
+         eyeBtn.classList.remove('active');
     } else {
         const sanitizedMsg = messages.find(m => m.originalMessageId === originalMsgId);
         const newMsg = {
@@ -87,6 +94,7 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
             originalMessageId: sanitizedMsg.originalMessageId,
         };
         sanitizedMessages.push(newMsg);
+        eyeBtn.classList.add('active');
     }
     await renderMessages();
 }
