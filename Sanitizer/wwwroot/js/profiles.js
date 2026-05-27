@@ -102,6 +102,9 @@ function openProfileCreation() {
     isProfileCreationVisible = true;
     const chatPanel = document.getElementById('chatPanel');
     const profileCreationPanel = document.getElementById('profileCreationPanel');
+    const rulesContainer = document.getElementById('rulesContainer');
+
+    rulesContainer.innerHTML = '';
     if (chatPanel) chatPanel.style.display = 'none';
     if (profileCreationPanel) profileCreationPanel.style.display = 'flex';
 }
@@ -127,13 +130,13 @@ async function saveNewProfile() {
 
     if (!saveBtn.classList.contains('active')) return;
     
+    const rulesContainer = document.getElementById('rulesContainer');
     const rules = {};
-    const cards = document.querySelectorAll('.rule-card');
+    const cards = rulesContainer.querySelectorAll('.rule-card');
 
     cards.forEach(dt => {
         rules[dt.dataset.dataType] = {
-            strategy: dt.dataset.method,
-            parameters: {}
+            strategy: dt.dataset.method
         };
     });
 

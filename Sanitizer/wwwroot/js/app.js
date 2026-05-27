@@ -136,6 +136,7 @@ async function init() {
     initEventListeners();
     initCollapseListeners();
     initDataMethodHandlers();
+    initEditHandlers();
     showChatPanel();
     initScrollbars();
     updateSendButtonState();
