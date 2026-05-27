@@ -61,7 +61,8 @@ function closeDataTypeModal() {
 function updateAvailableDataTypes() {
     // Получаем все уже выбранные типы данных из карточек
     const selectedTypes = new Set();
-    const cards = document.querySelectorAll('.rule-card');
+    const rulesContainer = document.getElementById('rulesContainer');
+    const cards = rulesContainer.querySelectorAll('.rule-card');
     cards.forEach(card => {
         const dataType = card.dataset.dataType;
         if (dataType) {
@@ -70,7 +71,7 @@ function updateAvailableDataTypes() {
     });
 
     // Обновляем отображение опций в модальном окне
-    const modalOptions = document.querySelectorAll('.data-type-option');
+    const modalOptions = document.querySelectorAll('#dataTypeModal .data-type-option');
     modalOptions.forEach(option => {
         const dataType = option.dataset.value;
         if (selectedTypes.has(dataType)) {
@@ -94,7 +95,7 @@ function addRuleCard(dataType, dataTypeDisplay) {
     const rulesContainer = document.getElementById('rulesContainer');
     if (!rulesContainer) return;
 
-    const existingCard = document.querySelector(`.rule-card[data-data-type="${dataType}"]`);
+    const existingCard = rulesContainer.querySelector(`.rule-card[data-data-type="${dataType}"]`);
     if (existingCard) {
         return;
     }
@@ -144,7 +145,7 @@ function addRuleCard(dataType, dataTypeDisplay) {
         updateAvailableDataTypes();
         updateSaveButtonState();
 
-        const remainingCards = document.querySelectorAll('.rule-card');
+        const remainingCards = rulesContainer.querySelectorAll('.rule-card');
         if (remainingCards.length === 0 && rulesHeader) {
             rulesHeader.style.display = 'none';
         }
@@ -175,10 +176,12 @@ function addRuleCard(dataType, dataTypeDisplay) {
     // Обработчик открытия/закрытия выпадающего списка методов
     methodSelectorBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.querySelectorAll('.method-dropdown.show').forEach(dd => {
+        const dropdowns = rulesContainer.querySelectorAll('.method-dropdown.show');
+        dropdowns.forEach(dd => {
             if (dd !== methodDropdown) dd.classList.remove('show');
         });
-        document.querySelectorAll('.method-btn.active').forEach(btn => {
+        const activeBtns = rulesContainer.querySelectorAll('.method-btn.active');
+        activeBtns.forEach(btn => {
             if (btn !== methodSelectorBtn) btn.classList.remove('active');
         });
 
@@ -210,7 +213,8 @@ function addRuleCard(dataType, dataTypeDisplay) {
 
 // Обновление состояния кнопок перемещения и видимости блока
 function updateMoveButtonsState() {
-    const cards = document.querySelectorAll('.rule-card');
+    const rulesContainer = document.getElementById('rulesContainer');
+    const cards = rulesContainer.querySelectorAll('.rule-card');
     const cardsCount = cards.length;
 
     cards.forEach((card, index) => {
@@ -243,7 +247,8 @@ function updateMoveButtonsState() {
 
 function updateProfileRulesArray() {
     profileRules = [];
-    const cards = document.querySelectorAll('.rule-card');
+    const rulesContainer = document.getElementById('rulesContainer');
+    const cards = rulesContainer.querySelectorAll('.rule-card');
 
     cards.forEach(card => {
         const dataType = card.dataset.dataType;
@@ -267,7 +272,8 @@ function updateSaveButtonState() {
 
     const hasName = profileNameInput.value.trim().length > 0;
 
-    const cards = document.querySelectorAll('.rule-card');
+    const rulesContainer = document.getElementById('rulesContainer');
+    const cards = rulesContainer ? rulesContainer.querySelectorAll('.rule-card') : [];
     let allCardsHaveMethod = true;
 
     if (cards.length > 0) {
@@ -309,11 +315,6 @@ function resetProfileCreationForm() {
     }
 
     profileRules = [];
-
-    const saveBtn = document.getElementById('saveProfileBtn');
-    if (saveBtn) {
-        saveBtn.classList.remove('active');
-    }
 
     updateAvailableDataTypes();
     updateSaveButtonState();
