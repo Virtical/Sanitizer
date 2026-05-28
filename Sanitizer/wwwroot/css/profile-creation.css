@@ -8,6 +8,22 @@
     position: absolute;
     top: 0;
     left: 0;
+    border-left: 1px solid var(--text-tertiary);
+}
+
+/* Стилизация скроллбара для страницы создания профиля */
+.profile-creation-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.profile-creation-panel::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 10px;
+}
+
+.profile-creation-panel::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 10px;
 }
 
 .profile-creation-content {
@@ -54,7 +70,7 @@
     border: 1px solid var(--text-tertiary);
     padding: 0 24px 0 62px;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 400;
+    font-weight: 600;
     font-size: 20px;
     line-height: 100%;
     color: var(--text-primary);
@@ -218,6 +234,10 @@
     font-weight: 600;
     font-size: 20px;
     line-height: 100%;
+    color: var(--text-tertiary);
+}
+
+.method-text.selected {
     color: var(--text-primary);
 }
 
@@ -341,7 +361,7 @@
 
 .data-type-btn {
     position: relative;
-    width: 351px;
+    width: 356px;
     max-height: 436px;
     background: var(--bg-primary);
     border: 1px solid var(--text-tertiary);
@@ -385,11 +405,28 @@
 .data-type-dropdown {
     display: flex;
     flex-direction: column;
-    padding-bottom: 6px;
-    width: 355px;
+    padding-bottom: 10px;
+    width: 100%;
     max-height: 360px;
     overflow-y: auto;
     gap: 10px;
+    box-sizing: border-box;
+}
+
+/* Стилизация скроллбара для списка типов данных */
+.data-type-dropdown::-webkit-scrollbar {
+    width: 7px;
+}
+
+.data-type-dropdown::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 10px;
+    margin-block: 10px;
+}
+
+.data-type-dropdown::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 10px;
 }
 
 .data-type-option {

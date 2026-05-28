@@ -8,6 +8,9 @@ function updateProfileDropdown(dropdownElement) {
     if (!dropdownElement) return;
     dropdownElement.innerHTML = '';
     
+    const profilesList = document.createElement('div');
+    profilesList.className = 'profiles-list';
+    
     if (currentProfile != null) {
         const selectedClone = cloneTemplate('profile-selected-template');
         if (!selectedClone) return;
@@ -26,20 +29,28 @@ function updateProfileDropdown(dropdownElement) {
             dropdownElement.classList.remove('show');
         });
         
-        dropdownElement.appendChild(selectedClone);
+        profilesList.appendChild(selectedClone);
     }
 
     const otherProfiles = allProfiles.filter(p => p.id !== currentProfile.id);
     if (otherProfiles.length > 0) {
-        const profilesList = document.createElement('div');
-        profilesList.className = 'profiles-list';
-        
         otherProfiles.forEach(profile => {
             const optionClone = cloneTemplate('profile-option-template');
             if (!optionClone) return;
             
             const option = optionClone.querySelector('.profile-option-item');
-            option.textContent = profile.name;
+            const optionName = optionClone.querySelector('.profile-option-name');
+            const editIcon = optionClone.querySelector('.profile-option-edit');
+
+            optionName.textContent = profile.name;
+
+            // Обработчик редактирования
+            editIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentProfile = profile;
+                openProfileEdit();
+            });
+
             option.addEventListener('click', async () => {
                 currentProfile = profile;
                 updateProfileButtonText();
@@ -58,17 +69,7 @@ function updateProfileDropdown(dropdownElement) {
             profilesList.appendChild(optionClone);
         });
         
-        if (otherProfiles.length >= 8) {
-            profilesList.classList.add('has-scroll');
-        } else {
-            profilesList.classList.remove('has-scroll');
-        }
-        
         dropdownElement.appendChild(profilesList);
-        
-        if (otherProfiles.length >= 8) {
-            setTimeout(() => createProfilesScrollbar(), 10);
-        }
     }
 
     if (currentProfile != null) {
