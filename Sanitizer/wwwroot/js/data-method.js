@@ -33,7 +33,12 @@ function initModalHandlers() {
         option.addEventListener('click', () => {
             const dataType = option.dataset.value;
             const titleSpan = option.querySelector('.option-title');
-            const dataTypeDisplay = titleSpan ? titleSpan.textContent : dataType;
+            const clone = titleSpan.cloneNode(true);
+            const descSpan = clone.querySelector('.option-description');
+            
+            if (descSpan) descSpan.remove();
+            const dataTypeDisplay = clone.textContent.trim();
+            
             addRuleCard(dataType, dataTypeDisplay);
             closeDataTypeModal();
         });

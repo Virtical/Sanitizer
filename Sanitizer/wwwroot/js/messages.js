@@ -80,6 +80,9 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     const originalMsg = messages.find(m => m.id === originalMsgId);
     if (!originalMsg) return;
 
+    const messagesArea = document.getElementById('messagesArea');
+    const currentScroll = messagesArea.scrollTop || 0;
+    const isAtBottom = messagesArea && (messagesArea.scrollHeight - messagesArea.scrollTop <= messagesArea.clientHeight + 50);
     const eyeBtn = document.querySelector(`.message.sent[data-message-id="${originalMsgId}"] .eye-btn`);
 
     if (sanitizedIndex !== -1) {
@@ -97,6 +100,12 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
         eyeBtn.classList.add('active');
     }
     await renderMessages();
+    
+    if (isAtBottom) {
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    } else {
+        messagesArea.scrollTop = currentScroll;
+    }
 }
 
 /**

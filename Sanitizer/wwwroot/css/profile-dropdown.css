@@ -5,12 +5,12 @@
     right: 0;
     width: 280px;
     background-color: var(--bg-primary);
-    border: 2px solid var(--border-primary);
-    border-radius: 35px;
+    border: 2px solid var(--text-tertiary);
+    border-radius: 20px;
     display: none;
     flex-direction: column;
     z-index: 100;
-    overflow: visible;
+    overflow: hidden;
     box-shadow: 0 4px 15px var(--shadow-default);
 }
 
@@ -18,6 +18,32 @@
     display: flex;
 }
 
+/* Скроллируемый список всех профилей */
+.profiles-list {
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+/* Стилизация скроллбара для списка профилей */
+.profiles-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profiles-list::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    margin-block: 10px;
+}
+
+.profiles-list::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 20px;
+}
+
+/* Выбранный профиль (внутри скроллируемого списка) */
 .profile-selected-item {
     display: flex;
     align-items: center;
@@ -25,8 +51,8 @@
     padding: 10px 16px;
     cursor: pointer;
     transition: background 0.2s;
-    background: var(--accent-primary);
-    margin: 8px 12px;
+    background: var(--accent-secondary);
+    margin: 4px 12px;
     border-radius: 20px;
     gap: 8px;
     flex-shrink: 0;
@@ -37,7 +63,7 @@
     font-weight: 600;
     font-size: 18px;
     line-height: 100%;
-    color: var(--text-white);
+    color: var(--text-primary);
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -56,21 +82,18 @@
 
 .bi-pencil-square {
     font-size: 20px;
+    color: var(--text-primary);
 }
 
-.profiles-list {
-    display: flex;
-    flex-direction: column;
-    max-height: none;
-    overflow-y: visible;
+.bi-pencil-square:hover {
+    color: var(--accent-text);
 }
 
-.profiles-list.has-scroll {
-    max-height: 300px;
-    overflow-y: auto;
-}
 
 .profile-option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 10px 16px;
     cursor: pointer;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
@@ -88,14 +111,57 @@
     flex-shrink: 0;
 }
 
+.profile-option-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Иконка редактирования для обычных профилей (скрыта по умолчанию) */
+.profile-option-edit {
+    font-size: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.profile-option-item:hover .profile-option-edit {
+    opacity: 1;
+    visibility: visible;
+}
+
+.profile-selected-edit {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 1;
+    visibility: visible;
+}
+
+.profile-selected-edit .bi-pencil-square {
+    font-size: 20px;
+    color: var(--text-primary);
+}
+
+.profile-selected-edit .bi-pencil-square:hover {
+    color: var(--accent-text);
+}
+
 .profile-option-item:hover {
     background-color: var(--bg-secondary);
 }
 
 .profile-divider-line {
     height: 1px;
-    background-color: var(--border-primary);
-    margin: 8px 12px;
+    background-color: var(--text-tertiary);
+    margin: 5px 0;
     flex-shrink: 0;
 }
 
@@ -103,28 +169,26 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px;
+    padding: 8px 10px;
     cursor: pointer;
     transition: background 0.2s;
     background: transparent;
     border: none;
-    width: calc(100% - 24px);
+    width: calc(100% - 10px);
     text-align: left;
     border-radius: 20px;
-    margin: 8px 12px;
+    margin: 0 6px 6px 6px;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
 .create-new-profile-btn:hover {
-    background-color: var(--bg-secondary);
+    background-color: var(--accent-secondary);
 }
 
 .create-icon-box {
     width: 24px;
     height: 24px;
-    background: var(--border-checkbox);
-    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,16 +197,16 @@
 
 .create-icon-plus {
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 400;
-    font-size: 18px;
+    font-weight: 700;
+    font-size: 25px;
     line-height: 100%;
     color: var(--text-primary);
 }
 
 .create-btn-text {
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 400;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 18px;
     line-height: 100%;
     color: var(--text-primary);
     white-space: nowrap;
