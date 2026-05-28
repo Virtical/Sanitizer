@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Storage.Data.Entities;
 
@@ -11,7 +11,7 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
         return await db.Profiles
             .Include(p => p.Rules)
             .AsNoTracking()
-            .Where(p => p.ApiKeyId == apiKeyId)
+            .Where(p => p.ApiKeyId == apiKeyId || p.ApiKeyId == Guid.Empty)
             .ToArrayAsync();
     }
 
@@ -19,7 +19,7 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
     {
         return await db.Profiles
             .Include(p => p.Rules)
-            .FirstOrDefaultAsync(p => p.Id == id && p.ApiKeyId == apiKeyId);
+            .FirstOrDefaultAsync(p => p.Id == id && (p.ApiKeyId == apiKeyId || p.ApiKeyId == Guid.Empty));
     }
 
     public async Task SaveAsync(SanitizationProfileEntity entity)

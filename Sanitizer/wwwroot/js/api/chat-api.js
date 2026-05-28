@@ -1,4 +1,5 @@
 const CHAT_API_BASE = 'http://localhost:5127/api/chat';
+const AUTH_TOKEN = 'C6F0DC04-333C-4969-A2D2-E06DDB389604';
 
 /**
  * Общая вспомогательная функция для стримингового POST-запроса.
@@ -10,7 +11,7 @@ const CHAT_API_BASE = 'http://localhost:5127/api/chat';
 async function apiSendStream(url, message, onChunk) {
     const resp = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Auth-Token': AUTH_TOKEN },
         body: JSON.stringify({ message })
     });
 
@@ -50,7 +51,8 @@ async function apiSendMessage(chatId, message, onChunk) {
 
 async function apiGetMessages(chatId) {
     const resp = await fetch(`${CHAT_API_BASE}/${chatId}`, {
-        method: 'GET'
+        method: 'GET',
+        headers: { 'X-Auth-Token': AUTH_TOKEN }
     });
 
     if (!resp.ok) {
@@ -63,7 +65,8 @@ async function apiGetMessages(chatId) {
 
 async function apiGetDialog() {
     const resp = await fetch(`${CHAT_API_BASE}`, {
-        method: 'GET'
+        method: 'GET',
+        headers: { 'X-Auth-Token': AUTH_TOKEN }
     });
 
     if (!resp.ok) {
@@ -77,7 +80,7 @@ async function apiGetDialog() {
 async function apiUpdateDialogProfile(dialogId, profileId) {
     const resp = await fetch(`${CHAT_API_BASE}/${dialogId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Auth-Token': AUTH_TOKEN },
         body: JSON.stringify({
             profileId: profileId
         })
