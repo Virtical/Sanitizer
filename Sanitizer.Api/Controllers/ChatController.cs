@@ -103,28 +103,40 @@ public class ChatController(
             Response.Headers.Append("X-Chat-Id", id);
             Response.ContentType = "text/plain";
             Response.Headers.Append("Cache-Control", "no-cache");
-            
+
             var messages = new List<ChatMessage>
             {
                 new(ChatRole.System, "Ты полезный ассистент"),
                 new(ChatRole.User, sanitization.SanitizedText)
             };
-            
+
             var options = new ChatOptions
             {
                 Tools = ChatFunctionFactory.CreateTools()
             };
 
+            var streaming = new StreamingDesanitizer(desanitizer, sanitization.Context);
             var fullResponse = new StringBuilder();
-            
+
             await foreach (var update in chatClient.GetStreamingResponseAsync(messages, options))
             {
-                if (!string.IsNullOrEmpty(update.Text))
+                if (string.IsNullOrEmpty(update.Text)) continue;
+
+                var safe = streaming.Push(update.Text);
+                if (safe.Length > 0)
                 {
-                    await Response.WriteAsync(update.Text);
+                    await Response.WriteAsync(safe);
                     await Response.Body.FlushAsync();
-                    fullResponse.Append(update.Text);
+                    fullResponse.Append(safe);
                 }
+            }
+
+            var tail = streaming.Flush();
+            if (tail.Length > 0)
+            {
+                await Response.WriteAsync(tail);
+                await Response.Body.FlushAsync();
+                fullResponse.Append(tail);
             }
 
             raw = fullResponse.ToString();
@@ -136,7 +148,6 @@ public class ChatController(
             return;
         }
 
-        var final = desanitizer.Desanitize(raw, sanitization.Context);
-        await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(final));
+        await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(raw));
     }
 }
