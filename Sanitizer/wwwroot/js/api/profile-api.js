@@ -15,3 +15,13 @@ async function apiCreateProfile(profile) {
     if (!resp.ok) throw new Error('Ошибка создания профиля');
     return resp.json();
 }
+
+async function apiUpdateProfile(profileId, profile) {
+    const resp = await fetch(`${PROFILES_API_BASE}/${profileId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile)
+    });
+    if (!resp.ok) throw new Error('Ошибка обновления профиля');
+    return resp.json();
+}

@@ -97,8 +97,18 @@ function initEventListeners() {
     if (saveProfileBtn) saveProfileBtn.addEventListener('click', saveNewProfile);
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (emptySendBtn) emptySendBtn.addEventListener('click', sendMessage);
-    if (messageInput) messageInput.addEventListener('keypress', async (e) => { if (e.key === 'Enter') await sendMessage(); });
-    if (emptyMessageInput) emptyMessageInput.addEventListener('keypress', async (e) => { if (e.key === 'Enter') await sendMessage(); });
+    if (messageInput) {
+        messageInput.addEventListener('input', updateSendButtonState);
+        messageInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') await sendMessage();
+        });
+    }
+    if (emptyMessageInput) {
+        emptyMessageInput.addEventListener('input', updateSendButtonState);
+        emptyMessageInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') await sendMessage();
+        });
+    }
     if (newChatBtn) newChatBtn.addEventListener('click', createNewDialog);
     if (userProfileBtn) userProfileBtn.addEventListener('click', () => {});
     document.addEventListener('click', handleClickOutside);
@@ -126,8 +136,10 @@ async function init() {
     initEventListeners();
     initCollapseListeners();
     initDataMethodHandlers();
+    initEditHandlers();
     showChatPanel();
     initScrollbars();
+    updateSendButtonState();
 }
 
 // Запуск после загрузки DOM

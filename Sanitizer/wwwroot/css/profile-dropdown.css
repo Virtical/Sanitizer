@@ -54,10 +54,8 @@
     flex-shrink: 0;
 }
 
-.profile-selected-edit img {
-    width: 24px;
-    height: 24px;
-    filter: brightness(0) invert(1);
+.bi-pencil-square {
+    font-size: 20px;
 }
 
 .profiles-list {

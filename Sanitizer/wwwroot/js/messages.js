@@ -1,5 +1,9 @@
 /* global marked */
 // ==================== УПРАВЛЕНИЕ СООБЩЕНИЯМИ ====================
+
+// Флаг ожидания ответа от сервера
+let isWaitingForResponse = false;
+
 async function renderMessages(data = null) {
     const serverData = data || await apiGetMessages(currentDialogId);
     const profileToShow = allProfiles.find(p => p.id === serverData.sanitizationProfileId) || currentProfile;
@@ -35,12 +39,16 @@ async function renderMessages(data = null) {
         const bubble = msgClone.querySelector('.message-bubble');
         
         msgDiv.classList.add(msg.type.toLowerCase());
+        msgDiv.setAttribute('data-message-id', msg.id);
         bubble.innerHTML = marked.parse(msg.text);
 
         if (msg.type === 'Sent') {
             const actionsClone = cloneTemplate('message-actions-template');
             if (actionsClone) {
                 const eyeBtn = actionsClone.querySelector('.eye-btn');
+
+                const hasSanitized = sanitizedMessages.some(m => m.originalMessageId === msg.id);
+                if (hasSanitized) eyeBtn.classList.add('active');
                 
                 eyeBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -72,8 +80,11 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
     const originalMsg = messages.find(m => m.id === originalMsgId);
     if (!originalMsg) return;
 
+    const eyeBtn = document.querySelector(`.message.sent[data-message-id="${originalMsgId}"] .eye-btn`);
+
     if (sanitizedIndex !== -1) {
          sanitizedMessages.splice(sanitizedIndex, 1);
+         eyeBtn.classList.remove('active');
     } else {
         const sanitizedMsg = messages.find(m => m.originalMessageId === originalMsgId);
         const newMsg = {
@@ -83,6 +94,7 @@ async function toggleSanitizedMessage(messages, originalMsgId) {
             originalMessageId: sanitizedMsg.originalMessageId,
         };
         sanitizedMessages.push(newMsg);
+        eyeBtn.classList.add('active');
     }
     await renderMessages();
 }
@@ -126,8 +138,49 @@ function appendOptimisticMessages(text) {
     return ansBubble;
 }
 
+// Обновление состояния кнопки отправки
+function updateSendButtonState() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const emptySendBtn = document.getElementById('emptySendBtn');
+
+    const text = (messageInput.value.trim()) || (emptyMessageInput.value.trim()) || '';
+    const hasText = text.length > 0;
+    const isActive = hasText && !isWaitingForResponse;
+
+    sendBtn.disabled = !isActive;
+    emptySendBtn.disabled = !isActive;
+}
+
+// Блокировка кнопок во время ожидания
+function blockButtons() {
+    isWaitingForResponse = true;
+    updateSendButtonState();
+}
+
+// Разблокировка кнопок после ответа
+function unblockButtons() {
+    isWaitingForResponse = false;
+    updateSendButtonState();
+}
+
+// Очистка полей ввода
+function clearMessageInput() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+
+    messageInput.value = '';
+    emptyMessageInput.value = '';
+}
+
+
 async function addMessage(text) {
     if (!text.trim()) return;
+    if (isWaitingForResponse) return;
+
+    blockButtons();
+    clearMessageInput();
 
     const messagesArea = document.getElementById('messagesArea');
     const answerBubble = appendOptimisticMessages(text);
@@ -143,8 +196,7 @@ async function addMessage(text) {
     try {
         if (!currentDialogId) {
             // Новый диалог — получаем id из заголовка X-Chat-Id
-            const { chatId } = await apiCreateDialog(text, onChunk);
-            currentDialogId = chatId;
+            currentDialogId = await apiCreateDialog(text, onChunk);
             await loadDialogs();
 
             if (currentProfile) {
@@ -154,16 +206,17 @@ async function addMessage(text) {
                     console.error('Ошибка привязки профиля к новому диалогу:', error);
                 }
             }
-        } else {
-            // Существующий диалог
-            await apiSendMessage(currentDialogId, text, onChunk);
         }
+        
+        // Существующий диалог
+        await apiSendMessage(currentDialogId, text, onChunk);
 
         // Финальная синхронизация с сервером:
         // получаем канонические данные (id сообщений, sanitized-копии для кнопки «глаза» и т.п.)
         const serverData = await apiGetMessages(currentDialogId);
         await renderMessages(serverData);
         renderDialogs();
+        unblockButtons();
     } catch (error) {
         console.error('Ошибка отправки:', error);
         if (answerBubble) {
@@ -171,5 +224,7 @@ async function addMessage(text) {
             answerBubble.classList.add('message-error');
             answerBubble.textContent = error.message;
         }
+        
+        unblockButtons();
     }
 }

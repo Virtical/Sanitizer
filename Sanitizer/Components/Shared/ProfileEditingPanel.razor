@@ -1,20 +1,19 @@
-<div class="profile-creation-panel" id="profileCreationPanel">
-
+<div class="profile-creation-panel" id="profileEditPanel">
     <div class="profile-creation-content">
-        <h1 class="creation-title">Создание нового профиля</h1>
+        <h1 class="creation-title">Редактирование профиля</h1>
         
         <div class="creation-input-container">
             <i class="bi bi-person input-icon"></i>
-            <input type="text" class="creation-input" id="newProfileName" placeholder="Введите название профиля">
+            <input type="text" class="creation-input" id="editProfileName" placeholder="Введите название профиля">
         </div>
     
-        <div class="rules-header" id="rulesHeader">
+        <div class="rules-header" id="editRulesHeader">
             <h2 class="rules-title">Правила обработки данных</h2>
         </div>
         
-        <div class="data-method-container" id="rulesContainer"></div>
+        <div class="data-method-container" id="editRulesContainer"></div>
         
-        <button class="add-icon-btn" id="addDataTypeBtn">
+        <button class="add-icon-btn" id="editAddDataTypeBtn">
             <div class="creation-add-row">
                 <i class="bi bi-plus-circle-fill"></i>
             </div>
@@ -22,18 +21,19 @@
         </button>
         
         <div class="creation-buttons-row">
-            <button class="action-btn creation-back-btn" id="backFromCreationBtn">Вернуться назад</button>
-            <button class="action-btn creation-save-btn" id="saveProfileBtn">Сохранить профиль</button>
+            <button class="action-btn creation-back-btn" id="cancelEditBtn">Вернуться назад</button>
+            <button class="action-btn creation-save-btn" id="saveEditBtn">Сохранить изменения</button>
         </div>
     </div>
 </div>
 
-<div class="data-type-wrapper" id="dataTypeModal">
+<!-- Модальное окно для редактирования -->
+<div class="data-type-wrapper" id="editDataTypeModal">
     <div class="modal-overlay"></div>
     <div class="data-type-btn">
         <div class="data-type-header">
             <h3 class="data-type-text">Выберите тип данных</h3>
-            <button class="data-type-close-btn" id="closeDataTypeModalBtn">
+            <button class="data-type-close-btn">
                 <i class="bi bi-x"></i>
             </button>
         </div>
@@ -81,54 +81,3 @@
         </div>
     </div>
 </div>
-
-<template id="rule-card-template">
-    <div class="rule-card">
-        <div class="rule-icon-wrapper">
-            <i class="bi rule-icon"></i>
-        </div>
-        <div class="rule-type"></div>
-
-        <div class="method-wrapper">
-            <div class="method-btn">
-                <span class="method-text">Выберите метод санитизации</span>
-                <i class="bi bi-chevron-down method-arrow"></i>
-            </div>
-            <div class="method-dropdown">
-                <div class="method-option" data-value="Mask">
-                    <i class="bi bi-eye-slash option-icon"></i>
-                    <span class="option-title">Mask <span class="option-description">(Маскирование)</span></span>
-                </div>
-                <div class="method-option" data-value="Replace">
-                    <i class="bi bi-repeat option-icon"></i>
-                    <span class="option-title">Replace <span class="option-description">(Замена)</span></span>
-                </div>
-                <div class="method-option" data-value="Hash">
-                    <i class="bi bi-hash option-icon"></i>
-                    <span class="option-title">Hash <span class="option-description">(Хэширование)</span></span>
-                </div>
-                <div class="method-option" data-value="Tokenize">
-                    <i class="bi bi-code-square option-icon"></i>
-                    <span class="option-title">Tokenize <span class="option-description">(Токенизация)</span></span>
-                </div>
-                <div class="method-option" data-value="Remove">
-                    <i class="bi bi-trash option-icon"></i>
-                    <span class="option-title">Remove <span class="option-description">(Удаление)</span></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="move-buttons">
-            <button class="move-up-btn">
-                <i class="bi bi-chevron-down move-icon up"></i>
-            </button>
-            <button class="move-down-btn">
-                <i class="bi bi-chevron-down move-icon down"></i>
-            </button>
-        </div>
-
-        <button class="delete-rule-btn">
-            <i class="bi bi-trash delete-icon"></i>
-        </button>
-    </div>
-</template>
