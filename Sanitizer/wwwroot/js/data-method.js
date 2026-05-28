@@ -105,16 +105,16 @@ function addRuleCard(dataType, dataTypeDisplay) {
         return;
     }
 
+    // Определяем тип карточки
+    const isRegex = dataType === 'Regex';
+
     // Создаём новую карточку из шаблона
-    const template = document.getElementById('rule-card-template');
+    const template = document.getElementById(isRegex ? 'rule-card-regex-template' : 'rule-card-template');
     const cardClone = template.content.cloneNode(true);
 
     const ruleCard = cardClone.querySelector('.rule-card');
     const ruleIcon = cardClone.querySelector('.rule-icon');
     const ruleTypeSpan = cardClone.querySelector('.rule-type');
-    const methodSelectorBtn = cardClone.querySelector('.method-btn');
-    const methodSelectorText = cardClone.querySelector('.method-text');
-    const methodDropdown = cardClone.querySelector('.method-dropdown');
     const deleteBtn = cardClone.querySelector('.delete-rule-btn');
     const moveUpBtn = cardClone.querySelector('.move-up-btn');
     const moveDownBtn = cardClone.querySelector('.move-down-btn');
@@ -178,36 +178,52 @@ function addRuleCard(dataType, dataTypeDisplay) {
         }
     });
 
-    // Обработчик открытия/закрытия выпадающего списка методов
-    methodSelectorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dropdowns = rulesContainer.querySelectorAll('.method-dropdown.show');
-        dropdowns.forEach(dd => {
-            if (dd !== methodDropdown) dd.classList.remove('show');
-        });
-        const activeBtns = rulesContainer.querySelectorAll('.method-btn.active');
-        activeBtns.forEach(btn => {
-            if (btn !== methodSelectorBtn) btn.classList.remove('active');
-        });
-
-        methodDropdown.classList.toggle('show');
-        methodSelectorBtn.classList.toggle('active');
-    });
-
-    // Обработчики выбора метода
-    const methodOptions = cardClone.querySelectorAll('.method-option');
-    methodOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const methodValue = option.dataset.value;
-            methodSelectorText.textContent = option.textContent;
-            methodSelectorText.classList.add('selected');
-            methodDropdown.classList.remove('show');
-            methodSelectorBtn.classList.remove('active');
-            ruleCard.dataset.method = methodValue;
+    if (isRegex) {
+        // Для Regex: фиксируем метод Tokenize и обрабатываем ввод паттерна
+        ruleCard.dataset.method = 'Tokenize';
+        const patternInput = cardClone.querySelector('.regex-pattern-input');
+        patternInput.addEventListener('input', () => {
+            ruleCard.dataset.pattern = patternInput.value;
             updateProfileRulesArray();
             updateSaveButtonState();
         });
-    });
+    } else {
+        // Для остальных типов: выпадающий список выбора метода
+        const methodSelectorBtn = cardClone.querySelector('.method-btn');
+        const methodSelectorText = cardClone.querySelector('.method-text');
+        const methodDropdown = cardClone.querySelector('.method-dropdown');
+
+        // Обработчик открытия/закрытия выпадающего списка методов
+        methodSelectorBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdowns = rulesContainer.querySelectorAll('.method-dropdown.show');
+            dropdowns.forEach(dd => {
+                if (dd !== methodDropdown) dd.classList.remove('show');
+            });
+            const activeBtns = rulesContainer.querySelectorAll('.method-btn.active');
+            activeBtns.forEach(btn => {
+                if (btn !== methodSelectorBtn) btn.classList.remove('active');
+            });
+
+            methodDropdown.classList.toggle('show');
+            methodSelectorBtn.classList.toggle('active');
+        });
+
+        // Обработчики выбора метода
+        const methodOptions = cardClone.querySelectorAll('.method-option');
+        methodOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const methodValue = option.dataset.value;
+                methodSelectorText.textContent = option.textContent;
+                methodSelectorText.classList.add('selected');
+                methodDropdown.classList.remove('show');
+                methodSelectorBtn.classList.remove('active');
+                ruleCard.dataset.method = methodValue;
+                updateProfileRulesArray();
+                updateSaveButtonState();
+            });
+        });
+    }
 
     rulesContainer.appendChild(cardClone);
     updateMoveButtonsState();
@@ -258,12 +274,12 @@ function updateProfileRulesArray() {
     cards.forEach(card => {
         const dataType = card.dataset.dataType;
         const method = card.dataset.method;
+        const pattern = card.dataset.pattern;
 
         if (dataType && method) {
-            profileRules.push({
-                type: dataType,
-                strategy: method
-            });
+            const rule = { type: dataType, strategy: method };
+            if (dataType === 'Regex') rule.pattern = pattern || '';
+            profileRules.push(rule);
         }
     });
 }
@@ -283,8 +299,10 @@ function updateSaveButtonState() {
 
     if (cards.length > 0) {
         cards.forEach(card => {
-            const method = card.dataset.method;
-            if (!method) {
+            if (!card.dataset.method) {
+                allCardsHaveMethod = false;
+            }
+            if (card.dataset.dataType === 'Regex' && !(card.dataset.pattern && card.dataset.pattern.trim().length > 0)) {
                 allCardsHaveMethod = false;
             }
         });
@@ -347,4 +365,3 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-

@@ -43,7 +43,7 @@ function loadProfileForEdit() {
 
         ruleTypes.forEach(ruleType => {
             const rule = rules[ruleType];
-            addEditRuleCard(ruleType, ruleType, rule.strategy);
+            addEditRuleCard(ruleType, ruleType, rule.strategy, rule.pattern);
         });
     } else {
         const rulesHeader = document.getElementById('editRulesHeader');
@@ -56,7 +56,7 @@ function loadProfileForEdit() {
 }
 
 // Добавление карточки правила в режиме редактирования
-function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null) {
+function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null, selectedPattern = null) {
     const rulesHeader = document.getElementById('editRulesHeader');
     if (rulesHeader) rulesHeader.style.display = 'block';
 
@@ -66,15 +66,15 @@ function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null) {
     const existingCard = document.querySelector(`#editRulesContainer .rule-card[data-data-type="${dataType}"]`);
     if (existingCard) return;
 
-    const template = document.getElementById('rule-card-template');
+    // Определяем тип карточки
+    const isRegex = dataType === 'Regex';
+
+    const template = document.getElementById(isRegex ? 'rule-card-regex-template-edit' : 'rule-card-template');
     const cardClone = template.content.cloneNode(true);
 
     const ruleCard = cardClone.querySelector('.rule-card');
     const ruleIcon = cardClone.querySelector('.rule-icon');
     const ruleTypeSpan = cardClone.querySelector('.rule-type');
-    const methodSelectorText = cardClone.querySelector('.method-text');
-    const methodSelectorBtn = cardClone.querySelector('.method-btn');
-    const methodDropdown = cardClone.querySelector('.method-dropdown');
     const deleteBtn = cardClone.querySelector('.delete-rule-btn');
     const moveUpBtn = cardClone.querySelector('.move-up-btn');
     const moveDownBtn = cardClone.querySelector('.move-down-btn');
@@ -96,17 +96,6 @@ function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null) {
     ruleTypeSpan.textContent = dataTypeDisplay;
     ruleCard.dataset.dataType = dataType;
 
-    if (selectedMethod) {
-        const selectedOption = Array.from(cardClone.querySelectorAll('.method-option')).find(
-            opt => opt.dataset.value === selectedMethod
-        );
-        if (selectedOption) {
-            methodSelectorText.textContent = selectedOption.textContent;
-            methodSelectorText.classList.add('selected');
-            ruleCard.dataset.method = selectedMethod;
-        }
-    }
-
     // Обработчик удаления карточки
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -116,7 +105,7 @@ function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null) {
         updateEditSaveButtonState();
 
         const remainingCards = document.querySelectorAll('#editRulesContainer .rule-card');
-        if (remainingCards.length === 0) rulesHeader.style.display = 'none';
+        if (remainingCards.length === 0 && rulesHeader) rulesHeader.style.display = 'none';
     });
 
     // Обработчик перемещения вверх
@@ -139,32 +128,62 @@ function addEditRuleCard(dataType, dataTypeDisplay, selectedMethod = null) {
         }
     });
 
-    // Выпадающий список методов
-    methodSelectorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.querySelectorAll('#editRulesContainer .method-dropdown.show').forEach(dd => {
-            if (dd !== methodDropdown) dd.classList.remove('show');
-        });
-        document.querySelectorAll('#editRulesContainer .method-btn.active').forEach(btn => {
-            if (btn !== methodSelectorBtn) btn.classList.remove('active');
-        });
-        methodDropdown.classList.toggle('show');
-        methodSelectorBtn.classList.toggle('active');
-    });
-
-    // Выбор метода
-    const methodOptions = cardClone.querySelectorAll('.method-option');
-    methodOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const methodValue = option.dataset.value;
-            methodSelectorText.textContent = option.textContent;
-            methodSelectorText.classList.add('selected');
-            methodDropdown.classList.remove('show');
-            methodSelectorBtn.classList.remove('active');
-            ruleCard.dataset.method = methodValue;
+    if (isRegex) {
+        // Для Regex: фиксируем метод Tokenize и обрабатываем ввод паттерна
+        ruleCard.dataset.method = 'Tokenize';
+        const patternInput = cardClone.querySelector('.regex-pattern-input');
+        if (selectedPattern) {
+            patternInput.value = selectedPattern;
+            ruleCard.dataset.pattern = selectedPattern;
+        }
+        patternInput.addEventListener('input', () => {
+            ruleCard.dataset.pattern = patternInput.value;
             updateEditSaveButtonState();
         });
-    });
+    } else {
+        // Для остальных типов: выпадающий список выбора метода
+        const methodSelectorText = cardClone.querySelector('.method-text');
+        const methodSelectorBtn = cardClone.querySelector('.method-btn');
+        const methodDropdown = cardClone.querySelector('.method-dropdown');
+
+        if (selectedMethod) {
+            const selectedOption = Array.from(cardClone.querySelectorAll('.method-option')).find(
+                opt => opt.dataset.value === selectedMethod
+            );
+            if (selectedOption) {
+                methodSelectorText.textContent = selectedOption.textContent;
+                methodSelectorText.classList.add('selected');
+                ruleCard.dataset.method = selectedMethod;
+            }
+        }
+
+        // Выпадающий список методов
+        methodSelectorBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('#editRulesContainer .method-dropdown.show').forEach(dd => {
+                if (dd !== methodDropdown) dd.classList.remove('show');
+            });
+            document.querySelectorAll('#editRulesContainer .method-btn.active').forEach(btn => {
+                if (btn !== methodSelectorBtn) btn.classList.remove('active');
+            });
+            methodDropdown.classList.toggle('show');
+            methodSelectorBtn.classList.toggle('active');
+        });
+
+        // Выбор метода
+        const methodOptions = cardClone.querySelectorAll('.method-option');
+        methodOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const methodValue = option.dataset.value;
+                methodSelectorText.textContent = option.textContent;
+                methodSelectorText.classList.add('selected');
+                methodDropdown.classList.remove('show');
+                methodSelectorBtn.classList.remove('active');
+                ruleCard.dataset.method = methodValue;
+                updateEditSaveButtonState();
+            });
+        });
+    }
 
     rulesContainer.appendChild(cardClone);
     updateEditMoveButtonsState();
@@ -233,6 +252,9 @@ function updateEditSaveButtonState() {
     
     cards.forEach(card => {
         if (!card.dataset.method) allHaveMethod = false;
+        if (card.dataset.dataType === 'Regex' && !(card.dataset.pattern && card.dataset.pattern.trim().length > 0)) {
+            allHaveMethod = false;
+        }
     });
 
     if ((editNameInput.value.trim().length > 0) && (cards.length === 0 || allHaveMethod)) {
@@ -240,7 +262,6 @@ function updateEditSaveButtonState() {
     } else {
         saveBtn.classList.remove('active');
     }
-    
 }
 
 // Открытие модального окна для редактирования
@@ -269,9 +290,9 @@ async function saveEditedProfile() {
         const dataType = card.dataset.dataType;
         const method = card.dataset.method;
         if (dataType && method) {
-            rules[dataType] = {
-                strategy: method
-            };
+            const rule = { strategy: method };
+            if (dataType === 'Regex') rule.pattern = card.dataset.pattern || '';
+            rules[dataType] = rule;
         }
     });
 
@@ -305,6 +326,7 @@ async function saveEditedProfile() {
         console.error('Ошибка сохранения профиля:', e);
     }
 }
+
 // Сброс формы редактирования
 function resetEditForm() {
     const editNameInput = document.getElementById('editProfileName');
@@ -328,7 +350,7 @@ function initEditHandlers() {
 
     addDataTypeBtn.addEventListener('click', openEditDataTypeModal);
     modalOverlay.addEventListener('click', () => modal.style.display = 'none');
-    closeBtn.addEventListener('click', () => {modal.style.display = 'none'});
+    closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
     editNameInput.addEventListener('input', updateEditSaveButtonState);
     saveBtn.addEventListener('click', saveEditedProfile);
     cancelBtn.addEventListener('click', () => {

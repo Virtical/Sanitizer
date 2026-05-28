@@ -24,6 +24,15 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
 
     public async Task CreateAsync(CreateProfileRequest profileRequest)
     {
+        foreach (var (type, cfg) in profileRequest.Rules)
+        {
+            if (type != DetectorType.Regex) continue;
+            if (string.IsNullOrWhiteSpace(cfg.Pattern))
+                throw new InvalidOperationException("Для типа Regex необходимо указать шаблон.");
+            try { _ = new System.Text.RegularExpressions.Regex(cfg.Pattern); }
+            catch (ArgumentException) { throw new InvalidOperationException("Некорректное регулярное выражение."); }
+        }
+
         var id = Guid.NewGuid().ToString();
         var entity = new SanitizationProfileEntity
         {
@@ -35,6 +44,7 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
                 ProfileId = id,
                 DetectorType = r.Key,
                 StrategyType = r.Value.Strategy,
+                Pattern = r.Value.Pattern,
             }).ToList()
         };
 
@@ -43,6 +53,15 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
 
     public async Task<ProfileResponse?> UpdateAsync(string id, UpdateProfileRequest updated)
     {
+        foreach (var (type, cfg) in updated.Rules)
+        {
+            if (type != DetectorType.Regex) continue;
+            if (string.IsNullOrWhiteSpace(cfg.Pattern))
+                throw new InvalidOperationException("Для типа Regex необходимо указать шаблон.");
+            try { _ = new System.Text.RegularExpressions.Regex(cfg.Pattern); }
+            catch (ArgumentException) { throw new InvalidOperationException("Некорректное регулярное выражение."); }
+        }
+
         var existing = await storage.GetByIdAsync(id, apiKeyContext.ApiKeyId);
         if (existing is null) return null;
 
@@ -56,6 +75,7 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
                 ProfileId = id,
                 DetectorType = r.Key,
                 StrategyType = r.Value.Strategy,
+                Pattern = r.Value.Pattern,
             }).ToList()
         };
 
@@ -80,6 +100,7 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
             model.Rules[r.DetectorType] = new StrategyConfig
             {
                 Strategy = r.StrategyType,
+                Pattern = r.Pattern,
             };
         }
 

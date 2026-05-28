@@ -136,9 +136,9 @@ async function saveNewProfile() {
     const cards = rulesContainer.querySelectorAll('.rule-card');
 
     cards.forEach(dt => {
-        rules[dt.dataset.dataType] = {
-            strategy: dt.dataset.method
-        };
+        const rule = { strategy: dt.dataset.method };
+        if (dt.dataset.dataType === 'Regex') rule.pattern = dt.dataset.pattern || '';
+        rules[dt.dataset.dataType] = rule;
     });
 
     const payload = {
