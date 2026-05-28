@@ -19,6 +19,7 @@ function updateProfileDropdown(dropdownElement) {
         const editIcon = selectedClone.querySelector('.profile-selected-edit');
         editIcon.addEventListener('click', (e) => {
             e.stopPropagation();
+            openProfileEdit();
         });
         
         selectedDiv.addEventListener('click', () => {
@@ -101,6 +102,9 @@ function openProfileCreation() {
     isProfileCreationVisible = true;
     const chatPanel = document.getElementById('chatPanel');
     const profileCreationPanel = document.getElementById('profileCreationPanel');
+    const rulesContainer = document.getElementById('rulesContainer');
+
+    rulesContainer.innerHTML = '';
     if (chatPanel) chatPanel.style.display = 'none';
     if (profileCreationPanel) profileCreationPanel.style.display = 'flex';
 }
@@ -121,13 +125,18 @@ function showChatPanel() {
 
 async function saveNewProfile() {
     const newProfileNameInput = document.getElementById('newProfileName');
-    const profileName = newProfileNameInput?.value.trim() || 'Профиль общения';
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const profileName = newProfileNameInput?.value.trim();
 
+    if (!saveBtn.classList.contains('active')) return;
+    
+    const rulesContainer = document.getElementById('rulesContainer');
     const rules = {};
-    selectedDataTypes.forEach(dt => {
-        rules[dt] = {
-            strategy: selectedMethod?.value ?? 'Mask',
-            parameters: {}
+    const cards = rulesContainer.querySelectorAll('.rule-card');
+
+    cards.forEach(dt => {
+        rules[dt.dataset.dataType] = {
+            strategy: dt.dataset.method
         };
     });
 
@@ -146,32 +155,14 @@ async function saveNewProfile() {
                 console.error('Ошибка привязки нового профиля к диалогу:', error);
             }
         }
+
+        updateProfileDropdowns();
+        updateProfileButtonText();
+        resetProfileCreationForm();
+        showChatPanel();
     } catch (e) {
         console.error(e);
-        return;
     }
-
-    updateProfileDropdowns();
-    updateProfileButtonText();
-
-    selectedDataTypes = [];
-    selectedMethod = null;
-
-    const dataMethodContainer = document.getElementById('dataMethodContainer');
-    if (dataMethodContainer) dataMethodContainer.style.display = 'none';
-    const addDataTypeBtn = document.getElementById('addDataTypeBtn');
-    if (addDataTypeBtn) addDataTypeBtn.style.background = 'var(--accent-primary)';
-
-    document.querySelectorAll('.data-type-option').forEach(opt => opt.classList.remove('selected'));
-    document.querySelectorAll('.method-option').forEach(opt => opt.classList.remove('selected'));
-
-    const dataTypeText = document.querySelector('.data-type-text');
-    if (dataTypeText) dataTypeText.textContent = 'Выберите тип данных';
-    const methodText = document.querySelector('.method-text');
-    if (methodText) methodText.textContent = 'Выберите метод санитизации';
-
-    showChatPanel();
-    if (newProfileNameInput) newProfileNameInput.value = '';
 }
 
 function updateProfileButtonText() {

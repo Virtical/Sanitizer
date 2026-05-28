@@ -9,11 +9,18 @@
     --text-muted: #A6A6A6;
     --text-white: #FFFFFF;
 
+    --accent-text: #368F4C;
     --accent-primary: #037C4E;
     --accent-hover: #02A065;
+    --accent-secondary: #D6EBDF;
+    --icon: #1C7E34;
+
+    --color-disabled: #9D9D9D;
+    --color-delete: #D60505;
 
     --border-primary: #5B5B5B;
     --border-checkbox: #D9D9D9;
 
     --shadow-default: rgba(0, 0, 0, 0.1);
+    --overlay-backdrop: rgba(0, 0, 0, 0.5);
 }

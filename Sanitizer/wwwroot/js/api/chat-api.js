@@ -48,16 +48,6 @@ async function apiSendMessage(chatId, message, onChunk) {
     return apiSendStream(`${CHAT_API_BASE}/send/${chatId}`, message, onChunk);
 }
 
-/**
- * Создать новый диалог и отправить первое сообщение (стриминг).
- * @param {string} message
- * @param {function|null} onChunk
- * @returns {Promise<{chatId: string|null, fullText: string}>}
- */
-async function apiCreateDialog(message, onChunk) {
-    return apiSendStream(`${CHAT_API_BASE}/send`, message, onChunk);
-}
-
 async function apiGetMessages(chatId) {
     const resp = await fetch(`${CHAT_API_BASE}/${chatId}`, {
         method: 'GET'

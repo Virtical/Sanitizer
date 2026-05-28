@@ -26,14 +26,14 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
 
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Обновление профиля")]
-    public async Task<IActionResult> Update(
-        [FromRoute] string id,
-        [FromBody] UpdateProfileRequest profileRequest)
+    public async Task<IActionResult> Update([FromRoute]string id, [FromBody] UpdateProfileRequest profileRequest)
     {
         var updated = await profileService.UpdateAsync(id, profileRequest);
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>Удалить профиль.</summary>
+    [SwaggerIgnore]
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Удаление профиля")]
     public async Task<IActionResult> Delete([FromRoute] string id)

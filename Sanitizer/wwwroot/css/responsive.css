@@ -20,14 +20,12 @@
     .messages-area { padding: 10px 20px 10px 20px; }
     .input-container { padding: 10px 20px; }
     .send-btn { right: 32px; bottom: 18px; width: 36px; height: 36px; }
-    .send-btn .send-circle { width: 36px; height: 36px; }
-    .send-btn .send-arrow { width: 16px; height: 18px; }
     .message-bubble { font-size: 16px; padding: 10px 14px; border-radius: 18px; }
     .empty-title { font-size: 24px; }
     .empty-message-input { height: 44px; font-size: 16px; padding: 0 60px 0 18px; }
     .message-input { height: 44px; font-size: 16px; padding: 0 60px 0 18px; }
     .eye-btn { width: 30px; height: 30px; }
-    .eye-icon { width: 30px; height: 30px; }
+    .bi-eye { font-size: 30px; }
     .profile-chat-btn { width: 180px; height: 38px; }
     .profile-chat-text { font-size: 16px; }
     .dialogs-panel { position: absolute; z-index: 20; }
@@ -42,8 +40,8 @@
     .empty-message-input { height: 40px; font-size: 14px; padding: 0 50px 0 14px; }
     .message-input { height: 40px; font-size: 14px; padding: 0 50px 0 14px; }
     .eye-btn { width: 26px; height: 26px; }
-    .eye-icon { width: 26px; height: 26px; }
+    .bi-eye { font-size: 26px; }
     .profile-chat-btn { width: 140px; height: 34px; }
     .profile-chat-text { font-size: 14px; }
-    .profile-chat-arrow { width: 10px; }
+    .profile-chat-arrow { font-size: 10px; }
 }
