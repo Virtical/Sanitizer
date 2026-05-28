@@ -12,4 +12,5 @@ public class SanitizationRuleEntity
 
     public DetectorType DetectorType { get; set; }
     public StrategyType StrategyType { get; set; }
+    public string? Pattern { get; set; }
 }

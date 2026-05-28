@@ -14,6 +14,8 @@ namespace Sanitizer.Api.Services;
 /// </summary>
 public class SanitizerService(DetectorRegistry registry, StrategyFactory strategyFactory)
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Text.RegularExpressions.Regex> _patternCache = new();
+
     public SanitizationResult Sanitize(string text, ProfileResponse profileRequest)
     {
         var sessionId = Guid.NewGuid().ToString();
@@ -21,8 +23,12 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
         // 1. Собираем все совпадения по активным правилам
         var allMatches = profileRequest.Rules
             .SelectMany(rule =>
-                registry.Get(rule.Key).Find(text)
-                    .Select(m => (Match: m, Type: rule.Key, Config: rule.Value)))
+            {
+                var matches = rule.Key == DetectorType.Regex
+                    ? FindByPattern(text, rule.Value.Pattern)
+                    : registry.Get(rule.Key).Find(text);
+                return matches.Select(m => (Match: m, Type: rule.Key, Config: rule.Value));
+            })
             .ToList();
 
         // 2. Убираем пересечения: побеждает более длинное, при равенстве — более раннее
@@ -61,6 +67,25 @@ public class SanitizerService(DetectorRegistry registry, StrategyFactory strateg
             Context = context,
             Items = items.OrderBy(x => x.Position).ToList()
         };
+    }
+
+    private static ItemMatch[] FindByPattern(string text, string? pattern)
+    {
+        if (string.IsNullOrWhiteSpace(pattern)) return Array.Empty<ItemMatch>();
+
+        System.Text.RegularExpressions.Regex regex;
+        try
+        {
+            regex = _patternCache.GetOrAdd(pattern,
+                p => new System.Text.RegularExpressions.Regex(
+                    p, System.Text.RegularExpressions.RegexOptions.Compiled));
+        }
+        catch (ArgumentException) { return Array.Empty<ItemMatch>(); }
+
+        return regex.Matches(text)
+            .Where(m => m.Length > 0)
+            .Select(m => new ItemMatch { Value = m.Value, Position = m.Index })
+            .ToArray();
     }
 
     private static List<(ItemMatch Match, DetectorType Type, StrategyConfig Config)> RemoveOverlaps(

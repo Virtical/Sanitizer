@@ -9,5 +9,6 @@ public enum DetectorType
     Guid,
     Url,
     ApiKey,
-    Name
+    Name,
+    Regex
 }
