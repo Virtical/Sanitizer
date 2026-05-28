@@ -1,4 +1,5 @@
-﻿using Sanitizer.Api.Services;
+﻿using Sanitizer.Api.Auth;
+using Sanitizer.Api.Services;
 
 namespace Sanitizer.Api.Middleware;
 
@@ -13,7 +14,7 @@ public class ApiKeyAuthMiddleware(RequestDelegate next, IConfiguration config)
 {
     private static readonly string[] PublicPrefixes = ["/swagger", "/health"];
 
-    public async Task InvokeAsync(HttpContext context, ApiKeyService apiKeyService)
+    public async Task InvokeAsync(HttpContext context, ApiKeyService apiKeyService, ICurrentApiKeyContext apiKeyContext)
     {
         var path = context.Request.Path.Value ?? string.Empty;
 
@@ -41,6 +42,11 @@ public class ApiKeyAuthMiddleware(RequestDelegate next, IConfiguration config)
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Unauthorized: invalid or expired API key.");
             return;
+        }
+        
+        if (apiKeyContext is CurrentApiKeyContext mutableCtx)
+        {
+            mutableCtx.SetApiKeyId(Guid.Parse(plain));
         }
 
         context.Items["IsAdmin"] = isAdmin;

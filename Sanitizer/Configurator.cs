@@ -1,6 +1,8 @@
-﻿using Sanitizer.Api.Models;
+﻿using Sanitizer.Api.Auth;
+using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Services;
+using Sanitizer.Api.Storage;
 
 namespace Sanitizer;
 
@@ -9,7 +11,10 @@ public static class Configurator
     public static async Task AddDefaultProfiles(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
-        var profileService = scope.ServiceProvider.GetRequiredService<ProfileService>();
+        var storage = scope.ServiceProvider.GetRequiredService<IProfileStorage>();
+        var apiKeyContext = new CurrentApiKeyContext();
+        apiKeyContext.SetApiKeyId(Guid.Empty);
+        var profileService = new ProfileService(storage, apiKeyContext);
 
         await profileService.CreateAsync(new CreateProfileRequest(
             "LLM-safe",
