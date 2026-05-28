@@ -29,7 +29,7 @@ public class ProfilesController(ProfileService profileService) : ControllerBase
     public async Task<IActionResult> Update([FromRoute]string id, [FromBody] UpdateProfileRequest profileRequest)
     {
         var updated = await profileService.UpdateAsync(id, profileRequest);
-        return updated is null ? NotFound() : Ok(updated);
+        return await GetAll();
     }
 
     /// <summary>Удалить профиль.</summary>
