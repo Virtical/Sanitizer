@@ -1,17 +1,23 @@
 # План обработки десанитизации (детокенизации) в режиме streaming
 
+## Формат токена
+
+Токены имеют формат `[<TYPE>_<N>]` (см. `TokenStore.GetOrCreate`),
+например `[PHONE_1]`, `[EMAIL_2]`. Максимальная длина токена — **15 символов**
+(включая обе квадратные скобки).
+
 ## Проблема
 
 В обычном (non-streaming) режиме весь ответ LLM приходит одной строкой,
 и `DesanitizerService.Desanitize(raw, context)` просто заменяет все токены
 обратно на исходные значения.
 
-В режиме streaming ответ приходит по частям (`update.Text`). Токен (например,
-`__TOKEN_PHONE_1__`) может быть разорван между двумя соседними чанками:
+В режиме streaming ответ приходит по частям (`update.Text`). Токен может быть
+разорван между двумя соседними чанками:
 
 ```
-chunk[i]   = "...ваш номер __TOK"
-chunk[i+1] = "EN_PHONE_1__ уже сохранён..."
+chunk[i]   = "...ваш номер [PHO"
+chunk[i+1] = "NE_1] уже сохранён..."
 ```
 
 Если применять `Desanitize` к каждому чанку независимо, токены на границах
@@ -19,84 +25,126 @@ chunk[i+1] = "EN_PHONE_1__ уже сохранён..."
 накапливать весь ответ и применять `Desanitize` в конце — это сводит на нет
 сам смысл стриминга.
 
-## Решение: потоковый детокенизатор с буфером границы
+## Решение: потоковый детокенизатор с буфером по скобкам
 
-Идея: поддерживать небольшой «хвостовой» буфер, в котором мог бы поместиться
-любой токен целиком. Из буфера в клиента отдаём только ту часть, в которой
-гарантированно нет начала незавершённого токена.
+Идея: отдаём клиенту всё до последней открывающей скобки `[`, у которой ещё
+не встретилась закрывающая `]`. Незакрытый «хвост» (от `[` до конца буфера)
+держим до тех пор, пока:
 
-### Алгоритм
+- не придёт закрывающая `]` (токен сформирован — выполняем `Desanitize` и
+  отдаём результат);
+- либо длина незакрытого фрагмента не превысит **15 символов** — значит, это
+  точно не наш токен, отдаём содержимое клиенту как есть.
 
-1. Все токены имеют известный формат (например, `__TOKEN_<TYPE>_<N>__`).
-   Из формата выводим:
-   - префикс начала токена (например, `__TOKEN_`);
-   - максимальную возможную длину токена `MaxTokenLength` (можно вычислить
-     по `SanitizationContext`, взяв max длины ключей + запас).
+### Константа
 
-2. Заводим строковый буфер `buffer` (StringBuilder).
+```csharp
+private const int MaxTokenLength = 15; // [TYPE_N]
+```
 
-3. На каждый `update.Text`:
-   1. Добавляем текст в `buffer`.
-   2. Применяем `Desanitize` к содержимому `buffer` —
-      все *полные* токены заменяются на исходные значения.
-   3. Находим в буфере позицию `safeEnd` — индекс, начиная с которого может
-      располагаться *незавершённый* токен:
-      - ищем последнее вхождение префикса токена (`__TOKEN_`);
-      - если найдено и от этой позиции до конца буфера меньше
-        `MaxTokenLength` символов — `safeEnd` = эта позиция;
-      - иначе `safeEnd` = длина буфера.
-   4. Отправляем клиенту подстроку `buffer[0..safeEnd]`,
-      удаляем эту часть из буфера.
-   5. Flush.
+### Алгоритм на каждый чанк
 
-4. После завершения стрима:
-   - применяем `Desanitize` к остатку буфера (на случай если последний токен
-     не закрылся — отдаём как есть);
-   - отправляем остаток клиенту;
-   - сохраняем полный собранный ответ в историю чата.
+1. Добавляем `chunk` к буферу `_buffer`.
+2. Ищем последнюю открывающую `[` в буфере.
+3. **Случай A.** `[` не найдена — весь буфер «безопасен»:
+   отдаём его клиенту, очищаем.
+4. **Случай B.** `[` найдена в позиции `openIdx`:
+   - если *после* `openIdx` в буфере встречается `]` — токен полностью
+     внутри буфера; применяем `Desanitize` ко всему буферу и отдаём результат
+     клиенту, очищаем буфер;
+   - если `]` нет, но `_buffer.Length - openIdx > MaxTokenLength` — открывающая
+     скобка точно не относится к токену; отдаём весь буфер как есть, очищаем;
+   - иначе (есть `[`, нет `]`, длина «хвоста» ≤ 15) — отдаём клиенту
+     `_buffer[0..openIdx]`, остаток оставляем в буфере, ждём следующий чанк.
+
+> ⚠️ Важно: проверять нужно именно *последнюю* открывающую `[`. Если в чанке
+> пришло `"... [PHONE_1] и ещё [EM"`, до первой `]` всё уже десанитизируется,
+> а в буфере остаётся только `"[EM"`.
+>
+> На практике проще делать так: пока в буфере есть открывающая `[`, у которой
+> есть парная `]`, прогоняем `Desanitize` и продвигаемся вперёд. Затем смотрим
+> на оставшуюся незакрытую `[`.
+
+### Финализация стрима
+
+После завершения `await foreach`:
+
+- если в буфере остался незакрытый хвост — отдаём его клиенту как есть
+  (это либо обычный текст с `[`, либо «битый» токен — в любом случае не
+  тянем дальше);
+- сохраняем полный собранный (уже десанитизированный) ответ в историю чата.
 
 ### Псевдокод
 
 ```csharp
+const int MaxTokenLength = 15;
+
 var buffer = new StringBuilder();
-var full = new StringBuilder();
-const string tokenPrefix = "__TOKEN_";
-int maxTokenLen = context.MaxTokenLength; // вычислить заранее
+var full   = new StringBuilder();
 
-await foreach (var update in chatClient.GetStreamingResponseAsync(...))
+async Task FlushSafe()
 {
-    if (string.IsNullOrEmpty(update.Text)) continue;
-
-    buffer.Append(update.Text);
-
-    // Заменяем все полные токены
-    var replaced = desanitizer.Desanitize(buffer.ToString(), context);
-    buffer.Clear();
-    buffer.Append(replaced);
-
-    // Ищем потенциально незавершённый токен в конце
-    int safeEnd = buffer.Length;
-    int idx = LastIndexOf(buffer, tokenPrefix);
-    if (idx >= 0 && buffer.Length - idx < maxTokenLen)
-        safeEnd = idx;
-
-    if (safeEnd > 0)
+    while (true)
     {
-        var toSend = buffer.ToString(0, safeEnd);
-        await Response.WriteAsync(toSend);
-        await Response.Body.FlushAsync();
-        full.Append(toSend);
-        buffer.Remove(0, safeEnd);
+        int openIdx = LastIndexOf(buffer, '[');
+
+        if (openIdx < 0)
+        {
+            // нет открывающей скобки — всё безопасно
+            await Emit(buffer.ToString());
+            buffer.Clear();
+            return;
+        }
+
+        int closeIdx = IndexOf(buffer, ']', openIdx + 1);
+
+        if (closeIdx >= 0)
+        {
+            // токен полностью в буфере — десанитизируем и отдаём весь буфер
+            var replaced = desanitizer.Desanitize(buffer.ToString(), context);
+            await Emit(replaced);
+            buffer.Clear();
+            return;
+        }
+
+        if (buffer.Length - openIdx > MaxTokenLength)
+        {
+            // это не наш токен — отдаём всё
+            await Emit(buffer.ToString());
+            buffer.Clear();
+            return;
+        }
+
+        // ждём закрывающую скобку — отдаём всё до openIdx, остальное держим
+        if (openIdx > 0)
+        {
+            await Emit(buffer.ToString(0, openIdx));
+            buffer.Remove(0, openIdx);
+        }
+        return;
     }
 }
 
-// Финал: отдать остаток
-var tail = desanitizer.Desanitize(buffer.ToString(), context);
-if (tail.Length > 0)
+async Task Emit(string s)
 {
-    await Response.WriteAsync(tail);
+    if (s.Length == 0) return;
+    await Response.WriteAsync(s);
     await Response.Body.FlushAsync();
-    full.Append(tail);
+    full.Append(s);
+}
+
+await foreach (var update in chatClient.GetStreamingResponseAsync(messages, options))
+{
+    if (string.IsNullOrEmpty(update.Text)) continue;
+    buffer.Append(update.Text);
+    await FlushSafe();
+}
+
+// финал: отдать остаток как есть
+if (buffer.Length > 0)
+{
+    await Emit(buffer.ToString());
+    buffer.Clear();
 }
 
 await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(full.ToString()));
@@ -104,59 +152,92 @@ await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(full.To
 
 ## Изменения в коде
 
-### 1. `DesanitizerService` (или новый `StreamingDesanitizer`)
+### 1. Новый класс `StreamingDesanitizer`
 
-Добавить стримовый враппер, инкапсулирующий логику буфера:
+Файл: `Sanitizer.Api/Services/StreamingDesanitizer.cs`.
 
 ```csharp
 public sealed class StreamingDesanitizer
 {
+    private const int MaxTokenLength = 15; // [TYPE_N]
+
     private readonly DesanitizerService _inner;
     private readonly SanitizationContext _context;
     private readonly StringBuilder _buffer = new();
-    private readonly int _maxTokenLen;
-    private const string TokenPrefix = "__TOKEN_";
 
-    public StreamingDesanitizer(DesanitizerService inner, SanitizationContext ctx)
+    public StreamingDesanitizer(DesanitizerService inner, SanitizationContext context)
     {
         _inner = inner;
-        _context = ctx;
-        _maxTokenLen = ctx.MaxTokenLength; // или вычислить по ключам
+        _context = context;
     }
 
-    /// <summary>Принимает очередной чанк, возвращает безопасную часть для отправки клиенту.</summary>
+    /// <summary>Принимает чанк, возвращает безопасную часть для отправки клиенту.</summary>
     public string Push(string chunk)
     {
         _buffer.Append(chunk);
-        var replaced = _inner.Desanitize(_buffer.ToString(), _context);
-        _buffer.Clear();
-        _buffer.Append(replaced);
 
-        int safeEnd = _buffer.Length;
-        int idx = LastIndexOf(_buffer, TokenPrefix);
-        if (idx >= 0 && _buffer.Length - idx < _maxTokenLen)
-            safeEnd = idx;
+        int openIdx = LastIndexOf(_buffer, '[');
 
-        if (safeEnd == 0) return string.Empty;
+        // 1. открывающей скобки нет — весь буфер безопасен
+        if (openIdx < 0)
+            return Drain();
 
-        var result = _buffer.ToString(0, safeEnd);
-        _buffer.Remove(0, safeEnd);
-        return result;
+        int closeIdx = IndexOf(_buffer, ']', openIdx + 1);
+
+        // 2. парная закрывающая есть — токен полностью внутри буфера
+        if (closeIdx >= 0)
+        {
+            var replaced = _inner.Desanitize(_buffer.ToString(), _context);
+            _buffer.Clear();
+            return replaced;
+        }
+
+        // 3. незакрытый хвост слишком длинный — это не токен
+        if (_buffer.Length - openIdx > MaxTokenLength)
+            return Drain();
+
+        // 4. ждём закрывающую: отдаём всё до openIdx
+        if (openIdx == 0) return string.Empty;
+        var safe = _buffer.ToString(0, openIdx);
+        _buffer.Remove(0, openIdx);
+        return safe;
     }
 
     /// <summary>Возвращает оставшийся хвост (вызывать в конце стрима).</summary>
     public string Flush()
     {
+        // На всякий случай прогоняем десанитизацию — вдруг там полный токен.
         var tail = _inner.Desanitize(_buffer.ToString(), _context);
         _buffer.Clear();
         return tail;
+    }
+
+    private string Drain()
+    {
+        var s = _buffer.ToString();
+        _buffer.Clear();
+        return s;
+    }
+
+    private static int LastIndexOf(StringBuilder sb, char c)
+    {
+        for (int i = sb.Length - 1; i >= 0; i--)
+            if (sb[i] == c) return i;
+        return -1;
+    }
+
+    private static int IndexOf(StringBuilder sb, char c, int start)
+    {
+        for (int i = start; i < sb.Length; i++)
+            if (sb[i] == c) return i;
+        return -1;
     }
 }
 ```
 
 ### 2. `ChatController.Send`
 
-Заменить текущий цикл:
+Заменить текущий цикл стриминга:
 
 ```csharp
 var streaming = new StreamingDesanitizer(desanitizer, sanitization.Context);
@@ -186,39 +267,35 @@ if (tail.Length > 0)
 await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(full.ToString()));
 ```
 
-Десанитизированный ответ сохраняется в историю (а не сырой с токенами).
-
-### 3. Гарантии формата токена
-
-Чтобы алгоритм работал надёжно:
-
-- Формат токена должен быть фиксированный, не пересекаться с обычным текстом
-  (длинный префикс, например `__TOKEN_`).
-- В `SanitizationContext` хранить `MaxTokenLength` (вычислять при создании
-  контекста — максимальная длина среди ключей замен + небольшой запас).
-- Префикс токена не должен встречаться внутри значений других токенов.
+В историю чата уходит уже десанитизированный текст.
 
 ## Граничные случаи
 
-1. **Токен на самой границе чанка** — обрабатывается буфером.
-2. **Несколько токенов подряд** — `Desanitize` заменит все полные за один проход.
-3. **Чанк длиннее `MaxTokenLength`, не содержит начала токена** — `safeEnd`
-   равен длине буфера, всё уходит клиенту сразу.
-4. **Поток оборвался посередине токена** — `Flush` пытается заменить остаток;
-   если не получилось — сырая последовательность уходит в клиент как fallback
-   (можно дополнительно логировать как ошибку).
-5. **LLM «галлюцинирует» несуществующий токен** — `Desanitize` оставит его
-   как есть; это поведение задаётся в `DesanitizerService` (по умолчанию
-   неизвестные токены сохраняются дословно).
+1. **`[` на самой границе чанка** — попадает в буфер, ждём `]`.
+2. **`]` нет, пришло > 15 символов после `[`** — это обычный текст с `[`,
+   отдаём как есть.
+3. **Несколько токенов подряд `[A_1][B_2]`** — после прихода первой `]`
+   десанитизируем весь буфер за один проход (`Desanitize` работает по всем
+   ключам контекста).
+4. **`[` встречается в обычном тексте (markdown-ссылка, JSON и т.п.)** —
+   если после неё нет `]` в пределах 15 символов, текст отдаётся клиенту;
+   если внутри 15 символов есть `]`, но это не токен — `Desanitize` оставит
+   фрагмент как есть (неизвестные токены не меняются).
+5. **Поток оборвался посередине токена** — `Flush` пробует десанитизацию,
+   если не получилось — содержимое уходит клиенту как есть.
+6. **LLM «галлюцинирует» несуществующий токен `[FOO_99]`** — пройдёт через
+   `Desanitize` без изменений.
 
 ## Тесты
 
-Создать unit-тесты для `StreamingDesanitizer`:
+Юнит-тесты для `StreamingDesanitizer`:
 
 - токен полностью в одном чанке;
-- токен разорван между двумя чанками;
-- токен разорван между N чанками (по 1 символу);
-- два токена подряд;
+- токен разорван между двумя чанками (`"... [PHO"` + `"NE_1] ..."`);
+- токен разорван посимвольно (N чанков по 1 символу);
+- два токена подряд (`"[A_1][B_2]"`);
+- одиночная `[` в обычном тексте (markdown `[ссылка](...)`);
+- `[` без `]` дольше 15 символов — должен «прорваться» наружу;
 - пустые чанки;
-- незакрытый токен в конце стрима;
-- текст без токенов (стрим проходит без задержек на буфере).
+- незакрытый токен в самом конце стрима;
+- текст без скобок (буфер не задерживает чанки).
