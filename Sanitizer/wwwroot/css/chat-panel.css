@@ -175,9 +175,9 @@
     padding: 14px 20px;
     border-radius: 20px;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 130%;
     word-wrap: break-word;
     max-width: 100%;
 }
@@ -249,7 +249,7 @@
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 600;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 130%;
     border: 1px solid var(--accent-primary);
     max-height: 200px;
     overflow-y: auto;
