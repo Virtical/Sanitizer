@@ -28,12 +28,6 @@ function getGroupTitle(group) {
     }
 }
 
-function truncateText(text, maxLength = 20) {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength - 3) + '...';
-}
-
 function cloneTemplate(templateId) {
     const template = document.getElementById(templateId);
     if (!template) {
