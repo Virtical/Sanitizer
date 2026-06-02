@@ -174,13 +174,39 @@ function unblockButtons() {
     updateSendButtonState();
 }
 
+// Инициализация всех textarea
+function autoResizeTextarea(textarea) {
+    if (!textarea) return;
+
+    textarea.style.height = 'auto';
+
+    // Получаем высоту содержимого
+    const scrollHeight = textarea.scrollHeight;
+    const maxHeight = 350;
+    const minHeight = 60;
+
+    // Устанавливаем новую высоту
+    textarea.style.height = Math.min(Math.max(scrollHeight, minHeight), maxHeight) + 'px';
+
+    // Показываем скролл только если нужно
+    if (scrollHeight > maxHeight) {
+        textarea.style.overflowY = 'auto';
+    } else {
+        textarea.style.overflowY = 'hidden';
+    }
+}
+
 // Очистка полей ввода
 function clearMessageInput() {
     const messageInput = document.getElementById('messageInput');
     const emptyMessageInput = document.getElementById('emptyMessageInput');
 
     messageInput.value = '';
+    messageInput.style.height = '60px';
+    messageInput.style.overflowY = 'hidden';
     emptyMessageInput.value = '';
+    emptyMessageInput.style.height = '60px';
+    emptyMessageInput.style.overflowY = 'hidden';
 }
 
 

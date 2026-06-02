@@ -98,15 +98,27 @@ function initEventListeners() {
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (emptySendBtn) emptySendBtn.addEventListener('click', sendMessage);
     if (messageInput) {
-        messageInput.addEventListener('input', updateSendButtonState);
+        messageInput.addEventListener('input', () => {
+            updateSendButtonState();
+            autoResizeTextarea(messageInput);
+        });
         messageInput.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') await sendMessage();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                await sendMessage();
+            }
         });
     }
     if (emptyMessageInput) {
-        emptyMessageInput.addEventListener('input', updateSendButtonState);
+        emptyMessageInput.addEventListener('input', () => {
+            updateSendButtonState();
+            autoResizeTextarea(emptyMessageInput);
+        });
         emptyMessageInput.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') await sendMessage();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                await sendMessage();
+            }
         });
     }
     if (newChatBtn) newChatBtn.addEventListener('click', createNewDialog);

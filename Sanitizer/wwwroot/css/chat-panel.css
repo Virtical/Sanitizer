@@ -88,32 +88,35 @@
 
 .empty-message-input {
     width: 100%;
-    height: 56px;
+    min-height: 60px;
+    max-height: 350px;
     background: var(--bg-secondary);
     border-radius: 28px;
     border: none;
-    padding: 0 70px 0 24px;
+    padding: 16px 70px 16px 24px;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 140%;
     color: var(--text-secondary);
     outline: none;
+    overflow-y: auto;
+    box-sizing: border-box;
+    clip-path: inset(0 round 28px);
 }
 
 .empty-message-input::placeholder {
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 140%;
     color: var(--text-tertiary);
 }
 
 .empty-send-btn {
     position: absolute;
     right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 12px;
     background: none;
     border: none;
     cursor: pointer;
@@ -279,31 +282,35 @@
 
 .message-input {
     width: 100%;
-    height: 56px;
-    padding: 0 70px 0 24px;
+    min-height: 60px;
+    max-height: 350px;
+    padding: 16px 70px 16px 24px;
     background-color: var(--bg-secondary);
     border-radius: 28px;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 140%;
     color: var(--text-secondary);
     outline: none;
     border: none;
+    overflow-y: hidden;
+    box-sizing: border-box;
+    clip-path: inset(0 round 28px);
 }
 
 .message-input::placeholder {
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
     font-size: 20px;
-    line-height: 100%;
+    line-height: 140%;
     color: var(--text-tertiary);
 }
 
 .send-btn {
     position: absolute;
     right: 92px;
-    bottom: 24px;
+    bottom: 30px;
     background: none;
     border: none;
     cursor: pointer;
@@ -330,4 +337,26 @@
     color: var(--text-tertiary);
     text-align: center;
     padding: 40px;
+}
+
+/* ==================== СТИЛИЗАЦИЯ СКРОЛЛБАРОВ ==================== */
+
+/* Скроллбар для textarea (поле ввода) */
+.message-input::-webkit-scrollbar,
+.empty-message-input::-webkit-scrollbar {
+    width: 9px;
+    margin-right: 20px;
+}
+
+.message-input::-webkit-scrollbar-track,
+.empty-message-input::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    margin-block: 13px;
+}
+
+.message-input::-webkit-scrollbar-thumb,
+.empty-message-input::-webkit-scrollbar-thumb {
+    background: var(--text-tertiary);
+    border-radius: 20px;
 }
