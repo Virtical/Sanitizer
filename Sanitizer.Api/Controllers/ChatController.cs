@@ -56,6 +56,20 @@ public class ChatController(
         var deleted = await chatHistoryService.DeleteChatAsync(id);
         return deleted ? Ok(id) : NotFound();
     }
+    
+    [HttpPost("sanitized/{chatId}")]
+    [SwaggerOperation(Summary = "Санитизировать сообщение")]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string chatId, [FromBody] SanitizedRequest request)
+    {
+        var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
+        var profile = profileId is not null
+            ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
+            : ProfileResponse.Default;
+
+        var sanitization = sanitizerService.Sanitize(request.Message, profile);
+        
+        return Ok(sanitization.SanitizedText);
+    }
 
     [HttpPost("send/{chatId}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
@@ -82,7 +96,7 @@ public class ChatController(
         try
         {
             var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
-            ProfileResponse profile = profileId is not null
+            var profile = profileId is not null
                 ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
                 : ProfileResponse.Default;
 
@@ -158,7 +172,7 @@ public class ChatController(
         await chatHistoryService.AddMessageAsync(chatId, MessageRequest.CreateAnswer(raw));
     }
 
-    private ChatMessage? ToChatMessage(Message message)
+    private static ChatMessage? ToChatMessage(Message message)
         => message.Type switch
         {
             MessageType.Sent => new ChatMessage(ChatRole.User, message.Text),
