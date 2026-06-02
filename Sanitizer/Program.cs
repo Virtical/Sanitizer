@@ -1,5 +1,5 @@
+using System.ClientModel;
 using Microsoft.EntityFrameworkCore;
-using OpenAI.Chat;
 using Sanitizer;
 using Sanitizer.Api.Auth;
 using Sanitizer.Api.Services;
@@ -102,8 +102,6 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
-builder.Services.AddHttpClient<LlmProxyService>();
-
 builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
 builder.Services.AddScoped<IApiKeyStorage, EfApiKeyStorage>();
 builder.Services.AddScoped<IChatStorage, EfChatStorage>();
@@ -126,9 +124,18 @@ builder.Services.AddScoped<ChatHistoryService>();
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
 {
+    var apiKey = builder.Configuration["Llm:ApiKey"] ?? throw new NullReferenceException();
+    var model = builder.Configuration["Llm:Model"] ?? throw new NullReferenceException();
+    var baseUrl = builder.Configuration["Llm:BaseUrl"] ?? throw new NullReferenceException();
+    
+    var options = new OpenAIClientOptions
+    {
+        Endpoint = new Uri(baseUrl)
+    };
+    
     builder.Services.AddSingleton<IChatClient>(_ 
-        => new OpenAIClient(builder.Configuration["Llm:ApiKey"])
-            .GetChatClient(builder.Configuration["Llm:Model"])
+        => new OpenAIClient(new ApiKeyCredential(apiKey), options)
+            .GetChatClient(model)
             .AsIChatClient()
             .AsBuilder()
             .UseFunctionInvocation()
