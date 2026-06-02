@@ -57,14 +57,14 @@ public class ChatController(
         return deleted ? Ok(id) : NotFound();
     }
 
-    [HttpPost("send/{id}")]
+    [HttpPost("send/{chatId}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
-    public async Task Send([FromRoute] string id, [FromBody] SendMessageRequest messageRequest)
+    public async Task Send([FromRoute] string chatId, [FromBody] SendMessageRequest messageRequest)
     {
-        if (string.IsNullOrEmpty(id))
+        if (string.IsNullOrEmpty(chatId))
         {
             Response.StatusCode = 400;
-            await Response.WriteAsync("id is required");
+            await Response.WriteAsync("chatId is required");
             return;
         }
 
@@ -76,19 +76,19 @@ public class ChatController(
         }
 
         var message = await chatHistoryService.AddMessageAsync(
-            id, MessageRequest.CreateSent(messageRequest.Message));
+            chatId, MessageRequest.CreateSent(messageRequest.Message));
 
         SanitizationResult sanitization;
         try
         {
-            var profileId = await chatHistoryService.GetProfileIdAsync(id);
+            var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
             ProfileResponse profile = profileId is not null
                 ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
                 : ProfileResponse.Default;
 
             sanitization = sanitizerService.Sanitize(messageRequest.Message, profile);
             await chatHistoryService.AddMessageAsync(
-                id, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
+                chatId, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
         }
         catch (InvalidOperationException ex)
         {
@@ -100,15 +100,22 @@ public class ChatController(
         string raw;
         try
         {
-            Response.Headers.Append("X-Chat-Id", id);
+            Response.Headers.Append("X-Chat-Id", chatId);
             Response.ContentType = "text/plain";
             Response.Headers.Append("Cache-Control", "no-cache");
 
-            var messages = new List<ChatMessage>
+            var chatSession = await chatHistoryService.GetByIdAsync(chatId);
+            var messages = new List<ChatMessage>();
+
+            if (chatSession is null)
             {
-                new(ChatRole.System, "Ты полезный ассистент"),
-                new(ChatRole.User, sanitization.SanitizedText)
-            };
+                messages.Add(new ChatMessage(ChatRole.System, "Ты полезный ассистент"));
+                messages.Add(new ChatMessage(ChatRole.User, sanitization.SanitizedText));
+            }
+            else
+            {
+                messages.AddRange(chatSession.Messages.Select(ToChatMessage).OfType<ChatMessage>());
+            }
 
             var options = new ChatOptions
             {
@@ -148,6 +155,14 @@ public class ChatController(
             return;
         }
 
-        await chatHistoryService.AddMessageAsync(id, MessageRequest.CreateAnswer(raw));
+        await chatHistoryService.AddMessageAsync(chatId, MessageRequest.CreateAnswer(raw));
     }
+
+    private ChatMessage? ToChatMessage(Message message)
+        => message.Type switch
+        {
+            MessageType.Sent => new ChatMessage(ChatRole.User, message.Text),
+            MessageType.Answer => new ChatMessage(ChatRole.Assistant, message.Text),
+            _ => null
+        };
 }
