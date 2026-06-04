@@ -82,6 +82,8 @@ function initEventListeners() {
     const userProfileBtn = document.getElementById('userProfileBtn');
     const messageInput = document.getElementById('messageInput');
     const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const sanitizeToggleBtn = document.getElementById('sanitizeToggleBtn');
+    const emptySanitizeToggleBtn = document.getElementById('emptySanitizeToggleBtn');
 
     if (hideDialogsBtn) hideDialogsBtn.addEventListener('click', toggleDialogsPanel);
     if (showDialogsBtn) showDialogsBtn.addEventListener('click', showDialogsPanel);
@@ -123,6 +125,8 @@ function initEventListeners() {
     }
     if (newChatBtn) newChatBtn.addEventListener('click', createNewDialog);
     if (userProfileBtn) userProfileBtn.addEventListener('click', () => {});
+    if (sanitizeToggleBtn) sanitizeToggleBtn.addEventListener('click', toggleSanitizeMode);
+    if (emptySanitizeToggleBtn) emptySanitizeToggleBtn.addEventListener('click', toggleSanitizeMode);
     document.addEventListener('click', handleClickOutside);
 }
 

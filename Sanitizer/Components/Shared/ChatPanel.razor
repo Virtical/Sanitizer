@@ -13,9 +13,15 @@
         <h1 class="empty-title">Начните общение</h1>
         <div class="empty-input-container">
             <textarea class="empty-message-input" id="emptyMessageInput" placeholder="Введите текст..." rows="1"></textarea>
-            <button class="empty-send-btn" id="emptySendBtn">
-                <i class="bi bi-arrow-up-circle-fill"></i>
-            </button>
+            <div class="input-buttons">
+                <button class="input-btn" id="emptySanitizeToggleBtn">
+                    <i class="bi bi-circle"></i>
+                    <i class="bi bi-eye-slash sanitize-icon-overlay"></i>
+                </button>
+                <button class="empty-send-btn" id="emptySendBtn">
+                    <i class="bi bi-arrow-up-circle-fill"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -23,9 +29,15 @@
         <div class="messages-area" id="messagesArea"></div>
         <div class="input-container">
             <textarea class="message-input" id="messageInput" placeholder="Введите текст..." rows="1"></textarea>
-            <button class="send-btn" id="sendBtn">
-                <i class="bi bi-arrow-up-circle-fill"></i>
-            </button>
+            <div class="input-buttons">
+                <button class="input-btn" id="sanitizeToggleBtn">
+                    <i class="bi bi-circle"></i>
+                    <i class="bi bi-eye-slash sanitize-icon-overlay"></i>
+                </button>
+                <button class="send-btn" id="sendBtn">
+                    <i class="bi bi-arrow-up-circle-fill"></i>
+                </button>
+            </div>
         </div>
     </div>
 </main>
