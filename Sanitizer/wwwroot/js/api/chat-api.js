@@ -93,3 +93,22 @@ async function apiUpdateDialogProfile(dialogId, profileId) {
 
     return resp.json();
 }
+
+async function apiSanitizeMessage(chatId, message) {
+    const resp = await fetch(`${CHAT_API_BASE}/sanitized/${chatId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Auth-Token': AUTH_TOKEN
+        },
+        body: JSON.stringify({ message })
+    });
+
+    if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(`Ошибка санитизации сообщения: ${resp.status} ${errorText}`);
+    }
+
+    const sanitizedText = await resp.text();
+    return { sanitizedMessage: sanitizedText };
+}

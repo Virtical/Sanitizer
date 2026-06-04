@@ -10,6 +10,9 @@ let isProfileCreationVisible = false;
 
 let isDialogsCollapsed = false;
 
+let originalMessageText = '';
+let isSanitizeMode = false;
+
 async function initProfiles() {
     try {
         allProfiles = await apiGetAllProfiles();

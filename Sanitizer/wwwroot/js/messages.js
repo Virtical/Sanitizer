@@ -209,8 +209,73 @@ function clearMessageInput() {
     emptyMessageInput.style.overflowY = 'hidden';
 }
 
+async function toggleSanitizeMode() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const sanitizeToggleBtn = document.getElementById('sanitizeToggleBtn');
+    const emptySanitizeToggleBtn = document.getElementById('emptySanitizeToggleBtn');
+
+    const activeInput = messageInput.offsetParent !== null ? messageInput : emptyMessageInput;
+    const activeBtn = messageInput.offsetParent !== null ? sanitizeToggleBtn : emptySanitizeToggleBtn;
+
+    if (!isSanitizeMode) {
+        const messageText = activeInput.value.trim();
+        if (!messageText) return;
+        originalMessageText = messageText;
+
+        try {
+            const result = await apiSanitizeMessage(currentDialogId, messageText);
+            activeInput.value = result.sanitizedMessage;
+            autoResizeTextarea(activeInput);
+            
+            const circleIcon = activeBtn.querySelector('i:first-child');
+            const eyeIcon = activeBtn.querySelector('.sanitize-icon-overlay');
+
+            circleIcon.style.color = 'var(--accent-primary)';
+            eyeIcon.className = 'bi bi-eye sanitize-icon-overlay';
+            eyeIcon.style.color = 'var(--accent-primary)';
+            eyeIcon.style.fontSize = '24px';
+            
+            isSanitizeMode = true;
+        } catch (error) {
+            console.error('Ошибка санитизации:', error);
+        }
+    } else {
+        activeInput.value = originalMessageText;
+        autoResizeTextarea(activeInput);
+        resetSanitizeButton(activeBtn);
+    }
+}
+
+function resetSanitizeButton(activeBtn) {
+    const circleIcon = activeBtn.querySelector('i:first-child');
+    const eyeIcon = activeBtn.querySelector('.sanitize-icon-overlay');
+
+    circleIcon.style.color = '';
+    eyeIcon.className = 'bi bi-eye-slash sanitize-icon-overlay';
+    eyeIcon.style.color = '';
+
+    isSanitizeMode = false;
+    originalMessageText = '';
+}
+
 
 async function addMessage(text) {
+    // Если режим санитизации активен, возвращаем исходный текст
+    if (isSanitizeMode) {
+        const messageInput = document.getElementById('messageInput');
+        const emptyMessageInput = document.getElementById('emptyMessageInput');
+        const activeInput = messageInput && messageInput.offsetParent !== null ? messageInput : emptyMessageInput;
+        const sanitizeToggleBtn = document.getElementById('sanitizeToggleBtn');
+        const emptySanitizeToggleBtn = document.getElementById('emptySanitizeToggleBtn');
+        const activeBtn = messageInput && messageInput.offsetParent !== null ? sanitizeToggleBtn : emptySanitizeToggleBtn;
+
+        activeInput.value = originalMessageText;
+        autoResizeTextarea(activeInput);
+        text = originalMessageText;
+        resetSanitizeButton(activeBtn);
+    }
+
     if (!text.trim()) return;
     if (isWaitingForResponse) return;
 

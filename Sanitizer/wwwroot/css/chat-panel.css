@@ -113,15 +113,50 @@
     color: var(--text-tertiary);
 }
 
-.empty-send-btn {
+/* Блок с двумя кнопками */
+.input-buttons {
     position: absolute;
-    right: 12px;
-    bottom: 12px;
+    right: 13px;
+    bottom: 11px;
+    display: flex;
+    flex-direction: row;
+    gap: 13px;
+    align-items: center;
+}
+
+/* Кнопка санитизации */
+.input-btn {
+    position: relative;
+    background: var(--text-white);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bi-circle {
+    font-size: 38px;
+    color: var(--color-disabled);
+}
+
+.sanitize-icon-overlay {
+    position: absolute;
+    font-size: 24px;
+    color: var(--color-disabled);
+    background: none;
+    border-radius: 50%;
+}
+
+.empty-send-btn {
     background: none;
     border: none;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -129,7 +164,7 @@
 }
 
 .bi-arrow-up-circle-fill {
-    font-size: 36px;
+    font-size: 38px;
     color: var(--accent-primary);
 }
 
@@ -307,15 +342,18 @@
     color: var(--text-tertiary);
 }
 
-.send-btn {
+.input-container .input-buttons {    
     position: absolute;
     right: 92px;
     bottom: 30px;
+}
+
+.send-btn {
     background: none;
     border: none;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     display: flex;
     align-items: center;
