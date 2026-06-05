@@ -112,3 +112,20 @@ async function apiSanitizeMessage(chatId, message) {
     const sanitizedText = await resp.text();
     return { sanitizedMessage: sanitizedText };
 }
+
+async function apiDeleteDialog(dialogId) {
+    const resp = await fetch(`${CHAT_API_BASE}/${dialogId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-Auth-Token': AUTH_TOKEN
+        }
+    });
+
+    if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(`Ошибка удаления диалога: ${resp.status} ${errorText}`);
+    }
+
+    const result = await resp.text();
+    return { deletedId: result };
+}

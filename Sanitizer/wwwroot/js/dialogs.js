@@ -64,6 +64,7 @@ function renderDialogs() {
 }
 
 function createNewDialog() {
+    isMessageSent = false;
     currentDialogId = null;
     const messagesArea = document.getElementById('messagesArea');
     const emptyState = document.getElementById('chatEmptyState');
