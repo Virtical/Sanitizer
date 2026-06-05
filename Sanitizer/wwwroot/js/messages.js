@@ -256,6 +256,7 @@ async function toggleSanitizeMode() {
             const result = await apiSanitizeMessage(currentDialogId, messageText);
             activeInput.value = result.sanitizedMessage;
             autoResizeTextarea(activeInput);
+            activeInput.readOnly = true;
             
             const circleIcon = activeBtn.querySelector('i:first-child');
             const eyeIcon = activeBtn.querySelector('.sanitize-icon-overlay');
@@ -272,6 +273,7 @@ async function toggleSanitizeMode() {
     } else {
         activeInput.value = originalMessageText;
         autoResizeTextarea(activeInput);
+        activeInput.readOnly = false;
         resetSanitizeButton(activeBtn);
     }
 }
@@ -283,6 +285,12 @@ function resetSanitizeButton(activeBtn) {
     circleIcon.style.color = '';
     eyeIcon.className = 'bi bi-eye-slash sanitize-icon-overlay';
     eyeIcon.style.color = '';
+
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const activeInput = messageInput.offsetParent !== null ? messageInput : emptyMessageInput;
+
+    activeInput.readOnly = false;
 
     isSanitizeMode = false;
     originalMessageText = '';
