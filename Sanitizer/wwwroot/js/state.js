@@ -15,6 +15,8 @@ let isSanitizeMode = false;
 
 let isMessageSent = false;
 
+let isDialogAddedToList = false;
+
 async function initProfiles() {
     try {
         allProfiles = await apiGetAllProfiles();

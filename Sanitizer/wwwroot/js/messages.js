@@ -242,6 +242,7 @@ async function toggleSanitizeMode() {
             // Если нет диалога - создаем его, но не загружаем в список
             if (!currentDialogId) {
                 currentDialogId = await apiCreateDialog(messageText);
+                isDialogAddedToList = false;
 
                 // Привязываем профиль к диалогу
                 if (currentProfile) {
@@ -331,9 +332,12 @@ async function addMessage(text) {
     };
 
     try {
+        let needLoadDialogs = false;
+
         if (!currentDialogId) {
             // Новый диалог — получаем id из заголовка X-Chat-Id
             currentDialogId = await apiCreateDialog(text);
+            needLoadDialogs = true;
 
             if (currentProfile) {
                 try {
@@ -342,13 +346,21 @@ async function addMessage(text) {
                     console.error('Ошибка привязки профиля к новому диалогу:', error);
                 }
             }
+        } else if (!isDialogAddedToList) {
+            // Диалог существует (создан через санитизацию), но еще не добавлен в список
+            needLoadDialogs = true;
+        }
+
+        // Загружаем диалоги в список, если нужно
+        if (needLoadDialogs) {
+            await loadDialogs();
+            isDialogAddedToList = true;
         }
         
         // Существующий диалог
         await apiSendMessage(currentDialogId, text, onChunk);
 
         isMessageSent = true;
-        await loadDialogs();
         
         // Финальная синхронизация с сервером:
         // получаем канонические данные (id сообщений, sanitized-копии для кнопки «глаза» и т.п.)
