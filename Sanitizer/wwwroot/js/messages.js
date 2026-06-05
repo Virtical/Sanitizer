@@ -224,6 +224,20 @@ async function toggleSanitizeMode() {
         originalMessageText = messageText;
 
         try {
+            // Если нет диалога - создаем его, но не загружаем в список
+            if (!currentDialogId) {
+                currentDialogId = await apiCreateDialog(messageText);
+
+                // Привязываем профиль к диалогу
+                if (currentProfile) {
+                    try {
+                        await apiUpdateDialogProfile(currentDialogId, currentProfile.id);
+                    } catch (error) {
+                        console.error('Ошибка привязки профиля к диалогу:', error);
+                    }
+                }
+            }
+
             const result = await apiSanitizeMessage(currentDialogId, messageText);
             activeInput.value = result.sanitizedMessage;
             autoResizeTextarea(activeInput);
@@ -296,8 +310,7 @@ async function addMessage(text) {
     try {
         if (!currentDialogId) {
             // Новый диалог — получаем id из заголовка X-Chat-Id
-            currentDialogId = await apiCreateDialog(text, onChunk);
-            await loadDialogs();
+            currentDialogId = await apiCreateDialog(text);
 
             if (currentProfile) {
                 try {
@@ -308,6 +321,7 @@ async function addMessage(text) {
             }
         }
         
+        await loadDialogs();
         // Существующий диалог
         await apiSendMessage(currentDialogId, text, onChunk);
 
