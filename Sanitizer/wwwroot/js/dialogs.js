@@ -50,7 +50,13 @@ function renderDialogs() {
             
             dialogDiv.addEventListener('click', async (e) => {
                 e.stopPropagation();
+                await deleteEmptyDialogIfNeeded();
                 currentDialogId = dialog.id;
+                isMessageSent = true;
+                isSanitizeMode = false;
+                originalMessageText = '';
+                
+                resetAllSanitizeButtons();
                 renderDialogs();
                 await renderMessages();
                 if (isProfileCreationVisible) showChatPanel();
@@ -63,8 +69,39 @@ function renderDialogs() {
     });
 }
 
+function resetAllSanitizeButtons() {
+    const sanitizeToggleBtn = document.getElementById('sanitizeToggleBtn');
+    const emptySanitizeToggleBtn = document.getElementById('emptySanitizeToggleBtn');
+
+    [sanitizeToggleBtn, emptySanitizeToggleBtn].forEach(btn => {
+        if (btn) {
+            const circleIcon = btn.querySelector('i:first-child');
+            const eyeIcon = btn.querySelector('.sanitize-icon-overlay');
+            circleIcon.style.color = '';
+            eyeIcon.className = 'bi bi-eye-slash sanitize-icon-overlay';
+            eyeIcon.style.color = '';
+        }
+    });
+}
+
+async function deleteEmptyDialogIfNeeded() {
+    if (currentDialogId && !isMessageSent) {
+        try {
+            const dialogData = await apiGetMessages(currentDialogId);
+            if (dialogData.messages.length === 0) await apiDeleteDialog(currentDialogId);
+        } catch (error) {
+            console.error('Ошибка при проверке/удалении диалога:', error);
+        }
+    }
+}
+
 function createNewDialog() {
+    if (currentDialogId && !isMessageSent) apiDeleteDialog(currentDialogId).catch(console.error);
+    
     isMessageSent = false;
+    isSanitizeMode = false;
+    originalMessageText = '';
+    isDialogAddedToList = false;
     currentDialogId = null;
     const messagesArea = document.getElementById('messagesArea');
     const emptyState = document.getElementById('chatEmptyState');
@@ -74,6 +111,7 @@ function createNewDialog() {
     emptyState.style.display = 'flex';
     messagesWrapper.style.display = 'none';
     
+    resetAllSanitizeButtons();
     renderDialogs();
 }
 
