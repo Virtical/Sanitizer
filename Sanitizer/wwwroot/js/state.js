@@ -13,6 +13,8 @@ let isDialogsCollapsed = false;
 let originalMessageText = '';
 let isSanitizeMode = false;
 
+let isMessageSent = false;
+
 async function initProfiles() {
     try {
         allProfiles = await apiGetAllProfiles();

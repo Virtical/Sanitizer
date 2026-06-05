@@ -209,6 +209,21 @@ function clearMessageInput() {
     emptyMessageInput.style.overflowY = 'hidden';
 }
 
+async function checkAndDeleteEmptyDialog() {
+    const messageInput = document.getElementById('messageInput');
+    const emptyMessageInput = document.getElementById('emptyMessageInput');
+    const activeInput = messageInput.offsetParent !== null ? messageInput : emptyMessageInput;
+    
+    if (currentDialogId && !isMessageSent && (!activeInput || activeInput.value.trim() === '')) {
+        try {
+            await apiDeleteDialog(currentDialogId);
+            currentDialogId = null;
+        } catch (error) {
+            console.error('Ошибка удаления пустого диалога:', error);
+        }
+    }
+}
+
 async function toggleSanitizeMode() {
     const messageInput = document.getElementById('messageInput');
     const emptyMessageInput = document.getElementById('emptyMessageInput');
@@ -321,10 +336,12 @@ async function addMessage(text) {
             }
         }
         
-        await loadDialogs();
         // Существующий диалог
         await apiSendMessage(currentDialogId, text, onChunk);
 
+        isMessageSent = true;
+        await loadDialogs();
+        
         // Финальная синхронизация с сервером:
         // получаем канонические данные (id сообщений, sanitized-копии для кнопки «глаза» и т.п.)
         const serverData = await apiGetMessages(currentDialogId);

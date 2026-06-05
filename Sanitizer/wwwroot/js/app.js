@@ -100,9 +100,10 @@ function initEventListeners() {
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (emptySendBtn) emptySendBtn.addEventListener('click', sendMessage);
     if (messageInput) {
-        messageInput.addEventListener('input', () => {
+        messageInput.addEventListener('input', async () => {
             updateSendButtonState();
             autoResizeTextarea(messageInput);
+            await checkAndDeleteEmptyDialog();
         });
         messageInput.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -112,9 +113,10 @@ function initEventListeners() {
         });
     }
     if (emptyMessageInput) {
-        emptyMessageInput.addEventListener('input', () => {
+        emptyMessageInput.addEventListener('input', async () => {
             updateSendButtonState();
             autoResizeTextarea(emptyMessageInput);
+            await checkAndDeleteEmptyDialog();
         });
         emptyMessageInput.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
