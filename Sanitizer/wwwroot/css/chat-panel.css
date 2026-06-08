@@ -117,7 +117,7 @@
 .input-buttons {
     position: absolute;
     right: 13px;
-    bottom: 11px;
+    bottom: 15px;
     display: flex;
     flex-direction: row;
     gap: 13px;
@@ -136,6 +136,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Стили для подсказки "Предпросмотр" над кнопкой */
+.input-btn::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    padding: 9px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-size: 15px;
+    font-weight: 400;
+    white-space: nowrap;
+    border: 1px solid var(--text-tertiary);
+    border-radius: 9px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 10001;
+    pointer-events: none;
+}
+
+.input-btn:hover::before {
+    opacity: 1;
+    visibility: visible;
 }
 
 .bi-circle {
