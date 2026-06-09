@@ -8,6 +8,13 @@ namespace Sanitizer;
 
 public static class Configurator
 {
+    public static async Task AddDefaultUsers(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        var usersService = scope.ServiceProvider.GetRequiredService<UsersService>();
+        await usersService.RegisterAsync("Test", "Test123");
+    }
+
     public static async Task AddDefaultProfiles(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();

@@ -8,23 +8,23 @@ namespace Sanitizer.Api.Services;
 public class ApiKeyService(IApiKeyStorage storage)
 {
     /// <summary>Создаёт новый ключ. Открытый ключ возвращается единожды.</summary>
-    public async Task<(ApiKey Model, string PlainKey)> CreateAsync(string name, DateTime? expiresAt = null)
+    public async Task<ApiKey> CreateAsync(string name, DateTime? expiresAt = null)
     {
         var plain = Guid.NewGuid().ToString();
         var model = new ApiKey
         {
             Name      = name,
-            KeyHash   = Hash(plain),
+            KeyHash   = plain,
             ExpiresAt = expiresAt,
             IsActive  = true
         };
         await storage.SaveAsync(model);
-        return (model, plain);
+        return model;
     }
 
     public Task<List<ApiKey>> GetAllAsync() => storage.GetAllAsync();
 
-    public async Task<bool> DeactivateAsync(string id)
+    public async Task<bool> DeactivateAsync(Guid id)
     {
         var keys = await storage.GetAllAsync();
         var key  = keys.FirstOrDefault(k => k.Id == id);
@@ -36,14 +36,10 @@ public class ApiKeyService(IApiKeyStorage storage)
 
     public async Task<bool> IsValidAsync(string plainKey)
     {
-        var hash = Hash(plainKey);
-        var keys = await storage.GetAllAsync();
-        return keys.Any(k =>
-            k.IsActive &&
-            k.KeyHash == hash &&
-            (k.ExpiresAt is null || k.ExpiresAt > DateTime.UtcNow));
+        var key = await storage.GetAsync(plainKey);
+        return key is not null && key.IsValid();
     }
-
-    public static string Hash(string plain) =>
-        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(plain))).ToLowerInvariant();
+    
+    public async Task<ApiKey> GetTokenAsync(Guid id)
+        => await storage.GetAsync(id);
 }

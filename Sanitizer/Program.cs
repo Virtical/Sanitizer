@@ -12,6 +12,8 @@ using Microsoft.Extensions.AI;
 using Microsoft.OpenApi.Models;
 using OpenAI;
 using Sanitizer.Api.Middleware;
+using Sanitizer.Api.Swagger;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,41 +32,44 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
+    c.ExampleFilters();
 
     c.SwaggerDoc("internal", new OpenApiInfo { Title = "Sanitizer Internal API" });
     c.SwaggerDoc("public", new OpenApiInfo { Title = "Sanitizer Public API" });
 
+    // X-Auth-Token для внутреннего API
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
         Name = "X-Auth-Token",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Description = "Публичный API-ключ в формате GUID"
+        Description = "Внутренний API-ключ в формате GUID"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    // Bearer для внешнего v1 API
+    c.AddSecurityDefinition("ApiToken", new OpenApiSecurityScheme
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "ApiKey"
-                }
-            },
-            Array.Empty<string>()
-        }
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Description = "OpenAI API Key (вставьте чистый токен sk-...)"
     });
 
-    // Разделяем контроллеры по документам
     c.DocInclusionPredicate((docName, apiDesc) =>
     {
         var isPublic = apiDesc.RelativePath?
-            .StartsWith("api/public/", StringComparison.OrdinalIgnoreCase) ?? false;
-        return docName == "public" ? isPublic : !isPublic;
+            .StartsWith("proxy/", StringComparison.OrdinalIgnoreCase) ?? false;
+        
+        if (docName == "public") return isPublic;
+        if (docName == "internal") return !isPublic;
+        return false;
     });
+
+    c.OperationFilter<SwaggerSecurityOperationFilter>();
 });
+
+builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateConversationRequestExample>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -106,6 +111,7 @@ builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
 builder.Services.AddScoped<IApiKeyStorage, EfApiKeyStorage>();
 builder.Services.AddScoped<IChatStorage, EfChatStorage>();
 builder.Services.AddScoped<IMessageStorage, EfMessageStorage>();
+builder.Services.AddScoped<IUsersStorage, EfUsersStorage>();
 
 // Контекст текущего API-ключа (scoped — живёт в рамках одного запроса)
 builder.Services.AddScoped<CurrentApiKeyContext>();
@@ -120,6 +126,14 @@ builder.Services.AddSingleton<DesanitizerService>();
 builder.Services.AddScoped<SanitizerService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<ChatHistoryService>();
+builder.Services.AddScoped<UsersService>();
+builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Services.AddHttpClient("OpenAI", client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/");
+    client.Timeout = TimeSpan.FromSeconds(100);
+});
 
 var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
 if (llmProvider == "openai")
@@ -171,7 +185,12 @@ app.UseSwaggerUI(c =>
 
 app.UseCors("AllowAll");
 
-app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+app.MapWhen(context => 
+{
+    var isApiPath = context.Request.Path.StartsWithSegments("/api");
+    var isLoginPath = context.Request.Path.StartsWithSegments("/api/login");
+    return isApiPath && !isLoginPath;
+}, appBuilder =>
 {
     appBuilder.UseMiddleware<ApiKeyAuthMiddleware>();
     appBuilder.UseRouting();
@@ -180,7 +199,9 @@ app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuild
 
 app.UseRateLimiter();
 app.MapControllers();
+app.MapReverseProxy();
 
+await app.AddDefaultUsers();
 await app.AddDefaultProfiles();
 
 app.Run();

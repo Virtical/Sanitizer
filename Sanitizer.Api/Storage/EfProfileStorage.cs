@@ -21,6 +21,13 @@ public class EfProfileStorage(SanitizerDbContext db) : IProfileStorage
             .Include(p => p.Rules)
             .FirstOrDefaultAsync(p => p.Id == id && (p.ApiKeyId == apiKeyId || p.ApiKeyId == Guid.Empty));
     }
+    
+    public async Task<SanitizationProfileEntity?> GetByNameAsync(string name, Guid apiKeyId)
+    {
+        return await db.Profiles
+            .Include(p => p.Rules)
+            .FirstOrDefaultAsync(p => p.Name == name && (p.ApiKeyId == apiKeyId || p.ApiKeyId == Guid.Empty));
+    }
 
     public async Task SaveAsync(SanitizationProfileEntity entity)
     {

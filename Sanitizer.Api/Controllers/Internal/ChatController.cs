@@ -19,7 +19,6 @@ namespace Sanitizer.Api.Controllers;
 [Route("api/chat")]
 public class ChatController(
     SanitizerService sanitizerService,
-    ProfileService profileService,
     DesanitizerService desanitizer,
     ChatHistoryService chatHistoryService,
     IChatClient chatClient) : ControllerBase
@@ -59,17 +58,8 @@ public class ChatController(
     
     [HttpPost("sanitized/{chatId}")]
     [SwaggerOperation(Summary = "Санитизировать сообщение")]
-    public async Task<IActionResult> GetByIdAsync([FromRoute] string chatId, [FromBody] SanitizedRequest request)
-    {
-        var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
-        var profile = profileId is not null
-            ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
-            : ProfileResponse.Default;
-
-        var sanitization = sanitizerService.Sanitize(request.Message, profile);
-        
-        return Ok(sanitization.SanitizedText);
-    }
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string chatId, [FromBody] SanitizedRequest request) 
+        => Ok((await sanitizerService.SanitizeAsync(request.Message, chatId)).SanitizedText);
 
     [HttpPost("send/{chatId}")]
     [SwaggerOperation(Summary = "Отправка сообщений")]
@@ -89,27 +79,7 @@ public class ChatController(
             return;
         }
 
-        var message = await chatHistoryService.AddMessageAsync(
-            chatId, MessageRequest.CreateSent(messageRequest.Message));
-
-        SanitizationResult sanitization;
-        try
-        {
-            var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
-            var profile = profileId is not null
-                ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
-                : ProfileResponse.Default;
-
-            sanitization = sanitizerService.Sanitize(messageRequest.Message, profile);
-            await chatHistoryService.AddMessageAsync(
-                chatId, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
-        }
-        catch (InvalidOperationException ex)
-        {
-            Response.StatusCode = 400;
-            await Response.WriteAsync(ex.Message);
-            return;
-        }
+        var sanitization = await sanitizerService.SanitizeAsync(messageRequest.Message, chatId);
 
         string raw;
         try
@@ -121,7 +91,7 @@ public class ChatController(
             var chatSession = await chatHistoryService.GetByIdAsync(chatId);
             var messages = new List<ChatMessage>();
 
-            if (chatSession is null)
+            if (chatSession!.Messages.Count == 0)
             {
                 messages.Add(new ChatMessage(ChatRole.System, "Ты полезный ассистент"));
                 messages.Add(new ChatMessage(ChatRole.User, sanitization.SanitizedText));
@@ -169,6 +139,8 @@ public class ChatController(
             return;
         }
 
+        var message = await chatHistoryService.AddMessageAsync(chatId, MessageRequest.CreateSent(messageRequest.Message));
+        await chatHistoryService.AddMessageAsync(chatId, MessageRequest.CreateSanitized(sanitization.SanitizedText, message.Id));
         await chatHistoryService.AddMessageAsync(chatId, MessageRequest.CreateAnswer(raw));
     }
 
