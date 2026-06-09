@@ -1,4 +1,3 @@
-using Sanitizer.Api.Controllers.Client.Requests;
 using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Strategy;
@@ -12,9 +11,23 @@ namespace Sanitizer.Api.Services;
 /// Запускает детекторы по правилам профиля, разрешает пересечения,
 /// применяет стратегии справа налево (не сбивая индексы).
 /// </summary>
-public class SanitizerService(DetectorRegistry registry, StrategyFactory strategyFactory)
+public class SanitizerService(
+    DetectorRegistry registry, 
+    StrategyFactory strategyFactory,
+    ChatHistoryService chatHistoryService,
+    ProfileService profileService)
 {
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Text.RegularExpressions.Regex> _patternCache = new();
+
+    public async Task<SanitizationResult> SanitizeAsync(string text, string chatId)
+    {
+        var profileId = await chatHistoryService.GetProfileIdAsync(chatId);
+        var profile = profileId is not null
+            ? await profileService.GetByIdAsync(profileId) ?? ProfileResponse.Default
+            : ProfileResponse.Default;
+        
+        return Sanitize(text, profile);
+    }
 
     public SanitizationResult Sanitize(string text, ProfileResponse profileRequest)
     {

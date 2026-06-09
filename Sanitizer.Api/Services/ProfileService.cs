@@ -21,6 +21,12 @@ public class ProfileService(IProfileStorage storage, ICurrentApiKeyContext apiKe
         var existing = await storage.GetByIdAsync(id, apiKeyContext.ApiKeyId);
         return existing is null ? null : MapToResponse(existing);
     }
+    
+    public async Task<ProfileResponse?> GetByNameAsync(string name)
+    {
+        var existing = await storage.GetByNameAsync(name, apiKeyContext.ApiKeyId);
+        return existing is null ? null : MapToResponse(existing);
+    }
 
     public async Task CreateAsync(CreateProfileRequest profileRequest)
     {

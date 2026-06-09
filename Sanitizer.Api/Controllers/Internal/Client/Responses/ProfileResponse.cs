@@ -13,7 +13,7 @@ public record ProfileResponse
         = new()
         {
             Id = Guid.NewGuid().ToString(),
-            Name = String.Empty,
+            Name = string.Empty,
             Rules = new Dictionary<DetectorType, StrategyConfig>()
         };
 }

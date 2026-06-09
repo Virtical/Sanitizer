@@ -12,6 +12,12 @@ public interface IProfileStorage
     /// Возвращает null, если профиль не найден или принадлежит другому ключу.
     /// </summary>
     Task<SanitizationProfileEntity?> GetByIdAsync(string id, Guid apiKeyId);
+    
+    /// <summary>
+    /// Получить профиль по имени.
+    /// Возвращает null, если профиль не найден или принадлежит другому ключу.
+    /// </summary>
+    Task<SanitizationProfileEntity?> GetByNameAsync(string name, Guid apiKeyId);
 
     /// <summary>Сохранить (создать или обновить) профиль.</summary>
     Task SaveAsync(SanitizationProfileEntity profile);

@@ -10,6 +10,8 @@ public class SanitizerDbContext(DbContextOptions<SanitizerDbContext> options) : 
     public DbSet<ApiKeyEntity> ApiKeys => Set<ApiKeyEntity>();
     public DbSet<ChatEntity> Chats => Set<ChatEntity>();
     public DbSet<MessageEntity> Messages => Set<MessageEntity>();
+    public DbSet<UserEntity> Users => Set<UserEntity>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,5 +56,14 @@ public class SanitizerDbContext(DbContextOptions<SanitizerDbContext> options) : 
         {
             b.HasIndex(m => new { m.ChatId, m.OrderIndex }).IsUnique();
         });
+        
+        modelBuilder.Entity<UserEntity>(b =>
+        {
+            b.HasOne<ApiKeyEntity>()
+                .WithMany()
+                .HasForeignKey(u => u.ApiKeyId)
+                .IsRequired();
+        });
+
     }
 }
