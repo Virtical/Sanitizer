@@ -1,5 +1,5 @@
 const CHAT_API_BASE = 'http://localhost:5127/api/chat';
-const AUTH_TOKEN = 'C6F0DC04-333C-4969-A2D2-E06DDB389604';
+let AUTH_TOKEN = sessionStorage.getItem('authToken');
 
 /**
  * Общая вспомогательная функция для стримингового POST-запроса.

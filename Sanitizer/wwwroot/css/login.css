@@ -1,0 +1,143 @@
+.login-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+}
+
+/* Логотип и название */
+.login-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    max-height: 50px;
+    margin-bottom: 33px;
+}
+
+.login-img {
+    width: 38px;
+    height: 38px;
+    display: block;
+}
+
+.login-title {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--text-primary);
+}
+
+/* Форма */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.login-input {
+    width: 487px;
+    height: 67px;
+    padding-left: 31px;
+    background: var(--bg-secondary);
+    border-radius: 40px;
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 4%;
+    border: none;
+    outline: none;
+    transition: border 0.2s, background 0.2s;
+}
+
+.login-input:focus {
+    background: var(--bg-primary);
+    border: 2px solid var(--accent-primary);
+}
+
+.login-input:focus::placeholder {
+    color: transparent;
+}
+
+.login-input::placeholder {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    letter-spacing: 4%;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 487px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 33px;
+    color: var(--text-tertiary);
+}
+
+/* Кнопка входа */
+.login-btn {
+    width: 191px;
+    height: 49px;
+    background: var(--btn-login-disabled);
+    border: none;
+    border-radius: 40px;
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--text-white);
+    margin-top: 15px;
+    align-self: center;
+    cursor: not-allowed;
+    transition: background 0.2s;
+}
+
+.login-btn:enabled {
+    cursor: pointer;
+}
+
+/* Стили для ошибок */
+.login-input.error {
+    border: 2px solid var(--color-error);
+    background: var(--bg-primary);
+}
+
+.error-message {
+    font-family: 'Source Serif Pro', 'Times New Roman', serif;
+    font-size: 14px;
+    color: var(--color-error);
+    margin-top: 5px;
+    margin-left: 15px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.password-wrapper .error-message {
+    position: absolute;
+    bottom: -25px;
+    left: 0;
+}
+
+/* Убираем фон автозаполнения в браузерах на WebKit (Chrome, Safari, Edge) */
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-secondary) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}

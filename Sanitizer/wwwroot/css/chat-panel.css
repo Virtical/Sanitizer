@@ -282,7 +282,7 @@
     opacity: 0.7;
 }
 
-.bi-eye {
+.eye-btn .bi-eye {
     font-size: 36px;
     color: var(--text-tertiary);
 }
@@ -314,7 +314,7 @@
     background: var(--bg-primary) !important;
     color: var(--text-primary) !important;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 20px;
     line-height: 130%;
     border: 1px solid var(--accent-primary);

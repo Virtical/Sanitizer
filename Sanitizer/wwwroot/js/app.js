@@ -147,6 +147,8 @@ function initScrollbars() {
 }
 
 async function init() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
     await loadDialogs();
     createNewDialog();
     await initProfiles();
