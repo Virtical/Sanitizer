@@ -146,8 +146,27 @@ function initScrollbars() {
     }
 }
 
+function updateUserInfo() {
+    const userLogin = sessionStorage.getItem('userLogin');
+    const userInitials = userLogin.substring(0, 2);
+        
+    // Для свернутой панели
+    const collapsedUserAvatar = document.querySelector('.collapsed-user-avatar');
+    const collapsedUserInitials = document.querySelector('.collapsed-user-initials');
+    collapsedUserAvatar.setAttribute('data-tooltip', userLogin);
+    collapsedUserInitials.textContent = userInitials;
+
+    // Для развернутой панели
+    const userAvatar = document.querySelector('.user-avatar');
+    const userInitialsSpan = document.querySelector('.user-initials');
+    const userNameSpan = document.querySelector('.user-name');
+    userAvatar.setAttribute('data-tooltip', userLogin);
+    userInitialsSpan.textContent = userInitials;
+    userNameSpan.textContent = userLogin;
+}
+
 async function init() {
-    const token = localStorage.getItem('authToken');
+    const token = sessionStorage.getItem('authToken');
     if (!token) return;
     await loadDialogs();
     createNewDialog();
@@ -160,6 +179,7 @@ async function init() {
     showChatPanel();
     initScrollbars();
     updateSendButtonState();
+    updateUserInfo();
 }
 
 // Запуск после загрузки DOM
