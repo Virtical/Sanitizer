@@ -79,12 +79,13 @@ loginForm.addEventListener('submit', async (e) => {
         try {
             clearErrors();
             loginBtn.disabled = true;
-            const token = await apiLogin(login, password);
-            if (token) {
-                sessionStorage.setItem('authToken', token);
+            const result = await apiLogin(login, password);
+            if (result && result.token) {
+                sessionStorage.setItem('authToken', result.token);
+                sessionStorage.setItem('userLogin', result.login);
                 window.location.reload();
             } else {
-                console.error('Токен не получен:', token);
+                console.error('Токен не получен:', result);
             }
         } catch (error) {
             console.error('Ошибка:', error);

@@ -15,7 +15,7 @@ async function apiLogin(login, password) {
     const responseText = await response.text();
 
     if (response.ok) {
-        return responseText.trim();
+        return { token: responseText.trim(), login: login };
     } else {
         throw new Error("Неверный логин или пароль");
     }
