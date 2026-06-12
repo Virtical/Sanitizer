@@ -14,9 +14,11 @@
     --accent-hover: #02A065;
     --accent-secondary: #D6EBDF;
     --icon: #1C7E34;
+    --btn-login-disabled: #85BEA6;
 
     --color-disabled: #9D9D9D;
     --color-delete: #D60505;
+    --color-error: #D70000;
 
     --border-primary: #5B5B5B;
     --border-checkbox: #D9D9D9;

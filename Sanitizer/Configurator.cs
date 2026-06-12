@@ -12,7 +12,8 @@ public static class Configurator
     {
         using var scope = app.ApplicationServices.CreateScope();
         var usersService = scope.ServiceProvider.GetRequiredService<UsersService>();
-        await usersService.RegisterAsync("Test", "Test123");
+        await usersService.RegisterAsync("Test1", "Test123");
+        await usersService.RegisterAsync("Test2", "Test123");
     }
 
     public static async Task AddDefaultProfiles(this IApplicationBuilder app)

@@ -3,7 +3,7 @@
 
 <PageTitle>Sanitizer</PageTitle>
 
-<div class="app-container">
+<div class="app-container" id="authenticatedContent" style="display: none;">
     <div class="main-layout">
         <DialogsPanel />
         <div class="right-panel-container">
@@ -14,15 +14,23 @@
     </div>
 </div>
 
+<div class="app-container" id="loginContent">
+    <div class="main-layout">
+        <LoginPanel />
+    </div>
+</div>
+
 <HtmlTemplates />
 
 <script src="js/modules/marked.min.js"></script>
+<script src="js/api/login-api.js"></script>
 <script src="js/api/dialogs-api.js"></script>
 <script src="js/api/profile-api.js"></script>
 <script src="js/api/chat-api.js"></script>
 <script src="js/state.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/scrollbar.js"></script>
+<script src="js/login.js"></script>
 <script src="js/dialogs.js"></script>
 <script src="js/messages.js"></script>
 <script src="js/profiles.js"></script>

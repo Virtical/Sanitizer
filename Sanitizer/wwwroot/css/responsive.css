@@ -1,4 +1,4 @@
-@media (min-width: 1400px) {
+@media (max-width: 1500px) {
     body {
         zoom: 0.85;
     }
