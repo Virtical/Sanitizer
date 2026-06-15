@@ -1,7 +1,6 @@
 :root {
     --bg-primary: #F5F5F5;
     --bg-secondary: #E8E8E8;
-    --bg-hover: #D8D8D8;
 
     --text-primary: #000000;
     --text-secondary: #2C2C2C;
@@ -11,7 +10,6 @@
 
     --accent-text: #368F4C;
     --accent-primary: #037C4E;
-    --accent-hover: #02A065;
     --accent-secondary: #D6EBDF;
     --icon: #1C7E34;
     --btn-login-disabled: #85BEA6;
@@ -19,9 +17,6 @@
     --color-disabled: #9D9D9D;
     --color-delete: #D60505;
     --color-error: #D70000;
-
-    --border-primary: #5B5B5B;
-    --border-checkbox: #D9D9D9;
 
     --shadow-default: rgba(0, 0, 0, 0.1);
     --overlay-backdrop: rgba(0, 0, 0, 0.5);

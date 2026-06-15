@@ -307,6 +307,7 @@
     position: relative;
     min-height: 0;
     overflow: hidden;
+    padding-right: 5px;
 }
 
 .dialogs-history {
@@ -314,12 +315,6 @@
     overflow-y: auto;
     padding-right: 28px;
     scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.dialogs-history::-webkit-scrollbar {
-    display: none;
 }
 
 .dialogs-list {

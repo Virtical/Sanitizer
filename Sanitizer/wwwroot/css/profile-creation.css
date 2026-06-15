@@ -11,21 +11,6 @@
     border-left: 1px solid var(--text-tertiary);
 }
 
-/* Стилизация скроллбара для страницы создания профиля */
-.profile-creation-panel::-webkit-scrollbar {
-    width: 8px;
-}
-
-.profile-creation-panel::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-    border-radius: 10px;
-}
-
-.profile-creation-panel::-webkit-scrollbar-thumb {
-    background: var(--text-tertiary);
-    border-radius: 10px;
-}
-
 .profile-creation-content {
     max-width: 936px;
     width: 100%;
@@ -368,6 +353,7 @@
     border-radius: 17px;
     overflow: hidden;
     z-index: 1001;
+    padding-right: 5px;
 }
 
 .data-type-header {
@@ -411,22 +397,6 @@
     overflow-y: auto;
     gap: 10px;
     box-sizing: border-box;
-}
-
-/* Стилизация скроллбара для списка типов данных */
-.data-type-dropdown::-webkit-scrollbar {
-    width: 7px;
-}
-
-.data-type-dropdown::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-    border-radius: 10px;
-    margin-block: 10px;
-}
-
-.data-type-dropdown::-webkit-scrollbar-thumb {
-    background: var(--text-tertiary);
-    border-radius: 10px;
 }
 
 .data-type-option {

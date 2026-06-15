@@ -151,9 +151,6 @@ function toggleDialogsCollapse() {
         dialogsPanel.style.maxWidth = '320px';
         if (hideBtn) hideBtn.style.display = 'flex';
     }
-    setTimeout(() => {
-        if (typeof updateScrollbars === 'function') updateScrollbars();
-    }, 100);
 }
 
 function showDialogsFromCollapsed() {

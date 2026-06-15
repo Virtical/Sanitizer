@@ -1,9 +1,4 @@
 // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
-function updateScrollbars() {
-    if (window.updateDialogsScrollbar) window.updateDialogsScrollbar();
-    if (window.updateMessagesScrollbar) window.updateMessagesScrollbar();
-}
-
 function toggleDialogsPanel() {
     const dialogsPanel = document.getElementById('dialogsPanel');
     const hideDialogsBtn = document.getElementById('hideDialogsBtn');
@@ -132,20 +127,6 @@ function initEventListeners() {
     document.addEventListener('click', handleClickOutside);
 }
 
-function initScrollbars() {
-    const dialogsHistory = document.getElementById('dialogsHistory');
-    const dialogsWrapper = document.querySelector('.dialogs-history-wrapper');
-    const messagesArea = document.getElementById('messagesArea');
-    const messagesWrapper = document.getElementById('messagesWrapper');
-
-    if (dialogsHistory && dialogsWrapper) {
-        window.updateDialogsScrollbar = createCustomScrollbar(dialogsHistory, dialogsWrapper);
-    }
-    if (messagesArea && messagesWrapper) {
-        window.updateMessagesScrollbar = createCustomScrollbar(messagesArea, messagesWrapper);
-    }
-}
-
 function updateUserInfo() {
     const userLogin = sessionStorage.getItem('userLogin');
     const userInitials = userLogin.substring(0, 2);
@@ -177,7 +158,6 @@ async function init() {
     initDataMethodHandlers();
     initEditHandlers();
     showChatPanel();
-    initScrollbars();
     updateSendButtonState();
     updateUserInfo();
 }

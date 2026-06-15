@@ -93,7 +93,7 @@
     background: var(--bg-secondary);
     border-radius: 28px;
     border: none;
-    padding: 16px 70px 16px 24px;
+    padding: 16px 80px 16px 24px;
     font-family: 'Source Serif Pro', 'Times New Roman', serif;
     font-weight: 400;
     font-size: 20px;
@@ -214,12 +214,6 @@
     flex-direction: column;
     gap: 16px;
     scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.messages-area::-webkit-scrollbar {
-    display: none;
 }
 
 .message {
@@ -322,22 +316,6 @@
     overflow-y: auto;
 }
 
-/* Стилизация скроллбара для санитизированного сообщения */
-.sanitized-message .message-bubble::-webkit-scrollbar {
-    width: 5px;
-}
-
-.sanitized-message .message-bubble::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-    border-radius: 20px;
-    margin-block: 13px;
-}
-
-.sanitized-message .message-bubble::-webkit-scrollbar-thumb {
-    background: var(--text-tertiary);
-    border-radius: 20px;
-}
-
 .input-container {
     position: relative;
     padding: 16px 80px;
@@ -404,26 +382,4 @@
     color: var(--text-tertiary);
     text-align: center;
     padding: 40px;
-}
-
-/* ==================== СТИЛИЗАЦИЯ СКРОЛЛБАРОВ ==================== */
-
-/* Скроллбар для textarea (поле ввода) */
-.message-input::-webkit-scrollbar,
-.empty-message-input::-webkit-scrollbar {
-    width: 9px;
-    margin-right: 20px;
-}
-
-.message-input::-webkit-scrollbar-track,
-.empty-message-input::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    margin-block: 13px;
-}
-
-.message-input::-webkit-scrollbar-thumb,
-.empty-message-input::-webkit-scrollbar-thumb {
-    background: var(--text-tertiary);
-    border-radius: 20px;
 }
