@@ -36,12 +36,12 @@ public class UsersService(IUsersStorage usersStorage, ApiKeyService apiKeyServic
         var user = await usersStorage.GetAsync(loginRequest.Login);
         if (user is null)
         {
-            return Result.Fail<string>($"User with login {loginRequest.Login} not found");
+            return Result.Fail<string>("Неверный логин");
         }
         
         if (user.Password != Hash(loginRequest.Password))
         {
-            return Result.Fail<string>("Wrong password");
+            return Result.Fail<string>("Неверный пароль");
         }
 
         var token = await apiKeyService.GetTokenAsync(user.ApiKeyId);

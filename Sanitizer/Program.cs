@@ -1,18 +1,19 @@
 using System.ClientModel;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
+using Microsoft.OpenApi.Models;
+using OpenAI;
 using Sanitizer;
 using Sanitizer.Api.Auth;
+using Sanitizer.Api.Middleware;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.Storage;
 using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Strategies;
-using Sanitizer.Components;
-using System.Threading.RateLimiting;
-using Microsoft.Extensions.AI;
-using Microsoft.OpenApi.Models;
-using OpenAI;
-using Sanitizer.Api.Middleware;
 using Sanitizer.Api.Swagger;
+using Sanitizer.Components;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +25,7 @@ builder.Services
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.Converters.Add(
-            new System.Text.Json.Serialization.JsonStringEnumConverter()));
+            new JsonStringEnumConverter()));
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -113,7 +114,6 @@ builder.Services.AddScoped<IChatStorage, EfChatStorage>();
 builder.Services.AddScoped<IMessageStorage, EfMessageStorage>();
 builder.Services.AddScoped<IUsersStorage, EfUsersStorage>();
 
-// Контекст текущего API-ключа (scoped — живёт в рамках одного запроса)
 builder.Services.AddScoped<CurrentApiKeyContext>();
 builder.Services.AddScoped<ICurrentApiKeyContext>(sp =>
     sp.GetRequiredService<CurrentApiKeyContext>());
@@ -135,31 +135,17 @@ builder.Services.AddHttpClient("OpenAI", client =>
     client.Timeout = TimeSpan.FromSeconds(100);
 });
 
-var llmProvider = builder.Configuration["Llm:Provider"]?.ToLowerInvariant() ?? "stub";
-if (llmProvider == "openai")
-{
-    var apiKey = builder.Configuration["Llm:ApiKey"] ?? throw new NullReferenceException();
-    var model = builder.Configuration["Llm:Model"] ?? throw new NullReferenceException();
-    var baseUrl = builder.Configuration["Llm:BaseUrl"] ?? throw new NullReferenceException();
-    
-    var options = new OpenAIClientOptions
-    {
-        Endpoint = new Uri(baseUrl)
-    };
-    
-    builder.Services.AddSingleton<IChatClient>(_ 
-        => new OpenAIClient(new ApiKeyCredential(apiKey), options)
-            .GetChatClient(model)
-            .AsIChatClient()
-            .AsBuilder()
-            .UseFunctionInvocation()
-            .Build()
-        );
-}
-else
-{
-    builder.Services.AddSingleton<ILlmClient, StubLlmClient>();
-}
+var config = builder
+                 .Configuration
+                 .GetSection("OpenAi")
+                 .Get<OpenAiConfig>() ?? throw new Exception("OpenAI configuration not found");
+
+var proxyConfig = builder
+                      .Configuration
+                      .GetSection("Proxy")
+                      .Get<ProxyConfig>();
+
+builder.Services.AddSingleton(OpenAiChatHelper.CreateChatClient(config, proxyConfig));
 
 var app = builder.Build();
 

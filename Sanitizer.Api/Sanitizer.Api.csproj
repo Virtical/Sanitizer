@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FluentResults" Version="4.0.0" />
+    <PackageReference Include="FluentResults" Version="3.16.0" />
     <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.2.0" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.6.0" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.6.0" />
@@ -28,5 +28,15 @@
     <Compile Remove="Models\MessageType.cs" />
     <Compile Remove="Models\ProfileCreateRequest.cs" />
     <Compile Remove="Models\SanitizationProfile.cs" />
+    <Compile Remove="Controllers\Internal\Errors\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Controllers\Internal\Errors\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Controllers\Internal\Errors\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Controllers\Internal\Errors\**" />
   </ItemGroup>
 </Project>
