@@ -14,20 +14,30 @@ function checkAuth() {
 function clearErrors() {
     const loginInput = document.getElementById('loginInput');
     const passwordInput = document.getElementById('passwordInput');
-    const generalError = document.getElementById('generalError');
+    const loginError = document.getElementById('loginError');
+    const passwordError = document.getElementById('passwordError');
     loginInput.classList.remove('error');
     passwordInput.classList.remove('error');
-    generalError.classList.remove('show');
+    loginError.classList.remove('show');
+    passwordError.classList.remove('show');
 }
 
-// Функция показа ошибки для обоих полей
-function showAuthError() {
+// Функция показа ошибки для логина
+function showLoginError(message) {
     const loginInput = document.getElementById('loginInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const generalError = document.getElementById('generalError');
+    const loginError = document.getElementById('loginError');
     loginInput.classList.add('error');
+    loginError.textContent = message;
+    loginError.classList.add('show');
+}
+
+// Функция показа ошибки для пароля
+function showPasswordError(message) {
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordError = document.getElementById('passwordError');
     passwordInput.classList.add('error');
-    generalError.classList.add('show');
+    passwordError.textContent = message;
+    passwordError.classList.add('show');
 }
 
 // Получаем элементы формы
@@ -52,12 +62,12 @@ function checkInputs() {
 // Слушаем события ввода и очищаем ошибки при вводе
 loginInput.addEventListener('input', () => {
     loginInput.classList.remove('error');
-    document.getElementById('generalError').classList.remove('show');
+    document.getElementById('loginError').classList.remove('show');
     checkInputs();
 });
 passwordInput.addEventListener('input', () => {
     passwordInput.classList.remove('error');
-    document.getElementById('generalError').classList.remove('show');
+    document.getElementById('passwordError').classList.remove('show');
     checkInputs();
 });
 
@@ -89,7 +99,11 @@ loginForm.addEventListener('submit', async (e) => {
             }
         } catch (error) {
             console.error('Ошибка:', error);
-            showAuthError();
+            if (error.message === "Неверный логин") {
+                showLoginError(error.message);
+            } else {
+                showPasswordError(error.message);
+            }
         } finally {
             loginBtn.disabled = false;
             checkInputs();

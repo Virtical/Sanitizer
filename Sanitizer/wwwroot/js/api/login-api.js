@@ -17,6 +17,7 @@ async function apiLogin(login, password) {
     if (response.ok) {
         return { token: responseText.trim(), login: login };
     } else {
-        throw new Error("Неверный логин или пароль");
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData[0].message);
     }
 }
