@@ -1,10 +1,7 @@
 #pragma warning disable OPENAI001
-using System.ClientModel;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using OpenAI.Conversations;
-using Sanitizer.Api.Controllers.Client.Response;
 using Sanitizer.Api.Controllers.Public.Client.Requests;
 using Sanitizer.Api.Controllers.Public.Client.Responses;
 using Sanitizer.Api.Services;

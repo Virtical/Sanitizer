@@ -1,5 +1,5 @@
+using Sanitizer.Api.Detectors;
 using Sanitizer.Api.Models;
-using Sanitizer.Service.Detectors;
 
 namespace Sanitizer.Api.Services;
 

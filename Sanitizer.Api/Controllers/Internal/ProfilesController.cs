@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Sanitizer.Api.Controllers.Client.Requests;
-using Sanitizer.Api.Models;
+using Sanitizer.Api.Controllers.Internal.Client.Requests;
 using Sanitizer.Api.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Sanitizer.Api.Controllers;
+namespace Sanitizer.Api.Controllers.Internal;
 
 /// <summary>CRUD для профилей санитизации (внутренний API для UI).</summary>
 [ApiController]

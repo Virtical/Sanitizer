@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Sanitizer.Service.Detectors;
+namespace Sanitizer.Api.Detectors;
 
 /// <summary>
 /// Обнаруживает номера банковских карт (PAN) с валидацией по алгоритму Luhn.

@@ -1,6 +1,4 @@
-﻿
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Sanitizer.Api.Swagger;

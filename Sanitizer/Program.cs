@@ -1,10 +1,7 @@
-using System.ClientModel;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.AI;
 using Microsoft.OpenApi.Models;
-using OpenAI;
 using Sanitizer;
 using Sanitizer.Api.Auth;
 using Sanitizer.Api.Middleware;
@@ -14,6 +11,7 @@ using Sanitizer.Api.Storage.Data;
 using Sanitizer.Api.Strategies;
 using Sanitizer.Api.Swagger;
 using Sanitizer.Components;
+using Sanitizer.TransportInfrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,25 +106,24 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
+builder.Services.AddSingleton<TokenStore>();
+builder.Services.AddSingleton<DetectorRegistry>();
+builder.Services.AddSingleton<StrategyFactory>();
+
 builder.Services.AddScoped<IProfileStorage, EfProfileStorage>();
 builder.Services.AddScoped<IApiKeyStorage, EfApiKeyStorage>();
 builder.Services.AddScoped<IChatStorage, EfChatStorage>();
 builder.Services.AddScoped<IMessageStorage, EfMessageStorage>();
 builder.Services.AddScoped<IUsersStorage, EfUsersStorage>();
-
-builder.Services.AddScoped<CurrentApiKeyContext>();
-builder.Services.AddScoped<ICurrentApiKeyContext>(sp =>
-    sp.GetRequiredService<CurrentApiKeyContext>());
-
-builder.Services.AddSingleton<TokenStore>();
 builder.Services.AddScoped<ApiKeyService>();
-builder.Services.AddSingleton<DetectorRegistry>();
-builder.Services.AddSingleton<StrategyFactory>();
-builder.Services.AddSingleton<DesanitizerService>();
 builder.Services.AddScoped<SanitizerService>();
+builder.Services.AddScoped<DesanitizerService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<ChatHistoryService>();
 builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<CurrentApiKeyContext>();
+builder.Services.AddScoped<ICurrentApiKeyContext>(sp => sp.GetRequiredService<CurrentApiKeyContext>());
+
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddHttpClient("OpenAI", client =>

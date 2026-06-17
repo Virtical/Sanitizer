@@ -1,4 +1,4 @@
-﻿using Sanitizer.Service.Detectors;
+﻿using Sanitizer.Api.Detectors;
 
 namespace Sanitizer.Test.Cases;
 

@@ -1,5 +1,5 @@
 using Sanitizer.Api.Auth;
-using Sanitizer.Api.Controllers.Client.Requests;
+using Sanitizer.Api.Controllers.Internal.Client.Requests;
 using Sanitizer.Api.Models.Chat;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Storage;

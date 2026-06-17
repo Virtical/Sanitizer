@@ -1,7 +1,7 @@
 ﻿using Microsoft.Recognizers.Text;
 using Microsoft.Recognizers.Text.Sequence;
 
-namespace Sanitizer.Service.Detectors;
+namespace Sanitizer.Api.Detectors;
 
 public class GuidDetector : IDetector
 {

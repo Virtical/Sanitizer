@@ -1,7 +1,7 @@
 ﻿using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Strategy;
 
-namespace Sanitizer.Api.Controllers.Client.Response;
+namespace Sanitizer.Api.Controllers.Internal.Client.Responses;
 
 public record ProfileResponse
 {

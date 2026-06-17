@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sanitizer;
+namespace Sanitizer.TransportInfrastructure;
 
 public record ProxyConfig
 {

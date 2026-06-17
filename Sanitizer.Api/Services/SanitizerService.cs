@@ -1,8 +1,8 @@
-using Sanitizer.Api.Controllers.Client.Response;
+using Sanitizer.Api.Controllers.Internal.Client.Responses;
+using Sanitizer.Api.Detectors;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Strategies;
-using Sanitizer.Service.Detectors;
 
 namespace Sanitizer.Api.Services;
 

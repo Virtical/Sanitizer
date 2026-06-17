@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Sanitizer.Service.Detectors;
+namespace Sanitizer.Api.Detectors;
 
 public class PhoneDetector : IDetector
 {

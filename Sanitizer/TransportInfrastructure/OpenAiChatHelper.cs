@@ -2,9 +2,8 @@
 using System.Net;
 using Microsoft.Extensions.AI;
 using OpenAI;
-using Sanitizer.TransportInfrastructure;
 
-namespace Sanitizer;
+namespace Sanitizer.TransportInfrastructure;
 
 public static class OpenAiChatHelper
 {

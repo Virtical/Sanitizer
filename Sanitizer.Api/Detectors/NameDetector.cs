@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Sanitizer.Service.Detectors;
+namespace Sanitizer.Api.Detectors;
 
 /// <summary>
 /// Обнаруживает имена людей по словарям топ-имён/фамилий для RU и EN.

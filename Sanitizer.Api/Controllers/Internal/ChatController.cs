@@ -1,15 +1,13 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.AI;
-using Sanitizer.Api.Controllers.Client.Requests;
-using Sanitizer.Api.Controllers.Client.Response;
-using Sanitizer.Api.Models;
+using Sanitizer.Api.Controllers.Internal.Client.Requests;
 using Sanitizer.Api.Models.Message;
 using Sanitizer.Api.Services;
 using Sanitizer.Api.ToolCalls;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Sanitizer.Api.Controllers;
+namespace Sanitizer.Api.Controllers.Internal;
 
 /// <summary>
 /// LLM Proxy: санитизирует входящие сообщения по профилю,

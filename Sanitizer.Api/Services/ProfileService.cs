@@ -1,6 +1,6 @@
 using Sanitizer.Api.Auth;
-using Sanitizer.Api.Controllers.Client.Requests;
-using Sanitizer.Api.Controllers.Client.Response;
+using Sanitizer.Api.Controllers.Internal.Client.Requests;
+using Sanitizer.Api.Controllers.Internal.Client.Responses;
 using Sanitizer.Api.Models;
 using Sanitizer.Api.Models.Strategy;
 using Sanitizer.Api.Storage;
